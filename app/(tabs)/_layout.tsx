@@ -53,6 +53,18 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="split"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="upload"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }
