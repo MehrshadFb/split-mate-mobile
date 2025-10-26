@@ -1,0 +1,28 @@
+{
+  "name": "splitmate-gemini-proxy",
+  "version": "1.0.0",
+  "description": "Gemini AI proxy server for SplitMate receipt scanning",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "redis": "^4.6.13",
+    "bull": "^4.12.2",
+    "axios": "^1.6.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3",
+    "jest": "^29.7.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
