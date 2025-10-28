@@ -36,7 +36,7 @@ export default function ItemsScreen() {
     price: number;
   } | null>(null);
 
-  if (!currentInvoice || currentInvoice.items.length === 0) {
+  if (!currentInvoice) {
     return (
       <SafeAreaView
         style={{ flex: 1, backgroundColor: colors.background.primary }}
@@ -74,7 +74,7 @@ export default function ItemsScreen() {
                 textAlign: "center",
               }}
             >
-              No Items Yet
+              No Invoice Found
             </Text>
             <Text
               style={{
@@ -159,46 +159,58 @@ export default function ItemsScreen() {
 
           {/* Items List */}
           <View className="mb-6">
-            {currentInvoice.items.map((item, index) => (
+            {currentInvoice.items.length === 0 ? (
               <View
-                key={index}
                 style={{
                   backgroundColor: colors.background.secondary,
                   borderRadius: 12,
-                  padding: 16,
+                  padding: 32,
+                  alignItems: "center",
                   marginBottom: 12,
                 }}
               >
-                {/* Item Header */}
-                {editingItem?.index === index ? (
-                  <View className="mb-3">
-                    <TextInput
-                      style={{
-                        backgroundColor: colors.background.primary,
-                        borderWidth: 1,
-                        borderColor: colors.border,
-                        borderRadius: 8,
-                        paddingHorizontal: 12,
-                        paddingVertical: 8,
-                        color: colors.text.primary,
-                        marginBottom: 8,
-                      }}
-                      value={editingItem.name}
-                      onChangeText={(text) =>
-                        setEditingItem({ ...editingItem, name: text })
-                      }
-                      placeholder="Item name"
-                      placeholderTextColor={colors.text.tertiary}
-                    />
-                    <View className="flex-row items-center">
-                      <Text
-                        style={{ color: colors.text.primary, marginRight: 8 }}
-                      >
-                        $
-                      </Text>
+                <Ionicons
+                  name="receipt-outline"
+                  size={48}
+                  color={colors.text.tertiary}
+                />
+                <Text
+                  style={{
+                    color: colors.text.primary,
+                    fontSize: 18,
+                    fontWeight: "600",
+                    marginTop: 12,
+                    textAlign: "center",
+                  }}
+                >
+                  No Items Yet
+                </Text>
+                <Text
+                  style={{
+                    color: colors.text.secondary,
+                    textAlign: "center",
+                    marginTop: 8,
+                  }}
+                >
+                  Add items manually using the button below
+                </Text>
+              </View>
+            ) : (
+              currentInvoice.items.map((item, index) => (
+                <View
+                  key={index}
+                  style={{
+                    backgroundColor: colors.background.secondary,
+                    borderRadius: 12,
+                    padding: 16,
+                    marginBottom: 12,
+                  }}
+                >
+                  {/* Item Header */}
+                  {editingItem?.index === index ? (
+                    <View className="mb-3">
                       <TextInput
                         style={{
-                          flex: 1,
                           backgroundColor: colors.background.primary,
                           borderWidth: 1,
                           borderColor: colors.border,
@@ -206,171 +218,201 @@ export default function ItemsScreen() {
                           paddingHorizontal: 12,
                           paddingVertical: 8,
                           color: colors.text.primary,
+                          marginBottom: 8,
                         }}
-                        value={editingItem.price.toString()}
+                        value={editingItem.name}
                         onChangeText={(text) =>
-                          setEditingItem({
-                            ...editingItem,
-                            price: parseFloat(text) || 0,
-                          })
+                          setEditingItem({ ...editingItem, name: text })
                         }
-                        keyboardType="decimal-pad"
-                        placeholder="0.00"
+                        placeholder="Item name"
                         placeholderTextColor={colors.text.tertiary}
                       />
-                    </View>
-                    <View className="flex-row mt-2">
-                      <TouchableOpacity
-                        onPress={handleSaveEdit}
-                        style={{
-                          flex: 1,
-                          backgroundColor: colors.accent.primary,
-                          paddingVertical: 8,
-                          borderRadius: 8,
-                          marginRight: 8,
-                        }}
-                      >
+                      <View className="flex-row items-center">
                         <Text
+                          style={{ color: colors.text.primary, marginRight: 8 }}
+                        >
+                          $
+                        </Text>
+                        <TextInput
                           style={{
-                            color: colors.text.inverse,
-                            textAlign: "center",
-                            fontWeight: "600",
+                            flex: 1,
+                            backgroundColor: colors.background.primary,
+                            borderWidth: 1,
+                            borderColor: colors.border,
+                            borderRadius: 8,
+                            paddingHorizontal: 12,
+                            paddingVertical: 8,
+                            color: colors.text.primary,
+                          }}
+                          value={editingItem.price.toString()}
+                          onChangeText={(text) =>
+                            setEditingItem({
+                              ...editingItem,
+                              price: parseFloat(text) || 0,
+                            })
+                          }
+                          keyboardType="decimal-pad"
+                          placeholder="0.00"
+                          placeholderTextColor={colors.text.tertiary}
+                        />
+                      </View>
+                      <View className="flex-row mt-2">
+                        <TouchableOpacity
+                          onPress={handleSaveEdit}
+                          style={{
+                            flex: 1,
+                            backgroundColor: colors.accent.primary,
+                            paddingVertical: 8,
+                            borderRadius: 8,
+                            marginRight: 8,
                           }}
                         >
-                          Save
-                        </Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        onPress={() => setEditingItem(null)}
-                        style={{
-                          flex: 1,
-                          backgroundColor: colors.neutral[300],
-                          paddingVertical: 8,
-                          borderRadius: 8,
-                        }}
-                      >
+                          <Text
+                            style={{
+                              color: colors.text.inverse,
+                              textAlign: "center",
+                              fontWeight: "600",
+                            }}
+                          >
+                            Save
+                          </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() => setEditingItem(null)}
+                          style={{
+                            flex: 1,
+                            backgroundColor: colors.neutral[300],
+                            paddingVertical: 8,
+                            borderRadius: 8,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              color: colors.text.primary,
+                              textAlign: "center",
+                              fontWeight: "600",
+                            }}
+                          >
+                            Cancel
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  ) : (
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        marginBottom: 12,
+                      }}
+                    >
+                      <View className="flex-1">
                         <Text
                           style={{
                             color: colors.text.primary,
-                            textAlign: "center",
                             fontWeight: "600",
+                            fontSize: 16,
                           }}
                         >
-                          Cancel
+                          {item.name}
                         </Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                ) : (
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      marginBottom: 12,
-                    }}
-                  >
-                    <View className="flex-1">
-                      <Text
-                        style={{
-                          color: colors.text.primary,
-                          fontWeight: "600",
-                          fontSize: 16,
-                        }}
-                      >
-                        {item.name}
-                      </Text>
-                      <Text
-                        style={{
-                          color: colors.accent.primary,
-                          fontWeight: "bold",
-                          fontSize: 18,
-                        }}
-                      >
-                        ${item.price.toFixed(2)}
-                      </Text>
-                    </View>
-                    <View className="flex-row">
-                      <TouchableOpacity
-                        onPress={() =>
-                          setEditingItem({
-                            index,
-                            name: item.name,
-                            price: item.price,
-                          })
-                        }
-                        className="p-2 mr-1"
-                      >
-                        <Ionicons
-                          name="pencil"
-                          size={20}
-                          color={colors.accent.primary}
-                        />
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        onPress={() => {
-                          Alert.alert(
-                            "Delete Item",
-                            "Are you sure you want to delete this item?",
-                            [
-                              { text: "Cancel", style: "cancel" },
-                              {
-                                text: "Delete",
-                                style: "destructive",
-                                onPress: () => deleteItem(index),
-                              },
-                            ]
-                          );
-                        }}
-                        className="p-2"
-                      >
-                        <Ionicons name="trash" size={20} color={colors.error} />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                )}
-
-                {/* People Pills */}
-                <View className="flex-row flex-wrap">
-                  {people.map((person) => {
-                    const isSelected = item.splitBetween.includes(person);
-                    return (
-                      <TouchableOpacity
-                        key={person}
-                        onPress={() => togglePersonForItem(index, person)}
-                        style={{
-                          paddingHorizontal: 16,
-                          paddingVertical: 8,
-                          borderRadius: 20,
-                          marginRight: 8,
-                          marginBottom: 8,
-                          backgroundColor: isSelected
-                            ? colors.accent.primary
-                            : colors.neutral[200],
-                        }}
-                        activeOpacity={0.7}
-                      >
                         <Text
                           style={{
-                            fontWeight: "500",
-                            color: isSelected
-                              ? colors.text.inverse
-                              : colors.text.secondary,
+                            color: colors.accent.primary,
+                            fontWeight: "bold",
+                            fontSize: 18,
                           }}
                         >
-                          {person}{" "}
-                          {isSelected ? (
-                            <Ionicons name="checkmark" size={14} />
-                          ) : (
-                            <Ionicons name="add" size={14} />
-                          )}
+                          ${item.price.toFixed(2)}
                         </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
+                      </View>
+                      <View className="flex-row">
+                        <TouchableOpacity
+                          onPress={() =>
+                            setEditingItem({
+                              index,
+                              name: item.name,
+                              price: item.price,
+                            })
+                          }
+                          className="p-2 mr-1"
+                        >
+                          <Ionicons
+                            name="pencil"
+                            size={20}
+                            color={colors.accent.primary}
+                          />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() => {
+                            Alert.alert(
+                              "Delete Item",
+                              "Are you sure you want to delete this item?",
+                              [
+                                { text: "Cancel", style: "cancel" },
+                                {
+                                  text: "Delete",
+                                  style: "destructive",
+                                  onPress: () => deleteItem(index),
+                                },
+                              ]
+                            );
+                          }}
+                          className="p-2"
+                        >
+                          <Ionicons
+                            name="trash"
+                            size={20}
+                            color={colors.accent.primary}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  )}
+
+                  {/* People Pills */}
+                  <View className="flex-row flex-wrap">
+                    {people.map((person) => {
+                      const isSelected = item.splitBetween.includes(person);
+                      return (
+                        <TouchableOpacity
+                          key={person}
+                          onPress={() => togglePersonForItem(index, person)}
+                          style={{
+                            paddingHorizontal: 16,
+                            paddingVertical: 8,
+                            borderRadius: 20,
+                            marginRight: 8,
+                            marginBottom: 8,
+                            backgroundColor: isSelected
+                              ? colors.accent.primary
+                              : colors.neutral[200],
+                          }}
+                          activeOpacity={0.7}
+                        >
+                          <Text
+                            style={{
+                              fontWeight: "500",
+                              color: isSelected
+                                ? colors.text.inverse
+                                : colors.text.secondary,
+                            }}
+                          >
+                            {person}{" "}
+                            {isSelected ? (
+                              <Ionicons name="checkmark" size={14} />
+                            ) : (
+                              <Ionicons name="add" size={14} />
+                            )}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
                 </View>
-              </View>
-            ))}
+              ))
+            )}
           </View>
 
           {/* Add Item Button */}

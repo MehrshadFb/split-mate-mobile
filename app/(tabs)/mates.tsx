@@ -24,8 +24,18 @@ export default function MatesScreen() {
   const [newPersonName, setNewPersonName] = useState("");
 
   const handleAddPerson = () => {
-    if (newPersonName.trim()) {
-      addPerson(newPersonName.trim());
+    const trimmedName = newPersonName.trim();
+    if (trimmedName) {
+      const nameExists = people.some(
+        (person) => person.toLowerCase() === trimmedName.toLowerCase()
+      );
+
+      if (nameExists) {
+        alert("This person has already been added!");
+        return;
+      }
+
+      addPerson(trimmedName);
       setNewPersonName("");
     }
   };
@@ -223,18 +233,6 @@ export default function MatesScreen() {
               fullWidth
               disabled={people.length < 2}
             />
-            {people.length < 2 && (
-              <Text
-                style={{
-                  fontSize: 14,
-                  color: colors.text.tertiary,
-                  textAlign: "center",
-                  marginTop: 8,
-                }}
-              >
-                Add at least 2 people to continue
-              </Text>
-            )}
           </View>
         </View>
       </KeyboardAvoidingView>
