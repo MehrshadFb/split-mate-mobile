@@ -21,6 +21,7 @@ export interface Invoice {
   createdAt: string;
   updatedAt: string;
   totalAmount: number;
+  savedAt?: string;
 }
 
 export interface ParsedReceiptData {

@@ -1,12 +1,11 @@
-// app/(tabs)/mates.tsx
-// People setup screen - who's splitting the bill
-
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  FlatList,
+  Alert,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
@@ -17,35 +16,45 @@ import { Button } from "../../src/components/Button";
 import { useTheme } from "../../src/contexts/ThemeContext";
 import { useInvoiceStore } from "../../src/stores/invoiceStore";
 
+const MIN_MATES_REQUIRED = 2;
+
 export default function MatesScreen() {
   const router = useRouter();
   const { colors } = useTheme();
-  const { people, addPerson, removePerson } = useInvoiceStore();
+  const { people, addPerson, removePerson, setEditingSavedInvoice } =
+    useInvoiceStore();
   const [newPersonName, setNewPersonName] = useState("");
 
   const handleAddPerson = () => {
     const trimmedName = newPersonName.trim();
-    if (trimmedName) {
-      const nameExists = people.some(
-        (person) => person.toLowerCase() === trimmedName.toLowerCase()
-      );
-
-      if (nameExists) {
-        alert("This person has already been added!");
-        return;
-      }
-
-      addPerson(trimmedName);
-      setNewPersonName("");
+    if (!trimmedName) {
+      return;
     }
+
+    const nameExists = people.some(
+      (mate) => mate.toLowerCase() === trimmedName.toLowerCase()
+    );
+
+    if (nameExists) {
+      Alert.alert("Duplicate name", "This mate is already on the list.");
+      return;
+    }
+
+    addPerson(trimmedName);
+    setNewPersonName("");
   };
 
   const handleContinue = () => {
-    if (people.length < 2) {
-      alert("Please add at least 2 mates to split the bill.");
+    if (people.length < MIN_MATES_REQUIRED) {
+      Alert.alert(
+        "Add more mates",
+        `Add at least ${MIN_MATES_REQUIRED} mates before continuing.`
+      );
       return;
     }
-    router.push("/(tabs)/list");
+
+    setEditingSavedInvoice(false);
+    router.push("/(tabs)/upload");
   };
 
   return (
@@ -53,29 +62,30 @@ export default function MatesScreen() {
       style={{ flex: 1, backgroundColor: colors.background.primary }}
     >
       <KeyboardAvoidingView
+        style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        className="flex-1"
       >
-        <View className="flex-1 p-6">
-          {/* Header */}
-          <View className="mb-8">
+        <ScrollView
+          contentContainerStyle={{ padding: 24, paddingBottom: 120 }}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={{ marginBottom: 24 }}>
             <Text
               style={{
                 fontSize: 36,
                 fontWeight: "bold",
                 color: colors.text.primary,
-                marginBottom: 8,
+                marginBottom: 12,
               }}
             >
               Who's Splitting?
             </Text>
             <Text style={{ fontSize: 18, color: colors.text.secondary }}>
-              Add the names of everyone sharing this bill
+              Add everyone who’s sharing this bill.
             </Text>
           </View>
 
-          {/* Input */}
-          <View className="flex-row mb-6">
+          <View style={{ flexDirection: "row", marginBottom: 20 }}>
             <TextInput
               style={{
                 flex: 1,
@@ -120,9 +130,8 @@ export default function MatesScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* People List */}
-          {people.length > 0 && (
-            <View className="flex-1 mb-6">
+          {people.length > 0 ? (
+            <View style={{ marginBottom: 32 }}>
               <Text
                 style={{
                   fontSize: 18,
@@ -133,108 +142,117 @@ export default function MatesScreen() {
               >
                 People ({people.length})
               </Text>
-              <FlatList
-                data={people}
-                keyExtractor={(item, index) => `${item}-${index}`}
-                renderItem={({ item, index }) => (
+              {people.map((person) => (
+                <View
+                  key={person}
+                  style={{
+                    backgroundColor: colors.background.secondary,
+                    borderRadius: 12,
+                    padding: 16,
+                    marginBottom: 10,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
                   <View
                     style={{
-                      backgroundColor: colors.background.secondary,
-                      borderRadius: 12,
-                      padding: 16,
-                      marginBottom: 8,
                       flexDirection: "row",
                       alignItems: "center",
-                      justifyContent: "space-between",
+                      flex: 1,
                     }}
                   >
                     <View
                       style={{
-                        flexDirection: "row",
+                        width: 40,
+                        height: 40,
+                        backgroundColor: colors.accent.light,
+                        borderRadius: 20,
                         alignItems: "center",
-                        flex: 1,
+                        justifyContent: "center",
+                        marginRight: 12,
                       }}
                     >
-                      <View
-                        style={{
-                          width: 40,
-                          height: 40,
-                          backgroundColor: colors.accent.light,
-                          borderRadius: 20,
-                          alignItems: "center",
-                          justifyContent: "center",
-                          marginRight: 12,
-                        }}
-                      >
-                        <Text
-                          style={{
-                            color: colors.accent.primary,
-                            fontWeight: "bold",
-                          }}
-                        >
-                          {item.charAt(0).toUpperCase()}
-                        </Text>
-                      </View>
                       <Text
                         style={{
-                          color: colors.text.primary,
-                          fontWeight: "500",
-                          fontSize: 16,
-                        }}
-                      >
-                        {item}
-                      </Text>
-                    </View>
-                    <TouchableOpacity
-                      onPress={() => removePerson(item)}
-                      className="p-2"
-                      activeOpacity={0.7}
-                    >
-                      <Text
-                        style={{
-                          color: colors.error,
-                          fontSize: 20,
+                          color: colors.accent.primary,
                           fontWeight: "bold",
                         }}
                       >
-                        ×
+                        {person.charAt(0).toUpperCase()}
                       </Text>
-                    </TouchableOpacity>
+                    </View>
+                    <Text
+                      style={{
+                        color: colors.text.primary,
+                        fontWeight: "500",
+                        fontSize: 16,
+                      }}
+                    >
+                      {person}
+                    </Text>
                   </View>
-                )}
-                showsVerticalScrollIndicator={false}
-              />
+                  <TouchableOpacity
+                    onPress={() => removePerson(person)}
+                    activeOpacity={0.7}
+                  >
+                    <Ionicons name="close" size={20} color={colors.error} />
+                  </TouchableOpacity>
+                </View>
+              ))}
             </View>
-          )}
-
-          {/* Empty State */}
-          {people.length === 0 && (
-            <View className="flex-1 items-center justify-center">
+          ) : (
+            <View
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: colors.background.secondary,
+                borderRadius: 16,
+                padding: 28,
+                borderWidth: 1,
+                borderColor: colors.border,
+                marginBottom: 32,
+              }}
+            >
+              <Ionicons
+                name="people-outline"
+                size={36}
+                color={colors.text.tertiary}
+              />
               <Text
                 style={{
-                  color: colors.text.tertiary,
+                  color: colors.text.primary,
+                  fontWeight: "600",
+                  fontSize: 18,
+                  marginTop: 12,
                   textAlign: "center",
-                  fontSize: 16,
                 }}
               >
-                No people added yet.{"\n"}
-                Add at least 2 people to continue.
+                Add at least two mates
+              </Text>
+              <Text
+                style={{
+                  color: colors.text.secondary,
+                  marginTop: 6,
+                  textAlign: "center",
+                }}
+              >
+                You’ll head to upload after everyone is listed.
               </Text>
             </View>
           )}
 
-          {/* Continue Button */}
-          <View className="pt-4">
+          <View style={{ paddingTop: 12 }}>
             <Button
               title="Continue"
               onPress={handleContinue}
               variant="primary"
               size="large"
               fullWidth
-              disabled={people.length < 2}
+              disabled={people.length < MIN_MATES_REQUIRED}
             />
           </View>
-        </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

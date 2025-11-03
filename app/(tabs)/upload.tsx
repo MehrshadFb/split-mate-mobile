@@ -17,6 +17,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Button } from "../../src/components/Button";
 import { ErrorBanner } from "../../src/components/ErrorBanner";
 import { ProgressBar } from "../../src/components/ProgressBar";
+import { useTheme } from "../../src/contexts/ThemeContext";
 import { useUpload } from "../../src/hooks/useUpload";
 import { useInvoiceStore } from "../../src/stores/invoiceStore";
 
@@ -30,9 +31,11 @@ const ALLOWED_TYPES = [
 
 export default function UploadScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
   const { queue, addToQueue, processAllReceipts, cancelUpload, retryUpload } =
     useUpload();
-  const { people, addItem, clearInvoice } = useInvoiceStore();
+  const { people, addItem, clearInvoice, setEditingSavedInvoice } =
+    useInvoiceStore();
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
 
   // Watch for all scans to complete and navigate
@@ -53,6 +56,7 @@ export default function UploadScreen() {
 
       // Clear existing invoice items before adding new ones
       clearInvoice();
+      setEditingSavedInvoice(false);
 
       // Add all items from all receipts
       scannedJobs.forEach((job) => {
@@ -69,10 +73,10 @@ export default function UploadScreen() {
 
       // Navigate to items assignment screen (not a tab)
       setTimeout(() => {
-        router.push("/items");
+        router.push({ pathname: "/(tabs)/list/items" });
       }, 500);
     }
-  }, [queue]);
+  }, [queue, clearInvoice, addItem, router, setEditingSavedInvoice]);
 
   // Check if mates are added
   if (people.length < 2) {
@@ -198,13 +202,14 @@ export default function UploadScreen() {
   const handleManualEntry = () => {
     // Clear existing items and add a default empty item
     clearInvoice();
+    setEditingSavedInvoice(false);
     addItem({
       name: "Enter Item Name",
       price: 0,
       splitBetween: [],
     });
     // Navigate to items assignment screen
-    router.push("/items");
+    router.push({ pathname: "/(tabs)/list/items" });
   };
 
   const queuedReceipts = queue.filter((job) => job.status === "queued");
@@ -223,6 +228,17 @@ export default function UploadScreen() {
     <SafeAreaView className="flex-1 bg-background-primary">
       <ScrollView className="flex-1">
         <View className="p-6">
+          <TouchableOpacity
+            onPress={() => router.push("/(tabs)/mates")}
+            className="flex-row items-center mb-6"
+            activeOpacity={0.7}
+          >
+            <Ionicons name="arrow-back" size={24} color={colors.text.primary} />
+            <Text className="text-text-primary text-lg font-semibold ml-2">
+              Back to Mates
+            </Text>
+          </TouchableOpacity>
+
           {/* Header */}
           <View className="mb-8">
             <Text className="text-4xl font-bold text-text-primary mb-2">

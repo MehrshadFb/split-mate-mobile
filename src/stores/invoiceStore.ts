@@ -1,12 +1,16 @@
 // src/stores/invoiceStore.ts
 // Zustand store for invoice state management
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { Invoice, Item, Person } from "../types/invoice";
 
 interface InvoiceState {
   currentInvoice: Invoice | null;
   people: string[];
+  savedInvoices: Invoice[];
+  editingSavedInvoice: boolean;
+  hasUnsavedChanges: boolean;
 
   // Actions
   setInvoice: (invoice: Invoice) => void;
@@ -19,13 +23,24 @@ interface InvoiceState {
   togglePersonForItem: (itemIndex: number, personName: string) => void;
   calculateTotals: () => void;
   clearInvoice: () => void;
+  resetSession: () => void;
+  loadSavedInvoices: () => Promise<void>;
+  saveCurrentInvoice: () => Promise<Invoice | null>;
+  setEditingSavedInvoice: (value: boolean) => void;
+  setHasUnsavedChanges: (value: boolean) => void;
 }
+
+const SAVED_INVOICES_KEY = "@splitmate:saved_invoices";
 
 export const useInvoiceStore = create<InvoiceState>((set, get) => ({
   currentInvoice: null,
   people: [],
+  savedInvoices: [],
+  editingSavedInvoice: false,
+  hasUnsavedChanges: false,
 
-  setInvoice: (invoice) => set({ currentInvoice: invoice }),
+  setInvoice: (invoice) =>
+    set({ currentInvoice: invoice, hasUnsavedChanges: false }),
 
   addPerson: (name) => {
     const trimmedName = name.trim();
@@ -33,12 +48,14 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
 
     set((state) => ({
       people: [...state.people, trimmedName],
+      hasUnsavedChanges: true,
     }));
   },
 
   removePerson: (name) => {
     set((state) => ({
       people: state.people.filter((p) => p !== name),
+      hasUnsavedChanges: true,
     }));
   },
 
@@ -56,6 +73,7 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
           ...state.currentInvoice,
           items: newItems,
         },
+        hasUnsavedChanges: true,
       };
     });
     get().calculateTotals();
@@ -82,6 +100,7 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
           ...state.currentInvoice,
           items: [...state.currentInvoice.items, item],
         },
+        hasUnsavedChanges: true,
       };
     });
     get().calculateTotals();
@@ -98,6 +117,7 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
           ...state.currentInvoice,
           items: newItems,
         },
+        hasUnsavedChanges: true,
       };
     });
     get().calculateTotals();
@@ -121,6 +141,7 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
           ...state.currentInvoice,
           items: newItems,
         },
+        hasUnsavedChanges: true,
       };
     });
     get().calculateTotals();
@@ -162,5 +183,79 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
     });
   },
 
-  clearInvoice: () => set({ currentInvoice: null }),
+  clearInvoice: () => set({ currentInvoice: null, hasUnsavedChanges: false }),
+
+  resetSession: () =>
+    set({
+      currentInvoice: null,
+      people: [],
+      editingSavedInvoice: false,
+      hasUnsavedChanges: false,
+    }),
+
+  loadSavedInvoices: async () => {
+    try {
+      const json = await AsyncStorage.getItem(SAVED_INVOICES_KEY);
+      const invoices: Invoice[] = json ? JSON.parse(json) : [];
+      set({ savedInvoices: invoices });
+    } catch (error) {
+      console.error("Failed to load saved invoices:", error);
+    }
+  },
+
+  saveCurrentInvoice: async () => {
+    const state = get();
+    if (!state.currentInvoice) {
+      return null;
+    }
+
+    // Recalculate totals to ensure saved data is up to date
+    state.calculateTotals();
+    const { currentInvoice, savedInvoices } = get();
+    if (!currentInvoice) {
+      return null;
+    }
+
+    const now = new Date().toISOString();
+    const invoiceId = currentInvoice.id || `invoice-${Date.now()}`;
+
+    const invoiceToSave: Invoice = {
+      ...currentInvoice,
+      id: invoiceId,
+      items: currentInvoice.items.map((item) => ({
+        ...item,
+        splitBetween: [...item.splitBetween],
+      })),
+      totals: currentInvoice.totals.map((person) => ({ ...person })),
+      people: [...currentInvoice.people],
+      updatedAt: now,
+      savedAt: now,
+    };
+
+    const filtered = savedInvoices.filter(
+      (invoice) => invoice.id !== invoiceId
+    );
+    const updatedInvoices = [invoiceToSave, ...filtered];
+
+    try {
+      await AsyncStorage.setItem(
+        SAVED_INVOICES_KEY,
+        JSON.stringify(updatedInvoices)
+      );
+      set({
+        savedInvoices: updatedInvoices,
+        currentInvoice: {
+          ...currentInvoice,
+          updatedAt: now,
+        },
+        hasUnsavedChanges: false,
+      });
+      return invoiceToSave;
+    } catch (error) {
+      console.error("Failed to save invoice:", error);
+      throw error;
+    }
+  },
+  setEditingSavedInvoice: (value) => set({ editingSavedInvoice: value }),
+  setHasUnsavedChanges: (value) => set({ hasUnsavedChanges: value }),
 }));
