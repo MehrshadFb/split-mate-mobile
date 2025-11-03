@@ -16,7 +16,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Button } from "../src/components/Button";
 import { useTheme } from "../src/contexts/ThemeContext";
 import { useInvoiceStore } from "../src/stores/invoiceStore";
-import { Item } from "../src/types/invoice";
+import { Invoice, Item } from "../src/types/invoice";
 
 export default function AssignItemsScreen() {
   const router = useRouter();
@@ -38,6 +38,8 @@ export default function AssignItemsScreen() {
     loadSavedInvoices,
     setPeople,
     deleteSavedInvoice,
+    setInvoice,
+    calculateTotals,
   } = useInvoiceStore();
 
   const allowNavigationRef = useRef(false);
@@ -47,10 +49,6 @@ export default function AssignItemsScreen() {
     clearInvoice();
     setPeople([]);
   }, [setEditingSavedInvoice, clearInvoice, setPeople]);
-
-  const resetNewSession = useCallback(() => {
-    resetSession();
-  }, [resetSession]);
 
   const [editingItem, setEditingItem] = useState<{
     index: number;
@@ -66,13 +64,13 @@ export default function AssignItemsScreen() {
       if (resetType === "existing") {
         clearExistingSession();
       } else {
-        resetNewSession();
+        resetSession();
       }
 
       allowNavigationRef.current = true;
       router.replace("/(tabs)/receipts");
     },
-    [loadSavedInvoices, clearExistingSession, resetNewSession, router]
+    [loadSavedInvoices, clearExistingSession, resetSession, router]
   );
 
   const handleSaveInvoice = useCallback(async () => {
@@ -154,73 +152,41 @@ export default function AssignItemsScreen() {
     handleSaveInvoice,
   ]);
 
-  if (!currentInvoice) {
-    return (
-      <SafeAreaView
-        style={{ flex: 1, backgroundColor: colors.background.primary }}
-      >
-        <View className="p-6">
-          <TouchableOpacity
-            onPress={() => {
-              clearExistingSession();
-              router.replace("/(tabs)/mates");
-            }}
-            className="flex-row items-center mb-6"
-            activeOpacity={0.7}
-          >
-            <Ionicons name="arrow-back" size={24} color={colors.text.primary} />
-            <Text
-              style={{
-                color: colors.text.primary,
-                fontSize: 18,
-                marginLeft: 8,
-              }}
-            >
-              Back
-            </Text>
-          </TouchableOpacity>
+  // Initialize empty invoice if none exists (for manual entry)
+  useEffect(() => {
+    if (!currentInvoice && people.length > 0) {
+      const emptyInvoice: Invoice = {
+        id: `invoice-${Date.now()}`,
+        items: [],
+        people: people,
+        totals: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        totalAmount: 0,
+      };
+      setInvoice(emptyInvoice);
+    }
+  }, [currentInvoice, people, setInvoice]);
 
-          <View className="flex-1 items-center justify-center">
-            <Ionicons
-              name="receipt-outline"
-              size={64}
-              color={colors.text.tertiary}
-            />
-            <Text
-              style={{
-                color: colors.text.primary,
-                fontSize: 20,
-                fontWeight: "600",
-                marginTop: 16,
-                textAlign: "center",
-              }}
-            >
-              No Invoice Found
-            </Text>
-            <Text
-              style={{
-                color: colors.text.secondary,
-                textAlign: "center",
-                marginTop: 8,
-                marginBottom: 24,
-              }}
-            >
-              Go back and upload receipts to get started
-            </Text>
-          </View>
-        </View>
-      </SafeAreaView>
-    );
+  // Calculate totals whenever items change
+  useEffect(() => {
+    if (currentInvoice?.items.length) {
+      calculateTotals();
+    }
+  }, [currentInvoice?.items, calculateTotals]);
+
+  if (!currentInvoice) {
+    return null;
   }
 
   const handleSaveEdit = () => {
-    if (editingItem) {
-      updateItem(editingItem.index, {
-        name: editingItem.name,
-        price: editingItem.price,
-      });
-      setEditingItem(null);
-    }
+    if (!editingItem) return;
+
+    updateItem(editingItem.index, {
+      name: editingItem.name,
+      price: editingItem.price,
+    });
+    setEditingItem(null);
   };
 
   const handleAddItem = () => {
@@ -232,9 +198,10 @@ export default function AssignItemsScreen() {
     addItem(newItem);
   };
 
-  const calculateTotalAmount = () => {
-    return currentInvoice.items.reduce((sum, item) => sum + item.price, 0);
-  };
+  const totalAmount = currentInvoice.items.reduce(
+    (sum, item) => sum + item.price,
+    0
+  );
 
   const handleBack = () => {
     if (editingSavedInvoice) {
@@ -265,7 +232,7 @@ export default function AssignItemsScreen() {
     }
   };
 
-  const handleDeleteReceipt = () => {
+  const handleDeleteReceipt = async () => {
     if (!currentInvoice?.id) return;
 
     Alert.alert(
@@ -291,10 +258,6 @@ export default function AssignItemsScreen() {
       ]
     );
   };
-
-  const saveButtonLabel = editingSavedInvoice
-    ? "Update Receipt"
-    : "Save Receipt";
 
   return (
     <SafeAreaView
@@ -736,146 +699,168 @@ export default function AssignItemsScreen() {
           />
 
           {/* Split Summary */}
-          {currentInvoice.totals && currentInvoice.totals.length > 0 && (
-            <View style={{ marginTop: 32 }}>
-              <View
-                style={{
-                  backgroundColor: colors.background.secondary,
-                  borderRadius: 20,
-                  padding: 24,
-                  borderWidth: 1,
-                  borderColor: colors.border,
-                  shadowColor: "#000000",
-                  shadowOpacity: 0.06,
-                  shadowRadius: 14,
-                  shadowOffset: { width: 0, height: 6 },
-                  elevation: 3,
-                }}
-              >
+          {currentInvoice.items.length > 0 &&
+            currentInvoice.totals?.length > 0 && (
+              <View style={{ marginTop: 32 }}>
                 <View
                   style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    marginBottom: 20,
+                    backgroundColor: colors.background.secondary,
+                    borderRadius: 20,
+                    padding: 24,
+                    borderWidth: 1,
+                    borderColor: colors.border,
+                    shadowColor: "#000000",
+                    shadowOpacity: 0.06,
+                    shadowRadius: 14,
+                    shadowOffset: { width: 0, height: 6 },
+                    elevation: 3,
                   }}
                 >
                   <View
                     style={{
-                      width: 48,
-                      height: 48,
-                      borderRadius: 16,
-                      backgroundColor: colors.accent.light,
+                      flexDirection: "row",
                       alignItems: "center",
-                      justifyContent: "center",
-                      marginRight: 12,
+                      marginBottom: 20,
                     }}
                   >
-                    <Ionicons
-                      name="pie-chart-outline"
-                      size={24}
-                      color={colors.accent.primary}
-                    />
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text
+                    <View
                       style={{
-                        color: colors.text.primary,
-                        fontWeight: "700",
-                        fontSize: 24,
+                        width: 48,
+                        height: 48,
+                        borderRadius: 16,
+                        backgroundColor: colors.accent.light,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        marginRight: 12,
                       }}
                     >
-                      Split Summary
-                    </Text>
+                      <Ionicons
+                        name="pie-chart-outline"
+                        size={24}
+                        color={colors.accent.primary}
+                      />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text
+                        style={{
+                          color: colors.text.primary,
+                          fontWeight: "700",
+                          fontSize: 24,
+                        }}
+                      >
+                        Split Summary
+                      </Text>
+                      <Text
+                        style={{
+                          color: colors.text.secondary,
+                          marginTop: 4,
+                        }}
+                      >
+                        Review the breakdown before you save this receipt.
+                      </Text>
+                    </View>
+                  </View>
+
+                  <View
+                    style={{
+                      backgroundColor: colors.accent.primary,
+                      borderRadius: 18,
+                      padding: 20,
+                      marginBottom: 20,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <View>
+                      <Text
+                        style={{
+                          color: colors.text.inverse,
+                          opacity: 0.8,
+                          fontSize: 14,
+                          fontWeight: "600",
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        Receipt Total
+                      </Text>
+                      <Text
+                        style={{
+                          color: colors.text.inverse,
+                          fontWeight: "800",
+                          fontSize: 32,
+                          marginTop: 4,
+                        }}
+                      >
+                        ${totalAmount.toFixed(2)}
+                      </Text>
+                    </View>
+                    <Ionicons
+                      name="wallet-outline"
+                      size={32}
+                      color={colors.text.inverse}
+                    />
+                  </View>
+
+                  <View style={{ marginBottom: 12 }}>
                     <Text
                       style={{
                         color: colors.text.secondary,
-                        marginTop: 4,
-                      }}
-                    >
-                      Review the breakdown before you save this receipt.
-                    </Text>
-                  </View>
-                </View>
-
-                <View
-                  style={{
-                    backgroundColor: colors.accent.primary,
-                    borderRadius: 18,
-                    padding: 20,
-                    marginBottom: 20,
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <View>
-                    <Text
-                      style={{
-                        color: colors.text.inverse,
-                        opacity: 0.8,
                         fontSize: 14,
                         fontWeight: "600",
+                        marginBottom: 12,
                         textTransform: "uppercase",
                       }}
                     >
-                      Receipt Total
+                      How much each person owes
                     </Text>
-                    <Text
-                      style={{
-                        color: colors.text.inverse,
-                        fontWeight: "800",
-                        fontSize: 32,
-                        marginTop: 4,
-                      }}
-                    >
-                      ${calculateTotalAmount().toFixed(2)}
-                    </Text>
-                  </View>
-                  <Ionicons
-                    name="wallet-outline"
-                    size={32}
-                    color={colors.text.inverse}
-                  />
-                </View>
-
-                <View style={{ marginBottom: 12 }}>
-                  <Text
-                    style={{
-                      color: colors.text.secondary,
-                      fontSize: 14,
-                      fontWeight: "600",
-                      marginBottom: 12,
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    How much each person owes
-                  </Text>
-                  {currentInvoice.totals.map((person) => {
-                    return (
-                      <View
-                        key={person.name}
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          backgroundColor: colors.background.primary,
-                          borderRadius: 16,
-                          padding: 16,
-                          marginBottom: 12,
-                          borderWidth: 1,
-                          borderColor: colors.border,
-                        }}
-                      >
+                    {currentInvoice.totals.map((person) => {
+                      return (
                         <View
+                          key={person.name}
                           style={{
-                            width: 44,
-                            height: 44,
-                            borderRadius: 12,
-                            backgroundColor: colors.accent.light,
+                            flexDirection: "row",
                             alignItems: "center",
-                            justifyContent: "center",
-                            marginRight: 12,
+                            backgroundColor: colors.background.primary,
+                            borderRadius: 16,
+                            padding: 16,
+                            marginBottom: 12,
+                            borderWidth: 1,
+                            borderColor: colors.border,
                           }}
                         >
+                          <View
+                            style={{
+                              width: 44,
+                              height: 44,
+                              borderRadius: 12,
+                              backgroundColor: colors.accent.light,
+                              alignItems: "center",
+                              justifyContent: "center",
+                              marginRight: 12,
+                            }}
+                          >
+                            <Text
+                              style={{
+                                color: colors.accent.primary,
+                                fontWeight: "700",
+                                fontSize: 18,
+                              }}
+                            >
+                              {person.name.charAt(0).toUpperCase()}
+                            </Text>
+                          </View>
+                          <View style={{ flex: 1 }}>
+                            <Text
+                              style={{
+                                color: colors.text.primary,
+                                fontWeight: "700",
+                                fontSize: 16,
+                              }}
+                            >
+                              {person.name}
+                            </Text>
+                          </View>
                           <Text
                             style={{
                               color: colors.accent.primary,
@@ -883,53 +868,34 @@ export default function AssignItemsScreen() {
                               fontSize: 18,
                             }}
                           >
-                            {person.name.charAt(0).toUpperCase()}
+                            ${person.total.toFixed(2)}
                           </Text>
                         </View>
-                        <View style={{ flex: 1 }}>
-                          <Text
-                            style={{
-                              color: colors.text.primary,
-                              fontWeight: "700",
-                              fontSize: 16,
-                            }}
-                          >
-                            {person.name}
-                          </Text>
-                        </View>
-                        <Text
-                          style={{
-                            color: colors.accent.primary,
-                            fontWeight: "700",
-                            fontSize: 18,
-                          }}
-                        >
-                          ${person.total.toFixed(2)}
-                        </Text>
-                      </View>
-                    );
-                  })}
-                </View>
+                      );
+                    })}
+                  </View>
 
-                <Button
-                  title={saveButtonLabel}
-                  onPress={handleSaveInvoice}
-                  variant="primary"
-                  size="large"
-                  fullWidth
-                  loading={isSaving}
-                  disabled={currentInvoice.items.length === 0}
-                  icon={
-                    <Ionicons
-                      name="download-outline"
-                      size={20}
-                      color={colors.text.inverse}
-                    />
-                  }
-                />
+                  <Button
+                    title={
+                      editingSavedInvoice ? "Update Receipt" : "Save Receipt"
+                    }
+                    onPress={handleSaveInvoice}
+                    variant="primary"
+                    size="large"
+                    fullWidth
+                    loading={isSaving}
+                    disabled={currentInvoice.items.length === 0}
+                    icon={
+                      <Ionicons
+                        name="download-outline"
+                        size={20}
+                        color={colors.text.inverse}
+                      />
+                    }
+                  />
+                </View>
               </View>
-            </View>
-          )}
+            )}
         </View>
       </ScrollView>
     </SafeAreaView>

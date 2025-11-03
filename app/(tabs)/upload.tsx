@@ -200,15 +200,8 @@ export default function UploadScreen() {
   };
 
   const handleManualEntry = () => {
-    // Clear existing items and add a default empty item
     clearInvoice();
     setEditingSavedInvoice(false);
-    addItem({
-      name: "Enter Item Name",
-      price: 0,
-      splitBetween: [],
-    });
-    // Navigate to items assignment screen
     router.push("/assign-items");
   };
 
