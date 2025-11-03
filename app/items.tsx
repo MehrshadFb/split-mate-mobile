@@ -811,10 +811,9 @@ export default function ItemsScreen() {
                       textTransform: "uppercase",
                     }}
                   >
-                    Who owes what
+                    How much each person owes
                   </Text>
                   {currentInvoice.totals.map((person) => {
-                    const itemsCount = getItemsCountForPerson(person.name);
                     return (
                       <View
                         key={person.name}
@@ -859,18 +858,6 @@ export default function ItemsScreen() {
                             }}
                           >
                             {person.name}
-                          </Text>
-                          <Text
-                            style={{
-                              color: colors.text.secondary,
-                              marginTop: 2,
-                            }}
-                          >
-                            {itemsCount === 0
-                              ? "No items assigned"
-                              : `${itemsCount} item${
-                                  itemsCount > 1 ? "s" : ""
-                                } assigned`}
                           </Text>
                         </View>
                         <Text

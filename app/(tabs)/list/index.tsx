@@ -42,7 +42,7 @@ export default function ListScreen() {
     setInvoice(cloned);
     calculateTotals();
     setEditingSavedInvoice(true);
-    router.push({ pathname: "/(tabs)/list/items" });
+    router.push("/items");
   };
 
   const formatSavedDate = (timestamp?: string) => {
@@ -132,78 +132,6 @@ export default function ListScreen() {
             </View>
           ) : (
             <View>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  marginBottom: 20,
-                  backgroundColor: colors.background.secondary,
-                  borderRadius: 18,
-                  padding: 20,
-                  borderWidth: 1,
-                  borderColor: colors.border,
-                }}
-              >
-                <View
-                  style={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: 16,
-                    backgroundColor: colors.accent.light,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginRight: 16,
-                  }}
-                >
-                  <Ionicons
-                    name="archive-outline"
-                    size={22}
-                    color={colors.accent.primary}
-                  />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text
-                    style={{
-                      color: colors.text.primary,
-                      fontWeight: "700",
-                      fontSize: 18,
-                    }}
-                  >
-                    {savedInvoices.length} saved receipt
-                    {savedInvoices.length === 1 ? "" : "s"}
-                  </Text>
-                  <Text
-                    style={{
-                      color: colors.text.secondary,
-                      marginTop: 4,
-                    }}
-                  >
-                    Tap any card to reopen and keep editing.
-                  </Text>
-                </View>
-                <TouchableOpacity
-                  onPress={() => router.push("/(tabs)/mates")}
-                  activeOpacity={0.7}
-                  style={{
-                    paddingHorizontal: 16,
-                    paddingVertical: 10,
-                    borderRadius: 12,
-                    backgroundColor: colors.background.primary,
-                    borderWidth: 1,
-                    borderColor: colors.border,
-                  }}
-                >
-                  <Text
-                    style={{
-                      color: colors.accent.primary,
-                      fontWeight: "600",
-                    }}
-                  >
-                    New receipt
-                  </Text>
-                </TouchableOpacity>
-              </View>
-
               {savedInvoices.map((invoice) => (
                 <TouchableOpacity
                   key={invoice.id}
