@@ -81,20 +81,50 @@ export default function UploadScreen() {
   // Check if mates are added
   if (people.length < 2) {
     return (
-      <SafeAreaView className="flex-1 bg-background-primary">
-        <View className="flex-1 items-center justify-center p-6">
-          <Ionicons name="people-outline" size={64} color="#A8A29E" />
-          <Text className="text-text-primary text-xl font-semibold mt-4 text-center">
+      <SafeAreaView
+        style={{ flex: 1, backgroundColor: colors.background.primary }}
+      >
+        <View
+          style={{
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 24,
+          }}
+        >
+          <Ionicons
+            name="people-outline"
+            size={64}
+            color={colors.text.tertiary}
+          />
+          <Text
+            style={{
+              color: colors.text.primary,
+              fontSize: 20,
+              fontWeight: "600",
+              marginTop: 16,
+              textAlign: "center",
+            }}
+          >
             Add Your Mates First
           </Text>
-          <Text className="text-text-secondary text-center mt-2 mb-6">
+          <Text
+            style={{
+              color: colors.text.secondary,
+              textAlign: "center",
+              marginTop: 8,
+              marginBottom: 24,
+            }}
+          >
             Go to the Mates tab and add at least 2 people to split the bill with
           </Text>
           <Button
             title="Go to Mates"
             onPress={() => router.push("/(tabs)")}
             variant="primary"
-            icon={<Ionicons name="people" size={20} color="white" />}
+            icon={
+              <Ionicons name="people" size={20} color={colors.text.inverse} />
+            }
           />
         </View>
       </SafeAreaView>
@@ -218,23 +248,36 @@ export default function UploadScreen() {
     queuedReceipts.length > 0 && processingUploads.length === 0;
 
   return (
-    <SafeAreaView className="flex-1 bg-background-primary">
-      <ScrollView className="flex-1">
-        <View className="p-6">
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: colors.background.primary }}
+    >
+      <ScrollView style={{ flex: 1 }}>
+        <View style={{ padding: 24 }}>
           <TouchableOpacity
             onPress={() => router.push("/(tabs)/mates")}
-            className="flex-row items-center mb-6"
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              marginBottom: 24,
+            }}
             activeOpacity={0.7}
           >
             <Ionicons name="arrow-back" size={24} color={colors.text.primary} />
           </TouchableOpacity>
 
           {/* Header */}
-          <View className="mb-8">
-            <Text className="text-4xl font-bold text-text-primary mb-2">
+          <View style={{ marginBottom: 32 }}>
+            <Text
+              style={{
+                fontSize: 36,
+                fontWeight: "bold",
+                color: colors.text.primary,
+                marginBottom: 8,
+              }}
+            >
               Upload Receipt
             </Text>
-            <Text className="text-lg text-text-secondary">
+            <Text style={{ fontSize: 18, color: colors.text.secondary }}>
               Take a photo or choose from your library
             </Text>
           </View>
@@ -242,14 +285,34 @@ export default function UploadScreen() {
           {/* Camera Button */}
           <TouchableOpacity
             onPress={handleTakePhoto}
-            className="bg-accent-primary rounded-2xl p-6 mb-4 items-center"
+            style={{
+              backgroundColor: colors.accent.primary,
+              borderRadius: 16,
+              padding: 24,
+              marginBottom: 16,
+              alignItems: "center",
+            }}
             activeOpacity={0.7}
           >
-            <Ionicons name="camera" size={48} color="white" />
-            <Text className="text-text-inverse font-bold text-lg mt-3">
+            <Ionicons name="camera" size={48} color={colors.text.inverse} />
+            <Text
+              style={{
+                color: colors.text.inverse,
+                fontWeight: "bold",
+                fontSize: 18,
+                marginTop: 12,
+              }}
+            >
               Take Photo
             </Text>
-            <Text className="text-text-inverse text-sm mt-1 opacity-80">
+            <Text
+              style={{
+                color: colors.text.inverse,
+                fontSize: 14,
+                marginTop: 4,
+                opacity: 0.8,
+              }}
+            >
               Use your camera to capture the receipt
             </Text>
           </TouchableOpacity>
@@ -257,23 +320,62 @@ export default function UploadScreen() {
           {/* File Picker Button */}
           <TouchableOpacity
             onPress={handleChooseFile}
-            className="bg-background-secondary border-2 border-border rounded-2xl p-6 mb-4 items-center"
+            style={{
+              backgroundColor: colors.background.secondary,
+              borderWidth: 2,
+              borderColor: colors.border,
+              borderRadius: 16,
+              padding: 24,
+              marginBottom: 16,
+              alignItems: "center",
+            }}
             activeOpacity={0.7}
           >
-            <Ionicons name="image" size={48} color="#D97757" />
-            <Text className="text-text-primary font-bold text-lg mt-3">
+            <Ionicons name="image" size={48} color={colors.accent.primary} />
+            <Text
+              style={{
+                color: colors.text.primary,
+                fontWeight: "bold",
+                fontSize: 18,
+                marginTop: 12,
+              }}
+            >
               Choose from Library
             </Text>
-            <Text className="text-text-secondary text-sm mt-1">
+            <Text
+              style={{
+                color: colors.text.secondary,
+                fontSize: 14,
+                marginTop: 4,
+              }}
+            >
               Select an existing photo
             </Text>
           </TouchableOpacity>
 
           {/* Divider */}
-          <View className="flex-row items-center my-6">
-            <View className="flex-1 h-px bg-border" />
-            <Text className="text-text-tertiary text-sm mx-4">or</Text>
-            <View className="flex-1 h-px bg-border" />
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              marginVertical: 24,
+            }}
+          >
+            <View
+              style={{ flex: 1, height: 1, backgroundColor: colors.border }}
+            />
+            <Text
+              style={{
+                color: colors.text.tertiary,
+                fontSize: 14,
+                marginHorizontal: 16,
+              }}
+            >
+              or
+            </Text>
+            <View
+              style={{ flex: 1, height: 1, backgroundColor: colors.border }}
+            />
           </View>
 
           {/* Manual Entry Button */}
@@ -283,13 +385,25 @@ export default function UploadScreen() {
             variant="outline"
             size="large"
             fullWidth
-            icon={<Ionicons name="create-outline" size={20} color="#D97757" />}
+            icon={
+              <Ionicons
+                name="create-outline"
+                size={20}
+                color={colors.accent.primary}
+              />
+            }
           />
 
           {/* Preview Selected Images */}
           {selectedImages.length > 0 && (
-            <View className="mt-6">
-              <Text className="text-text-primary font-semibold mb-2">
+            <View style={{ marginTop: 24 }}>
+              <Text
+                style={{
+                  color: colors.text.primary,
+                  fontWeight: "600",
+                  marginBottom: 8,
+                }}
+              >
                 Selected Receipts ({selectedImages.length})
               </Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -297,7 +411,12 @@ export default function UploadScreen() {
                   <Image
                     key={index}
                     source={{ uri }}
-                    className="w-32 h-48 rounded-xl mr-3"
+                    style={{
+                      width: 128,
+                      height: 192,
+                      borderRadius: 12,
+                      marginRight: 12,
+                    }}
                     resizeMode="cover"
                   />
                 ))}
@@ -307,29 +426,55 @@ export default function UploadScreen() {
 
           {/* Queued Receipts */}
           {queuedReceipts.length > 0 && (
-            <View className="mt-6">
-              <Text className="text-text-primary font-semibold mb-3">
+            <View style={{ marginTop: 24 }}>
+              <Text
+                style={{
+                  color: colors.text.primary,
+                  fontWeight: "600",
+                  marginBottom: 12,
+                }}
+              >
                 {queuedReceipts.length} receipt
                 {queuedReceipts.length > 1 ? "s" : ""} ready to process
               </Text>
               {queuedReceipts.map((job) => (
                 <View
                   key={job.id}
-                  className="bg-background-secondary rounded-xl p-4 mb-3 flex-row items-center justify-between"
+                  style={{
+                    backgroundColor: colors.background.secondary,
+                    borderRadius: 12,
+                    padding: 16,
+                    marginBottom: 12,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
                 >
-                  <View className="flex-1">
-                    <Text className="text-text-primary font-medium">
+                  <View style={{ flex: 1 }}>
+                    <Text
+                      style={{ color: colors.text.primary, fontWeight: "500" }}
+                    >
                       {job.fileName}
                     </Text>
-                    <Text className="text-text-tertiary text-xs mt-1">
+                    <Text
+                      style={{
+                        color: colors.text.tertiary,
+                        fontSize: 12,
+                        marginTop: 4,
+                      }}
+                    >
                       Ready to scan
                     </Text>
                   </View>
                   <TouchableOpacity
                     onPress={() => cancelUpload(job.id)}
-                    className="ml-2"
+                    style={{ marginLeft: 8 }}
                   >
-                    <Ionicons name="trash-outline" size={20} color="#EF4444" />
+                    <Ionicons
+                      name="trash-outline"
+                      size={20}
+                      color={colors.error}
+                    />
                   </TouchableOpacity>
                 </View>
               ))}
@@ -344,30 +489,66 @@ export default function UploadScreen() {
                 size="large"
                 fullWidth
                 disabled={!canProcess}
-                icon={<Ionicons name="sparkles" size={20} color="white" />}
+                icon={
+                  <Ionicons
+                    name="sparkles"
+                    size={20}
+                    color={colors.text.inverse}
+                  />
+                }
               />
             </View>
           )}
 
           {/* Processing Uploads */}
           {processingUploads.length > 0 && (
-            <View className="mt-6">
-              <Text className="text-text-primary font-semibold mb-3">
+            <View style={{ marginTop: 24 }}>
+              <Text
+                style={{
+                  color: colors.text.primary,
+                  fontWeight: "600",
+                  marginBottom: 12,
+                }}
+              >
                 Processing {processingUploads.length} receipt
                 {processingUploads.length > 1 ? "s" : ""}
               </Text>
               {processingUploads.map((job) => (
                 <View
                   key={job.id}
-                  className="bg-background-secondary rounded-xl p-4 mb-3"
+                  style={{
+                    backgroundColor: colors.background.secondary,
+                    borderRadius: 12,
+                    padding: 16,
+                    marginBottom: 12,
+                  }}
                 >
-                  <View className="flex-row items-center justify-between mb-2">
-                    <Text className="text-text-primary font-medium flex-1">
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      marginBottom: 8,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: colors.text.primary,
+                        fontWeight: "500",
+                        flex: 1,
+                      }}
+                    >
                       {job.fileName}
                     </Text>
                   </View>
                   <ProgressBar progress={job.progress} />
-                  <Text className="text-text-tertiary text-xs mt-2">
+                  <Text
+                    style={{
+                      color: colors.text.tertiary,
+                      fontSize: 12,
+                      marginTop: 8,
+                    }}
+                  >
                     {job.status === "uploading" && "Uploading..."}
                     {job.status === "scanning" && "🤖 AI reading receipt..."}
                     {job.status === "pending" && "Waiting..."}
@@ -389,14 +570,31 @@ export default function UploadScreen() {
           ))}
 
           {/* Info */}
-          <View className="mt-8 bg-accent-light rounded-xl p-4">
-            <View className="flex-row items-start">
-              <Ionicons name="information-circle" size={20} color="#D97757" />
-              <View className="flex-1 ml-3">
-                <Text className="text-accent-hover font-semibold mb-1">
+          <View
+            style={{
+              marginTop: 32,
+              backgroundColor: colors.accent.light,
+              borderRadius: 12,
+              padding: 16,
+            }}
+          >
+            <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
+              <Ionicons
+                name="information-circle"
+                size={20}
+                color={colors.accent.primary}
+              />
+              <View style={{ flex: 1, marginLeft: 12 }}>
+                <Text
+                  style={{
+                    color: colors.accent.hover,
+                    fontWeight: "600",
+                    marginBottom: 4,
+                  }}
+                >
                   Supported Files
                 </Text>
-                <Text className="text-text-secondary text-sm">
+                <Text style={{ color: colors.text.secondary, fontSize: 14 }}>
                   JPG, PNG, or PDF files under 10 MB{"\n"}
                   Your receipt will be securely processed by AI
                 </Text>
