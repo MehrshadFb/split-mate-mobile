@@ -53,7 +53,7 @@ export default function AssignItemsScreen() {
   const [editingItem, setEditingItem] = useState<{
     index: number;
     name: string;
-    price: number;
+    price: string;
   } | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -182,16 +182,23 @@ export default function AssignItemsScreen() {
   const handleSaveEdit = () => {
     if (!editingItem) return;
 
+    const price =
+      editingItem.price.trim() === "" ? 0 : parseFloat(editingItem.price);
+    const name =
+      editingItem.name.trim() === ""
+        ? `Item #${editingItem.index + 1}`
+        : editingItem.name;
+
     updateItem(editingItem.index, {
-      name: editingItem.name,
-      price: editingItem.price,
+      name,
+      price: isNaN(price) ? 0 : price,
     });
     setEditingItem(null);
   };
-
   const handleAddItem = () => {
+    const itemNumber = currentInvoice.items.length + 1;
     const newItem: Item = {
-      name: "New Item",
+      name: `Item #${itemNumber}`,
       price: 0,
       splitBetween: [],
     };
@@ -439,13 +446,17 @@ export default function AssignItemsScreen() {
                               color: colors.text.primary,
                               paddingVertical: 8,
                             }}
-                            value={editingItem.price.toString()}
-                            onChangeText={(text) =>
-                              setEditingItem({
-                                ...editingItem,
-                                price: parseFloat(text) || 0,
-                              })
-                            }
+                            value={editingItem.price}
+                            onChangeText={(text) => {
+                              // Allow empty string, numbers, and decimal point
+                              const validInput = /^\d*\.?\d{0,2}$/;
+                              if (text === "" || validInput.test(text)) {
+                                setEditingItem({
+                                  ...editingItem,
+                                  price: text,
+                                });
+                              }
+                            }}
                             keyboardType="decimal-pad"
                             placeholder="0.00"
                             placeholderTextColor={colors.text.tertiary}
@@ -476,7 +487,7 @@ export default function AssignItemsScreen() {
                                 fontWeight: "700",
                               }}
                             >
-                              Save changes
+                              Save
                             </Text>
                           </TouchableOpacity>
                           <TouchableOpacity
@@ -556,7 +567,10 @@ export default function AssignItemsScreen() {
                                   setEditingItem({
                                     index,
                                     name: item.name,
-                                    price: item.price,
+                                    price:
+                                      item.price === 0
+                                        ? ""
+                                        : item.price.toString(),
                                   })
                                 }
                                 style={{
