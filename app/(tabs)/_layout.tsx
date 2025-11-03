@@ -36,9 +36,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="list"
+        name="receipts"
         options={{
-          title: "List",
+          title: "Receipts",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="receipt" size={size} color={color} />
           ),
@@ -51,12 +51,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="settings" size={size} color={color} />
           ),
-        }}
-      />
-      <Tabs.Screen
-        name="split"
-        options={{
-          href: null,
         }}
       />
       <Tabs.Screen

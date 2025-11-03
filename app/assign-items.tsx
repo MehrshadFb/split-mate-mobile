@@ -1,4 +1,4 @@
-// app/items.tsx
+// app/assign-items.tsx
 // Items assignment screen - assign items to people (NOT a tab)
 
 import { Ionicons } from "@expo/vector-icons";
@@ -18,7 +18,7 @@ import { useTheme } from "../src/contexts/ThemeContext";
 import { useInvoiceStore } from "../src/stores/invoiceStore";
 import { Item } from "../src/types/invoice";
 
-export default function ItemsScreen() {
+export default function AssignItemsScreen() {
   const router = useRouter();
   const navigation = useNavigation();
   const { colors } = useTheme();
@@ -37,6 +37,7 @@ export default function ItemsScreen() {
     setEditingSavedInvoice,
     loadSavedInvoices,
     setPeople,
+    deleteSavedInvoice,
   } = useInvoiceStore();
 
   const allowNavigationRef = useRef(false);
@@ -69,7 +70,7 @@ export default function ItemsScreen() {
       }
 
       allowNavigationRef.current = true;
-      router.replace("/(tabs)/list");
+      router.replace("/(tabs)/receipts");
     },
     [loadSavedInvoices, clearExistingSession, resetNewSession, router]
   );
@@ -235,12 +236,6 @@ export default function ItemsScreen() {
     return currentInvoice.items.reduce((sum, item) => sum + item.price, 0);
   };
 
-  const getItemsCountForPerson = (personName: string) => {
-    return currentInvoice.items.filter((item) =>
-      item.splitBetween.includes(personName)
-    ).length;
-  };
-
   const handleBack = () => {
     if (editingSavedInvoice) {
       if (hasUnsavedChanges) {
@@ -270,6 +265,33 @@ export default function ItemsScreen() {
     }
   };
 
+  const handleDeleteReceipt = () => {
+    if (!currentInvoice?.id) return;
+
+    Alert.alert(
+      "Delete Receipt",
+      "Are you sure you want to delete this receipt? This action cannot be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deleteSavedInvoice(currentInvoice.id);
+              navigateToList("existing");
+            } catch (error) {
+              Alert.alert(
+                "Delete Failed",
+                "We couldn't delete this receipt. Please try again."
+              );
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const saveButtonLabel = editingSavedInvoice
     ? "Update Receipt"
     : "Save Receipt";
@@ -280,24 +302,39 @@ export default function ItemsScreen() {
     >
       <ScrollView className="flex-1">
         <View className="p-6">
-          {/* Header with Back Button */}
-          <TouchableOpacity
-            onPress={handleBack}
-            className="flex-row items-center mb-6"
-            activeOpacity={0.7}
+          {/* Header with Back Button and Delete Icon */}
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: 24,
+            }}
           >
-            <Ionicons name="arrow-back" size={24} color={colors.text.primary} />
-            <Text
-              style={{
-                color: colors.text.primary,
-                fontSize: 18,
-                marginLeft: 8,
-                fontWeight: "600",
-              }}
+            <TouchableOpacity
+              onPress={handleBack}
+              className="flex-row items-center"
+              activeOpacity={0.7}
             >
-              {editingSavedInvoice ? "Back to Receipts" : "Back to Upload"}
-            </Text>
-          </TouchableOpacity>
+              <Ionicons
+                name="arrow-back"
+                size={24}
+                color={colors.text.primary}
+              />
+            </TouchableOpacity>
+
+            {editingSavedInvoice && currentInvoice?.id && (
+              <TouchableOpacity
+                onPress={handleDeleteReceipt}
+                style={{
+                  padding: 8,
+                }}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="close" size={28} color={colors.error} />
+              </TouchableOpacity>
+            )}
+          </View>
 
           {/* Title */}
           <View className="mb-6">

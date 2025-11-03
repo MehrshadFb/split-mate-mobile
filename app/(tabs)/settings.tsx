@@ -1,4 +1,4 @@
-// app/(tabs)/split.tsx
+// app/(tabs)/settings.tsx
 // Settings screen - app preferences and information
 
 import { Ionicons } from "@expo/vector-icons";

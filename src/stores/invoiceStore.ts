@@ -26,6 +26,7 @@ interface InvoiceState {
   resetSession: () => void;
   loadSavedInvoices: () => Promise<void>;
   saveCurrentInvoice: () => Promise<Invoice | null>;
+  deleteSavedInvoice: (invoiceId: string) => Promise<void>;
   setEditingSavedInvoice: (value: boolean) => void;
   setHasUnsavedChanges: (value: boolean) => void;
 }
@@ -256,6 +257,25 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
       throw error;
     }
   },
+
+  deleteSavedInvoice: async (invoiceId) => {
+    const { savedInvoices } = get();
+    const updatedInvoices = savedInvoices.filter(
+      (invoice) => invoice.id !== invoiceId
+    );
+
+    try {
+      await AsyncStorage.setItem(
+        SAVED_INVOICES_KEY,
+        JSON.stringify(updatedInvoices)
+      );
+      set({ savedInvoices: updatedInvoices });
+    } catch (error) {
+      console.error("Failed to delete invoice:", error);
+      throw error;
+    }
+  },
+
   setEditingSavedInvoice: (value) => set({ editingSavedInvoice: value }),
   setHasUnsavedChanges: (value) => set({ hasUnsavedChanges: value }),
 }));

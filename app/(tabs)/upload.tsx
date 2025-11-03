@@ -73,7 +73,7 @@ export default function UploadScreen() {
 
       // Navigate to items assignment screen (not a tab)
       setTimeout(() => {
-        router.push({ pathname: "/(tabs)/list/items" });
+        router.push("/assign-items");
       }, 500);
     }
   }, [queue, clearInvoice, addItem, router, setEditingSavedInvoice]);
@@ -209,7 +209,7 @@ export default function UploadScreen() {
       splitBetween: [],
     });
     // Navigate to items assignment screen
-    router.push({ pathname: "/(tabs)/list/items" });
+    router.push("/assign-items");
   };
 
   const queuedReceipts = queue.filter((job) => job.status === "queued");
@@ -234,9 +234,6 @@ export default function UploadScreen() {
             activeOpacity={0.7}
           >
             <Ionicons name="arrow-back" size={24} color={colors.text.primary} />
-            <Text className="text-text-primary text-lg font-semibold ml-2">
-              Back to Mates
-            </Text>
           </TouchableOpacity>
 
           {/* Header */}

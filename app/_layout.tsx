@@ -1,3 +1,6 @@
+// app/_layout.tsx
+// Root layout - providers and navigation setup
+
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { ThemeProvider } from "../src/contexts/ThemeContext";

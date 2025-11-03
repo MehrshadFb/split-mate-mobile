@@ -1,4 +1,4 @@
-// app/(tabs)/list/index.tsx
+// app/(tabs)/receipts/index.tsx
 // Saved receipts overview
 
 import { Ionicons } from "@expo/vector-icons";
@@ -11,7 +11,7 @@ import { useTheme } from "../../../src/contexts/ThemeContext";
 import { useInvoiceStore } from "../../../src/stores/invoiceStore";
 import { Invoice } from "../../../src/types/invoice";
 
-export default function ListScreen() {
+export default function ReceiptsScreen() {
   const router = useRouter();
   const { colors } = useTheme();
   const {
@@ -42,7 +42,7 @@ export default function ListScreen() {
     setInvoice(cloned);
     calculateTotals();
     setEditingSavedInvoice(true);
-    router.push("/items");
+    router.push("/assign-items");
   };
 
   const formatSavedDate = (timestamp?: string) => {

@@ -1,3 +1,6 @@
+// app/(tabs)/mates.tsx
+// Mates management screen - add/remove people for bill splitting
+
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
