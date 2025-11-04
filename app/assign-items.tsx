@@ -399,6 +399,16 @@ export default function AssignItemsScreen() {
   };
 
   const handleRemovePerson = (personName: string) => {
+    // Check if removing this person would leave fewer than 2 people
+    if (people.length <= 2) {
+      Alert.alert(
+        "Cannot Remove",
+        "You need at least 2 people to split a receipt.",
+        [{ text: "OK" }]
+      );
+      return;
+    }
+
     // Check if person is assigned to any items
     const hasAssignedItems = currentInvoice.items.some((item) =>
       item.splitBetween.includes(personName)
