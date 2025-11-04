@@ -152,6 +152,7 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
     set((state) => {
       if (!state.currentInvoice) return state;
 
+      // Create totals for ALL people, including those with no items assigned (they'll have $0)
       const newTotals: Person[] = state.people.map((person) => ({
         name: person,
         total: 0,
@@ -176,7 +177,8 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
       return {
         currentInvoice: {
           ...state.currentInvoice,
-          totals: newTotals,
+          people: state.people, // Ensure invoice's people array is synced
+          totals: newTotals, // This includes everyone, even with $0
           totalAmount,
           updatedAt: new Date().toISOString(),
         },

@@ -40,6 +40,7 @@ export default function AssignItemsScreen() {
     deleteSavedInvoice,
     setInvoice,
     calculateTotals,
+    setHasUnsavedChanges,
   } = useInvoiceStore();
 
   const allowNavigationRef = useRef(false);
@@ -56,6 +57,8 @@ export default function AssignItemsScreen() {
     price: string;
   } | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [showManagePeople, setShowManagePeople] = useState(false);
+  const [newPersonName, setNewPersonName] = useState("");
 
   const navigateToList = useCallback(
     (resetType: "new" | "existing") => {
@@ -81,11 +84,11 @@ export default function AssignItemsScreen() {
   );
 
   const handleSaveInvoice = useCallback(async () => {
-    if (!currentInvoice || currentInvoice.items.length === 0) {
-      Alert.alert("Nothing to save", "Add items before saving this receipt.");
+    if (!currentInvoice) {
       return false;
     }
 
+    // Allow saving even with 0 items - user can add items later
     try {
       setIsSaving(true);
       const savedInvoice = await saveCurrentInvoice();
@@ -273,6 +276,87 @@ export default function AssignItemsScreen() {
     );
   };
 
+  const handleAddPerson = () => {
+    const trimmedName = newPersonName.trim();
+    if (!trimmedName) {
+      return;
+    }
+
+    const nameExists = people.some(
+      (mate) => mate.toLowerCase() === trimmedName.toLowerCase()
+    );
+
+    if (nameExists) {
+      Alert.alert("Duplicate name", "This person is already on the list.");
+      return;
+    }
+
+    // Add person to both the people array and the current invoice
+    const updatedPeople = [...people, trimmedName];
+    setPeople(updatedPeople);
+
+    // Update the current invoice's people array
+    if (currentInvoice) {
+      setInvoice({
+        ...currentInvoice,
+        people: updatedPeople,
+      });
+    }
+
+    // Recalculate totals to include the new person with $0
+    calculateTotals();
+
+    // Mark as unsaved change when editing a saved receipt
+    if (editingSavedInvoice) {
+      setHasUnsavedChanges(true);
+    }
+    setNewPersonName("");
+  };
+
+  const handleRemovePerson = (personName: string) => {
+    // Check if person is assigned to any items
+    const hasAssignedItems = currentInvoice.items.some((item) =>
+      item.splitBetween.includes(personName)
+    );
+
+    if (hasAssignedItems) {
+      Alert.alert(
+        "Cannot Remove",
+        `${personName} is assigned to one or more items. Remove them from all items first.`,
+        [{ text: "OK" }]
+      );
+      return;
+    }
+
+    Alert.alert("Remove Person", `Remove ${personName} from this receipt?`, [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Remove",
+        style: "destructive",
+        onPress: () => {
+          const updatedPeople = people.filter((p) => p !== personName);
+          setPeople(updatedPeople);
+
+          // Update the current invoice's people array
+          if (currentInvoice) {
+            setInvoice({
+              ...currentInvoice,
+              people: updatedPeople,
+            });
+          }
+
+          // Recalculate totals to remove the person from the summary
+          calculateTotals();
+
+          // Mark as unsaved change when editing a saved receipt
+          if (editingSavedInvoice) {
+            setHasUnsavedChanges(true);
+          }
+        },
+      },
+    ]);
+  };
+
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: colors.background.primary }}
@@ -328,6 +412,233 @@ export default function AssignItemsScreen() {
             <Text style={{ fontSize: 18, color: colors.text.secondary }}>
               Select who ordered each item
             </Text>
+          </View>
+
+          {/* Manage People Section */}
+          <View
+            style={{
+              backgroundColor: colors.background.secondary,
+              borderRadius: 16,
+              marginBottom: 20,
+              borderWidth: 1,
+              borderColor: colors.border,
+              overflow: "hidden",
+            }}
+          >
+            {/* Header - Collapsible */}
+            <TouchableOpacity
+              onPress={() => setShowManagePeople(!showManagePeople)}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: 18,
+                backgroundColor: colors.background.secondary,
+              }}
+              activeOpacity={0.7}
+            >
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <View
+                  style={{
+                    width: 40,
+                    height: 40,
+                    backgroundColor: colors.accent.light,
+                    borderRadius: 12,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginRight: 12,
+                  }}
+                >
+                  <Ionicons
+                    name="people"
+                    size={22}
+                    color={colors.accent.primary}
+                  />
+                </View>
+                <View>
+                  <Text
+                    style={{
+                      color: colors.text.primary,
+                      fontWeight: "700",
+                      fontSize: 17,
+                    }}
+                  >
+                    Manage People
+                  </Text>
+                  <Text
+                    style={{
+                      color: colors.text.secondary,
+                      fontSize: 13,
+                      marginTop: 2,
+                    }}
+                  >
+                    {people.length} {people.length === 1 ? "person" : "people"}
+                  </Text>
+                </View>
+              </View>
+              <Ionicons
+                name={showManagePeople ? "chevron-up" : "chevron-down"}
+                size={24}
+                color={colors.text.tertiary}
+              />
+            </TouchableOpacity>
+
+            {/* Expandable Content */}
+            {showManagePeople && (
+              <View
+                style={{
+                  borderTopWidth: 1,
+                  borderTopColor: colors.border,
+                  padding: 18,
+                }}
+              >
+                {/* Add Person Input */}
+                <View style={{ marginBottom: 20 }}>
+                  <Text
+                    style={{
+                      color: colors.text.secondary,
+                      fontSize: 13,
+                      fontWeight: "600",
+                      marginBottom: 10,
+                      textTransform: "uppercase",
+                      letterSpacing: 0.5,
+                    }}
+                  >
+                    Add New Person
+                  </Text>
+                  <View style={{ flexDirection: "row" }}>
+                    <TextInput
+                      style={{
+                        flex: 1,
+                        backgroundColor: colors.background.primary,
+                        borderWidth: 1,
+                        borderColor: colors.border,
+                        borderRadius: 12,
+                        paddingHorizontal: 14,
+                        paddingVertical: 12,
+                        color: colors.text.primary,
+                        fontSize: 16,
+                        marginRight: 10,
+                      }}
+                      placeholder="Enter name"
+                      placeholderTextColor={colors.text.tertiary}
+                      value={newPersonName}
+                      onChangeText={setNewPersonName}
+                      onSubmitEditing={handleAddPerson}
+                      returnKeyType="done"
+                      autoCapitalize="words"
+                    />
+                    <TouchableOpacity
+                      onPress={handleAddPerson}
+                      style={{
+                        backgroundColor: colors.accent.primary,
+                        borderRadius: 12,
+                        paddingHorizontal: 24,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        minWidth: 70,
+                      }}
+                      activeOpacity={0.7}
+                    >
+                      <Text
+                        style={{
+                          color: colors.text.inverse,
+                          fontWeight: "700",
+                          fontSize: 15,
+                        }}
+                      >
+                        Add
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+
+                {/* People List */}
+                {people.length > 0 && (
+                  <View>
+                    <Text
+                      style={{
+                        color: colors.text.secondary,
+                        fontSize: 13,
+                        fontWeight: "600",
+                        marginBottom: 10,
+                        textTransform: "uppercase",
+                        letterSpacing: 0.5,
+                      }}
+                    >
+                      Current People
+                    </Text>
+                    {people.map((person, index) => (
+                      <View
+                        key={person}
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          backgroundColor: colors.background.primary,
+                          borderRadius: 12,
+                          padding: 14,
+                          marginBottom: index === people.length - 1 ? 0 : 10,
+                        }}
+                      >
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            alignItems: "center",
+                            flex: 1,
+                          }}
+                        >
+                          <View
+                            style={{
+                              width: 38,
+                              height: 38,
+                              backgroundColor: colors.accent.light,
+                              borderRadius: 19,
+                              alignItems: "center",
+                              justifyContent: "center",
+                              marginRight: 12,
+                            }}
+                          >
+                            <Text
+                              style={{
+                                color: colors.accent.primary,
+                                fontWeight: "700",
+                                fontSize: 16,
+                              }}
+                            >
+                              {person.charAt(0).toUpperCase()}
+                            </Text>
+                          </View>
+                          <Text
+                            style={{
+                              color: colors.text.primary,
+                              fontWeight: "600",
+                              fontSize: 16,
+                            }}
+                          >
+                            {person}
+                          </Text>
+                        </View>
+                        <TouchableOpacity
+                          onPress={() => handleRemovePerson(person)}
+                          style={{
+                            padding: 6,
+                            borderRadius: 8,
+                          }}
+                          activeOpacity={0.6}
+                        >
+                          <Ionicons
+                            name="close-circle"
+                            size={24}
+                            color={colors.error}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </View>
+            )}
           </View>
 
           {/* Items List */}
@@ -895,28 +1206,28 @@ export default function AssignItemsScreen() {
                       );
                     })}
                   </View>
-
-                  <Button
-                    title={
-                      editingSavedInvoice ? "Update Receipt" : "Save Receipt"
-                    }
-                    onPress={handleSaveInvoice}
-                    variant="primary"
-                    size="large"
-                    fullWidth
-                    loading={isSaving}
-                    disabled={currentInvoice.items.length === 0}
-                    icon={
-                      <Ionicons
-                        name="download-outline"
-                        size={20}
-                        color={colors.text.inverse}
-                      />
-                    }
-                  />
                 </View>
               </View>
             )}
+
+          {/* Save Button - Always visible */}
+          <View style={{ marginTop: 32, marginBottom: 20 }}>
+            <Button
+              title={editingSavedInvoice ? "Update Receipt" : "Save Receipt"}
+              onPress={handleSaveInvoice}
+              variant="primary"
+              size="large"
+              fullWidth
+              loading={isSaving}
+              icon={
+                <Ionicons
+                  name="download-outline"
+                  size={20}
+                  color={colors.text.inverse}
+                />
+              }
+            />
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
