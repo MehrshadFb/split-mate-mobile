@@ -202,7 +202,7 @@ export default function UploadScreen() {
       <ScrollView style={{ flex: 1 }}>
         <View style={{ padding: 24 }}>
           <TouchableOpacity
-            onPress={() => router.push("/(tabs)/mates")}
+            onPress={() => router.back()}
             style={{
               flexDirection: "row",
               alignItems: "center",

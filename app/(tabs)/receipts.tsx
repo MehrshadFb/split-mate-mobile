@@ -1,4 +1,4 @@
-// app/(tabs)/receipts/index.tsx
+// app/(tabs)/receipts.tsx
 // Saved receipts overview
 
 import { Ionicons } from "@expo/vector-icons";
@@ -6,10 +6,10 @@ import { useRouter } from "expo-router";
 import React, { useEffect } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button } from "../../../src/components/Button";
-import { useTheme } from "../../../src/contexts/ThemeContext";
-import { useInvoiceStore } from "../../../src/stores/invoiceStore";
-import { Invoice } from "../../../src/types/invoice";
+import { Button } from "../../src/components/Button";
+import { useTheme } from "../../src/contexts/ThemeContext";
+import { useInvoiceStore } from "../../src/stores/invoiceStore";
+import { Invoice } from "../../src/types/invoice";
 
 export default function ReceiptsScreen() {
   const router = useRouter();

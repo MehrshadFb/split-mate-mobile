@@ -63,12 +63,19 @@ export default function AssignItemsScreen() {
 
       if (resetType === "existing") {
         clearExistingSession();
+        // For existing receipts, go back with animation
+        allowNavigationRef.current = true;
+        if (router.canGoBack()) {
+          router.back();
+        } else {
+          router.replace("/(tabs)/receipts");
+        }
       } else {
+        // For new receipts, navigate to receipts tab to show the saved list
         resetSession();
+        allowNavigationRef.current = true;
+        router.replace("/(tabs)/receipts");
       }
-
-      allowNavigationRef.current = true;
-      router.replace("/(tabs)/receipts");
     },
     [loadSavedInvoices, clearExistingSession, resetSession, router]
   );
@@ -235,7 +242,7 @@ export default function AssignItemsScreen() {
         navigateToList("existing");
       }
     } else {
-      router.push("/(tabs)/upload");
+      router.back(); // Use back() instead of push to properly reverse the navigation
     }
   };
 
