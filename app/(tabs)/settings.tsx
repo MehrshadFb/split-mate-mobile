@@ -30,6 +30,7 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: colors.background.primary }}
+      edges={["top", "left", "right"]}
     >
       <ScrollView className="flex-1">
         <View className="p-6">

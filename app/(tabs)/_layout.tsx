@@ -19,13 +19,8 @@ export default function TabLayout() {
           borderTopColor: colors.border,
         },
       }}
+      initialRouteName="mates"
     >
-      <Tabs.Screen
-        name="index"
-        options={{
-          href: null, // Hide from tab bar
-        }}
-      />
       <Tabs.Screen
         name="mates"
         options={{
@@ -57,6 +52,7 @@ export default function TabLayout() {
         name="upload"
         options={{
           href: null,
+          tabBarStyle: { display: "none" },
         }}
       />
     </Tabs>

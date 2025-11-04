@@ -78,59 +78,6 @@ export default function UploadScreen() {
     }
   }, [queue, clearInvoice, addItem, router, setEditingSavedInvoice]);
 
-  // Check if mates are added
-  if (people.length < 2) {
-    return (
-      <SafeAreaView
-        style={{ flex: 1, backgroundColor: colors.background.primary }}
-      >
-        <View
-          style={{
-            flex: 1,
-            alignItems: "center",
-            justifyContent: "center",
-            padding: 24,
-          }}
-        >
-          <Ionicons
-            name="people-outline"
-            size={64}
-            color={colors.text.tertiary}
-          />
-          <Text
-            style={{
-              color: colors.text.primary,
-              fontSize: 20,
-              fontWeight: "600",
-              marginTop: 16,
-              textAlign: "center",
-            }}
-          >
-            Add Your Mates First
-          </Text>
-          <Text
-            style={{
-              color: colors.text.secondary,
-              textAlign: "center",
-              marginTop: 8,
-              marginBottom: 24,
-            }}
-          >
-            Go to the Mates tab and add at least 2 people to split the bill with
-          </Text>
-          <Button
-            title="Go to Mates"
-            onPress={() => router.push("/(tabs)")}
-            variant="primary"
-            icon={
-              <Ionicons name="people" size={20} color={colors.text.inverse} />
-            }
-          />
-        </View>
-      </SafeAreaView>
-    );
-  }
-
   const validateFile = (uri: string, type: string, size?: number): boolean => {
     // Check file type
     if (!ALLOWED_TYPES.some((allowed) => type.includes(allowed))) {
@@ -250,6 +197,7 @@ export default function UploadScreen() {
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: colors.background.primary }}
+      edges={["top", "left", "right"]}
     >
       <ScrollView style={{ flex: 1 }}>
         <View style={{ padding: 24 }}>

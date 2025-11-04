@@ -63,6 +63,7 @@ export default function MatesScreen() {
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: colors.background.primary }}
+      edges={["top", "left", "right"]}
     >
       <KeyboardAvoidingView
         style={{ flex: 1 }}
