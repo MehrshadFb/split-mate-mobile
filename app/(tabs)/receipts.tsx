@@ -61,6 +61,17 @@ export default function ReceiptsScreen() {
     });
   };
 
+  const getReceiptTitle = (invoice: Invoice) => {
+    if (invoice.title) {
+      return invoice.title;
+    }
+    // Generate default title based on date
+    const date = new Date(invoice.createdAt || Date.now());
+    const month = date.toLocaleDateString("en-US", { month: "short" });
+    const day = date.getDate();
+    return `Receipt ${month} ${day}`;
+  };
+
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: colors.background.primary }}
@@ -178,7 +189,7 @@ export default function ReceiptsScreen() {
                         fontSize: 17,
                       }}
                     >
-                      {formatSavedDate(invoice.savedAt || invoice.updatedAt)}
+                      {getReceiptTitle(invoice)}
                     </Text>
                     <Text
                       style={{
@@ -186,10 +197,7 @@ export default function ReceiptsScreen() {
                         marginTop: 4,
                       }}
                     >
-                      {invoice.items.length} item
-                      {invoice.items.length === 1 ? "" : "s"} ·{" "}
-                      {invoice.people.length} mate
-                      {invoice.people.length === 1 ? "" : "s"}
+                      {formatSavedDate(invoice.savedAt || invoice.updatedAt)}
                     </Text>
                   </View>
                   <View style={{ alignItems: "flex-end" }}>

@@ -14,6 +14,7 @@ export interface Person {
 
 export interface Invoice {
   id: string;
+  title?: string;
   items: Item[];
   people: string[];
   totals: Person[];

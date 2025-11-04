@@ -41,6 +41,7 @@ export default function AssignItemsScreen() {
     setInvoice,
     calculateTotals,
     setHasUnsavedChanges,
+    setInvoiceTitle,
   } = useInvoiceStore();
 
   const allowNavigationRef = useRef(false);
@@ -59,6 +60,8 @@ export default function AssignItemsScreen() {
   const [isSaving, setIsSaving] = useState(false);
   const [showManagePeople, setShowManagePeople] = useState(false);
   const [newPersonName, setNewPersonName] = useState("");
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [tempTitle, setTempTitle] = useState("");
 
   const navigateToList = useCallback(
     (resetType: "new" | "existing") => {
@@ -88,6 +91,13 @@ export default function AssignItemsScreen() {
       return false;
     }
 
+    // If title is being edited and has changed, save it first
+    if (isEditingTitle && tempTitle.trim() !== getDisplayTitle()) {
+      setInvoiceTitle(tempTitle.trim());
+      setIsEditingTitle(false);
+      setTempTitle("");
+    }
+
     // Allow saving even with 0 items - user can add items later
     try {
       setIsSaving(true);
@@ -107,7 +117,15 @@ export default function AssignItemsScreen() {
     }
 
     return false;
-  }, [currentInvoice, saveCurrentInvoice, navigateToList, editingSavedInvoice]);
+  }, [
+    currentInvoice,
+    saveCurrentInvoice,
+    navigateToList,
+    editingSavedInvoice,
+    isEditingTitle,
+    tempTitle,
+    setInvoiceTitle,
+  ]);
 
   useEffect(() => {
     if (!editingSavedInvoice) {
@@ -120,7 +138,11 @@ export default function AssignItemsScreen() {
         return;
       }
 
-      if (!hasUnsavedChanges) {
+      // Check if title is being edited and has changed
+      const titleChanged =
+        isEditingTitle && tempTitle.trim() !== getDisplayTitle();
+
+      if (!hasUnsavedChanges && !titleChanged) {
         clearExistingSession();
         allowNavigationRef.current = true;
         navigation.dispatch(event.data.action);
@@ -128,6 +150,14 @@ export default function AssignItemsScreen() {
       }
 
       event.preventDefault();
+
+      // If title is being edited, save it before showing alert
+      if (titleChanged) {
+        setInvoiceTitle(tempTitle.trim());
+        setIsEditingTitle(false);
+        setTempTitle("");
+        setHasUnsavedChanges(true);
+      }
 
       Alert.alert(
         "Unsaved changes",
@@ -160,6 +190,10 @@ export default function AssignItemsScreen() {
     hasUnsavedChanges,
     clearExistingSession,
     handleSaveInvoice,
+    isEditingTitle,
+    tempTitle,
+    setInvoiceTitle,
+    setHasUnsavedChanges,
   ]);
 
   // Initialize empty invoice if none exists (for manual entry)
@@ -222,7 +256,19 @@ export default function AssignItemsScreen() {
 
   const handleBack = () => {
     if (editingSavedInvoice) {
-      if (hasUnsavedChanges) {
+      // Check if title is being edited and has changed
+      const titleChanged =
+        isEditingTitle && tempTitle.trim() !== getDisplayTitle();
+
+      if (hasUnsavedChanges || titleChanged) {
+        // If title is being edited, save it before showing alert
+        if (titleChanged) {
+          setInvoiceTitle(tempTitle.trim());
+          setIsEditingTitle(false);
+          setTempTitle("");
+          setHasUnsavedChanges(true);
+        }
+
         Alert.alert(
           "Unsaved changes",
           "Do you want to save your changes before leaving?",
@@ -274,6 +320,45 @@ export default function AssignItemsScreen() {
         },
       ]
     );
+  };
+
+  const getDisplayTitle = () => {
+    if (currentInvoice?.title) {
+      return currentInvoice.title;
+    }
+    // Generate default title based on date
+    const date = new Date(currentInvoice?.createdAt || Date.now());
+    const month = date.toLocaleDateString("en-US", { month: "short" });
+    const day = date.getDate();
+    return `Receipt ${month} ${day}`;
+  };
+
+  const handleStartEditingTitle = () => {
+    setTempTitle(getDisplayTitle());
+    setIsEditingTitle(true);
+  };
+
+  const handleSaveTitle = () => {
+    if (!isEditingTitle) return;
+
+    const trimmed = tempTitle.trim();
+    const currentTitle = getDisplayTitle();
+
+    // Only update if the title actually changed and is not empty
+    if (trimmed && trimmed !== currentTitle) {
+      setInvoiceTitle(trimmed);
+      // Mark as unsaved change when editing a saved receipt
+      if (editingSavedInvoice) {
+        setHasUnsavedChanges(true);
+      }
+    }
+    setIsEditingTitle(false);
+    setTempTitle("");
+  };
+
+  const handleCancelEditingTitle = () => {
+    setIsEditingTitle(false);
+    setTempTitle("");
   };
 
   const handleAddPerson = () => {
@@ -397,21 +482,55 @@ export default function AssignItemsScreen() {
             )}
           </View>
 
-          {/* Title */}
-          <View className="mb-6">
+          {/* Editable Receipt Title */}
+          <View style={{ marginBottom: 24 }}>
             <Text
               style={{
-                fontSize: 36,
-                fontWeight: "bold",
-                color: colors.text.primary,
+                fontSize: 14,
+                fontWeight: "600",
+                color: colors.text.secondary,
                 marginBottom: 8,
+                textTransform: "uppercase",
               }}
             >
-              Assign Items
+              Receipt Name
             </Text>
-            <Text style={{ fontSize: 18, color: colors.text.secondary }}>
-              Select who ordered each item
-            </Text>
+            <TextInput
+              value={isEditingTitle ? tempTitle : getDisplayTitle()}
+              onFocus={() => {
+                if (!isEditingTitle) {
+                  setTempTitle(getDisplayTitle());
+                  setIsEditingTitle(true);
+                }
+              }}
+              onChangeText={(text) => {
+                if (!isEditingTitle) {
+                  setTempTitle(text);
+                  setIsEditingTitle(true);
+                } else {
+                  setTempTitle(text);
+                }
+              }}
+              onBlur={() => {
+                if (isEditingTitle) {
+                  handleSaveTitle();
+                }
+              }}
+              style={{
+                fontSize: 24,
+                fontWeight: "700",
+                color: colors.text.primary,
+                padding: 16,
+                backgroundColor: colors.background.primary,
+                borderRadius: 12,
+                borderWidth: 2,
+                borderColor: isEditingTitle
+                  ? colors.accent.primary
+                  : colors.border,
+              }}
+              placeholder="Enter receipt name"
+              placeholderTextColor={colors.text.secondary}
+            />
           </View>
 
           {/* Manage People Section */}

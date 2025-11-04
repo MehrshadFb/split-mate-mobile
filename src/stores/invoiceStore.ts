@@ -14,6 +14,7 @@ interface InvoiceState {
 
   // Actions
   setInvoice: (invoice: Invoice) => void;
+  setInvoiceTitle: (title: string) => void;
   addPerson: (name: string) => void;
   removePerson: (name: string) => void;
   setPeople: (people: string[]) => void;
@@ -42,6 +43,20 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
 
   setInvoice: (invoice) =>
     set({ currentInvoice: invoice, hasUnsavedChanges: false }),
+
+  setInvoiceTitle: (title) => {
+    set((state) => {
+      if (!state.currentInvoice) return state;
+      return {
+        currentInvoice: {
+          ...state.currentInvoice,
+          title,
+          updatedAt: new Date().toISOString(),
+        },
+        hasUnsavedChanges: true,
+      };
+    });
+  },
 
   addPerson: (name) => {
     const trimmedName = name.trim();
@@ -225,6 +240,7 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
     const invoiceToSave: Invoice = {
       ...currentInvoice,
       id: invoiceId,
+      title: currentInvoice.title, // Explicitly preserve title
       items: currentInvoice.items.map((item) => ({
         ...item,
         splitBetween: [...item.splitBetween],
