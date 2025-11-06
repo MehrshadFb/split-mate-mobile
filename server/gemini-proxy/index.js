@@ -342,7 +342,7 @@ app.use((error, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`🚀 Gemini Proxy Server running on port ${PORT}`);
   console.log(`   Environment: ${process.env.NODE_ENV || "development"}`);
-  console.log(`   Gemini Model: gemini-1.5-pro`);
+  console.log(`   Gemini Model: gemini-2.5-pro`);
   console.log(`   Max retries: ${GEMINI_CONFIG.maxRetries}`);
   console.log(`   Timeout: ${GEMINI_CONFIG.timeout}ms`);
 });
