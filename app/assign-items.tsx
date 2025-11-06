@@ -51,6 +51,15 @@ export default function AssignItemsScreen() {
     setPeople([]);
   }, [setEditingSavedInvoice, clearInvoice, setPeople]);
 
+  // Clear session on unmount if editing existing invoice
+  useEffect(() => {
+    return () => {
+      if (editingSavedInvoice) {
+        clearExistingSession();
+      }
+    };
+  }, [editingSavedInvoice, clearExistingSession]);
+
   const [editingItem, setEditingItem] = useState<{
     index: number;
     name: string;
