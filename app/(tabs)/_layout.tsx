@@ -18,8 +18,8 @@ export default function TabLayout() {
           backgroundColor: colors.background.primary,
           borderTopColor: colors.border,
         },
-        animation: "shift", // Default tab animation
-        lazy: true, // Only render tabs when they're focused
+        animation: "shift",
+        lazy: false,
       }}
       initialRouteName="mates"
     >
@@ -30,8 +30,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="people" size={size} color={color} />
           ),
-          // Prevent issues with rapid tapping
-          freezeOnBlur: true,
         }}
       />
       <Tabs.Screen
@@ -41,8 +39,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="receipt" size={size} color={color} />
           ),
-          // Prevent issues with rapid tapping
-          freezeOnBlur: true,
         }}
       />
       <Tabs.Screen
@@ -52,15 +48,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="settings" size={size} color={color} />
           ),
-          // Prevent issues with rapid tapping
-          freezeOnBlur: true,
-        }}
-      />
-      <Tabs.Screen
-        name="upload"
-        options={{
-          href: null,
-          tabBarStyle: { display: "none" },
         }}
       />
     </Tabs>

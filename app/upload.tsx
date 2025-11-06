@@ -1,4 +1,4 @@
-// app/(tabs)/upload.tsx
+// app/upload.tsx
 // Upload receipt screen with camera and file picker
 
 import { Ionicons } from "@expo/vector-icons";
@@ -14,12 +14,12 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button } from "../../src/components/Button";
-import { ErrorBanner } from "../../src/components/ErrorBanner";
-import { ProgressBar } from "../../src/components/ProgressBar";
-import { useTheme } from "../../src/contexts/ThemeContext";
-import { useUpload } from "../../src/hooks/useUpload";
-import { useInvoiceStore } from "../../src/stores/invoiceStore";
+import { Button } from "../src/components/Button";
+import { ErrorBanner } from "../src/components/ErrorBanner";
+import { ProgressBar } from "../src/components/ProgressBar";
+import { useTheme } from "../src/contexts/ThemeContext";
+import { useUpload } from "../src/hooks/useUpload";
+import { useInvoiceStore } from "../src/stores/invoiceStore";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES = [

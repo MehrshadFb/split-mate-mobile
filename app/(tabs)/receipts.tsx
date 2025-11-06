@@ -2,8 +2,8 @@
 // Saved receipts overview
 
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import React, { useEffect } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
+import React, { useCallback } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button } from "../../src/components/Button";
@@ -23,9 +23,13 @@ export default function ReceiptsScreen() {
     setEditingSavedInvoice,
   } = useInvoiceStore();
 
-  useEffect(() => {
-    loadSavedInvoices();
-  }, [loadSavedInvoices]);
+  // Use useFocusEffect to load invoices when screen comes into focus
+  // This prevents issues with tab navigation and freezeOnBlur
+  useFocusEffect(
+    useCallback(() => {
+      loadSavedInvoices();
+    }, [])
+  );
 
   const handleOpenSavedInvoice = (invoice: Invoice) => {
     const cloned: Invoice = {

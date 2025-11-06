@@ -119,10 +119,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  if (isLoading) {
-    return null; // Or a loading screen
-  }
-
   return (
     <ThemeContext.Provider value={{ theme, colorScheme, setTheme, colors }}>
       {children}

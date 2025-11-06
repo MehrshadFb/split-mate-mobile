@@ -59,7 +59,7 @@ export default function MatesScreen() {
     setEditingSavedInvoice(false);
     // Use push with slide animation (default iOS behavior)
     router.push({
-      pathname: "/(tabs)/upload",
+      pathname: "/upload",
       // Animation is handled by the native stack navigator
     });
   };
