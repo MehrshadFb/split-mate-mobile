@@ -2,8 +2,9 @@
 // Items assignment screen - assign items to people (NOT a tab)
 
 import { Ionicons } from "@expo/vector-icons";
+import { usePreventRemove } from "@react-navigation/native";
 import { useNavigation, useRouter } from "expo-router";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Alert,
   ScrollView,
@@ -44,8 +45,6 @@ export default function AssignItemsScreen() {
     setInvoiceTitle,
   } = useInvoiceStore();
 
-  const allowNavigationRef = useRef(false);
-
   const clearExistingSession = useCallback(() => {
     setEditingSavedInvoice(false);
     clearInvoice();
@@ -70,7 +69,6 @@ export default function AssignItemsScreen() {
       if (resetType === "existing") {
         clearExistingSession();
         // For existing receipts, go back with animation
-        allowNavigationRef.current = true;
         if (router.canGoBack()) {
           router.back();
         } else {
@@ -79,7 +77,6 @@ export default function AssignItemsScreen() {
       } else {
         // For new receipts, navigate to receipts tab to show the saved list
         resetSession();
-        allowNavigationRef.current = true;
         router.replace("/(tabs)/receipts");
       }
     },
@@ -127,74 +124,29 @@ export default function AssignItemsScreen() {
     setInvoiceTitle,
   ]);
 
-  useEffect(() => {
-    if (!editingSavedInvoice) {
-      return;
-    }
-
-    const unsubscribe = navigation.addListener("beforeRemove", (event) => {
-      if (allowNavigationRef.current) {
-        allowNavigationRef.current = false;
-        return;
-      }
-
-      // Check if title is being edited and has changed
-      const titleChanged =
-        isEditingTitle && tempTitle.trim() !== getDisplayTitle();
-
-      if (!hasUnsavedChanges && !titleChanged) {
-        clearExistingSession();
-        allowNavigationRef.current = true;
-        navigation.dispatch(event.data.action);
-        return;
-      }
-
-      event.preventDefault();
-
-      // If title is being edited, save it before showing alert
-      if (titleChanged) {
-        setInvoiceTitle(tempTitle.trim());
-        setIsEditingTitle(false);
-        setTempTitle("");
-        setHasUnsavedChanges(true);
-      }
-
-      Alert.alert(
-        "Unsaved changes",
-        "Do you want to save your changes before leaving?",
-        [
-          { text: "Cancel", style: "cancel" },
-          {
-            text: "Discard",
-            style: "destructive",
-            onPress: () => {
-              clearExistingSession();
-              allowNavigationRef.current = true;
-              navigation.dispatch(event.data.action);
-            },
+  usePreventRemove(hasUnsavedChanges, ({ data }) => {
+    Alert.alert(
+      "Unsaved changes",
+      "Do you want to save your changes before leaving?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Discard",
+          style: "destructive",
+          onPress: () => {
+            clearExistingSession();
+            navigation.dispatch(data.action);
           },
-          {
-            text: "Save changes",
-            onPress: () => {
-              handleSaveInvoice();
-            },
+        },
+        {
+          text: "Save changes",
+          onPress: () => {
+            handleSaveInvoice();
           },
-        ]
-      );
-    });
-
-    return unsubscribe;
-  }, [
-    navigation,
-    editingSavedInvoice,
-    hasUnsavedChanges,
-    clearExistingSession,
-    handleSaveInvoice,
-    isEditingTitle,
-    tempTitle,
-    setInvoiceTitle,
-    setHasUnsavedChanges,
-  ]);
+        },
+      ]
+    );
+  });
 
   // Initialize empty invoice if none exists (for manual entry)
   useEffect(() => {
@@ -255,43 +207,10 @@ export default function AssignItemsScreen() {
   );
 
   const handleBack = () => {
-    if (editingSavedInvoice) {
-      // Check if title is being edited and has changed
-      const titleChanged =
-        isEditingTitle && tempTitle.trim() !== getDisplayTitle();
-
-      if (hasUnsavedChanges || titleChanged) {
-        // If title is being edited, save it before showing alert
-        if (titleChanged) {
-          setInvoiceTitle(tempTitle.trim());
-          setIsEditingTitle(false);
-          setTempTitle("");
-          setHasUnsavedChanges(true);
-        }
-
-        Alert.alert(
-          "Unsaved changes",
-          "Do you want to save your changes before leaving?",
-          [
-            { text: "Cancel", style: "cancel" },
-            {
-              text: "Discard",
-              style: "destructive",
-              onPress: () => navigateToList("existing"),
-            },
-            {
-              text: "Save changes",
-              onPress: () => {
-                handleSaveInvoice();
-              },
-            },
-          ]
-        );
-      } else {
-        navigateToList("existing");
-      }
+    if (router.canGoBack()) {
+      router.back();
     } else {
-      router.back(); // Use back() instead of push to properly reverse the navigation
+      router.replace("/(tabs)/receipts");
     }
   };
 
