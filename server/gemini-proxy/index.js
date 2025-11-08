@@ -266,9 +266,6 @@ async function processGeminiScan(scanJobId) {
 
       console.log(`✓ Scan ${scanJobId} completed successfully`);
 
-      // TODO: Send push notification to client
-      // await sendPushNotification(job.userId, scanJobId, 'success');
-
       return;
     } catch (error) {
       console.error(
@@ -304,25 +301,9 @@ async function processGeminiScan(scanJobId) {
         console.error(
           `✗ Scan ${scanJobId} failed after ${GEMINI_CONFIG.maxRetries} attempts`
         );
-
-        // TODO: Send failure push notification
-        // await sendPushNotification(job.userId, scanJobId, 'failed');
       }
     }
   }
-}
-
-/**
- * Send push notification (placeholder - implement with Expo or APNs)
- */
-async function sendPushNotification(userId, scanJobId, status) {
-  // TODO: Implement push notification
-  // For Expo: Use Expo Push Notification service
-  // For APNs: Use node-apn or similar library
-
-  console.log(
-    `[Push Notification] User: ${userId}, Job: ${scanJobId}, Status: ${status}`
-  );
 }
 
 // Error handling middleware

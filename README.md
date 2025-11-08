@@ -26,13 +26,11 @@ A React Native mobile app for splitting expenses with friends, powered by Google
 
 - 📊 Real-time upload progress tracking
 
-- 🎨 Claude AI-inspired color paletteIn the output, you'll find options to open the app in a
+- 🎨 Claude AI-inspired color palette
 
 - 🔒 Secure - API keys never exposed to client
 
-- 📲 Push notifications for scan completion- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-
-- ⚡ React Query for server state management- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
+- ⚡ React Query for server state management
 
 - 🐻 Zustand for local state- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
 

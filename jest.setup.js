@@ -14,12 +14,13 @@ jest.mock("expo-image-picker", () => ({
   launchImageLibraryAsync: jest.fn(),
 }));
 
-jest.mock("expo-notifications", () => ({
-  getExpoPushTokenAsync: jest.fn(),
-  setNotificationHandler: jest.fn(),
-  addNotificationReceivedListener: jest.fn(),
-  addNotificationResponseReceivedListener: jest.fn(),
+jest.mock("expo-router", () => ({
+  useRouter: jest.fn(),
+  usePathname: jest.fn(),
+  useLocalSearchParams: jest.fn(),
 }));
+
+jest.mock("expo-status-bar", () => ({
 
 // Suppress console warnings in tests
 global.console = {
