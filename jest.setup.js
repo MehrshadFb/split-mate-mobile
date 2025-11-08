@@ -21,6 +21,8 @@ jest.mock("expo-router", () => ({
 }));
 
 jest.mock("expo-status-bar", () => ({
+  StatusBar: jest.fn(),
+}));
 
 // Suppress console warnings in tests
 global.console = {
