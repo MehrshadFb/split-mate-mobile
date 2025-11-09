@@ -1,11 +1,9 @@
 // app/_layout.tsx
 // Root layout - providers and navigation setup
 
-import { QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { ThemeProvider, useTheme } from "../src/contexts/ThemeContext";
-import { queryClient } from "../src/services/queryClient";
 import "./globals.css";
 
 function RootStack() {
@@ -35,9 +33,7 @@ function RootStack() {
 export default function RootLayout() {
   return (
     <ThemeProvider>
-      <QueryClientProvider client={queryClient}>
-        <RootStack />
-      </QueryClientProvider>
+      <RootStack />
     </ThemeProvider>
   );
 }

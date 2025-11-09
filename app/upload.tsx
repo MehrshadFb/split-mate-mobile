@@ -1,10 +1,10 @@
 // app/upload.tsx
-// Upload receipt screen with camera and file picker
+// Simplified upload receipt screen
 
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Alert,
   Image,
@@ -15,85 +15,40 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button } from "../src/components/Button";
-import { ErrorBanner } from "../src/components/ErrorBanner";
-import { ProgressBar } from "../src/components/ProgressBar";
 import { useTheme } from "../src/contexts/ThemeContext";
 import { useUpload } from "../src/hooks/useUpload";
 import { useInvoiceStore } from "../src/stores/invoiceStore";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-const ALLOWED_TYPES = [
-  "image/jpeg",
-  "image/png",
-  "image/jpg",
-  "application/pdf",
-];
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/jpg"];
+
+interface SelectedImage {
+  uri: string;
+  fileName: string;
+  mimeType: string;
+  fileSize?: number;
+}
 
 export default function UploadScreen() {
   const router = useRouter();
   const { colors } = useTheme();
-  const { queue, addToQueue, processAllReceipts, cancelUpload, retryUpload } =
-    useUpload();
-  const { people, addItem, clearInvoice, setEditingSavedInvoice } =
-    useInvoiceStore();
-  const [selectedImages, setSelectedImages] = useState<string[]>([]);
-
-  // Watch for all scans to complete and navigate
-  useEffect(() => {
-    const scannedJobs = queue.filter((job) => job.status === "scanned");
-    const processingJobs = queue.filter(
-      (job) =>
-        job.status === "uploading" ||
-        job.status === "scanning" ||
-        job.status === "pending"
-    );
-
-    // If we have scanned jobs and no more processing, navigate
-    if (scannedJobs.length > 0 && processingJobs.length === 0) {
-      console.log(
-        `🎉 All ${scannedJobs.length} receipts scanned! Navigating...`
-      );
-
-      // Clear existing invoice items before adding new ones
-      clearInvoice();
-      setEditingSavedInvoice(false);
-
-      // Add all items from all receipts
-      scannedJobs.forEach((job) => {
-        if (job.result?.items) {
-          job.result.items.forEach((item) => {
-            addItem({
-              name: item.name,
-              price: item.price,
-              splitBetween: [], // User will assign people
-            });
-          });
-        }
-      });
-
-      // Navigate to items assignment screen (not a tab)
-      setTimeout(() => {
-        router.push("/assign-items");
-      }, 500);
-    }
-  }, [queue, clearInvoice, addItem, router, setEditingSavedInvoice]);
+  const { uploadReceipts, isLoading, error, clearError } = useUpload();
+  const { addItem, clearInvoice, setEditingSavedInvoice } = useInvoiceStore();
+  const [selectedImages, setSelectedImages] = useState<SelectedImage[]>([]);
 
   const validateFile = (uri: string, type: string, size?: number): boolean => {
     // Check file type
     if (!ALLOWED_TYPES.some((allowed) => type.includes(allowed))) {
       Alert.alert(
         "Unsupported File",
-        "This file isn't supported. Try a JPG, PNG, or PDF under 10 MB."
+        "Please select a JPG or PNG image under 10 MB."
       );
       return false;
     }
 
     // Check file size
     if (size && size > MAX_FILE_SIZE) {
-      Alert.alert(
-        "File Too Large",
-        "This file is too large. Try a file under 10 MB."
-      );
+      Alert.alert("File Too Large", "Please select an image under 10 MB.");
       return false;
     }
 
@@ -121,20 +76,18 @@ export default function UploadScreen() {
 
       if (!result.canceled && result.assets[0]) {
         const asset = result.assets[0];
-        if (
-          validateFile(
-            asset.uri,
-            asset.mimeType || "image/jpeg",
-            asset.fileSize
-          )
-        ) {
-          setSelectedImages((prev) => [...prev, asset.uri]);
-          addToQueue(
-            asset.uri,
-            asset.fileName || `receipt-${Date.now()}.jpg`,
-            asset.fileSize || 0,
-            asset.mimeType || "image/jpeg"
-          );
+        const mimeType = asset.mimeType || "image/jpeg";
+
+        if (validateFile(asset.uri, mimeType, asset.fileSize)) {
+          setSelectedImages((prev) => [
+            ...prev,
+            {
+              uri: asset.uri,
+              fileName: asset.fileName || `receipt-${Date.now()}.jpg`,
+              mimeType,
+              fileSize: asset.fileSize,
+            },
+          ]);
         }
       }
     } catch (error) {
@@ -154,20 +107,18 @@ export default function UploadScreen() {
 
       if (!result.canceled && result.assets[0]) {
         const asset = result.assets[0];
-        if (
-          validateFile(
-            asset.uri,
-            asset.mimeType || "image/jpeg",
-            asset.fileSize
-          )
-        ) {
-          setSelectedImages((prev) => [...prev, asset.uri]);
-          addToQueue(
-            asset.uri,
-            asset.fileName || `receipt-${Date.now()}.jpg`,
-            asset.fileSize || 0,
-            asset.mimeType || "image/jpeg"
-          );
+        const mimeType = asset.mimeType || "image/jpeg";
+
+        if (validateFile(asset.uri, mimeType, asset.fileSize)) {
+          setSelectedImages((prev) => [
+            ...prev,
+            {
+              uri: asset.uri,
+              fileName: asset.fileName || `receipt-${Date.now()}.jpg`,
+              mimeType,
+              fileSize: asset.fileSize,
+            },
+          ]);
         }
       }
     } catch (error) {
@@ -176,23 +127,43 @@ export default function UploadScreen() {
     }
   };
 
+  const handleRemoveImage = (index: number) => {
+    setSelectedImages((prev) => prev.filter((_, i) => i !== index));
+    clearError();
+  };
+
+  const handleProceed = async () => {
+    if (selectedImages.length === 0) return;
+
+    clearError();
+
+    // Upload and process
+    const items = await uploadReceipts(selectedImages);
+
+    if (items && items.length > 0) {
+      // Success! Clear existing invoice and add new items
+      clearInvoice();
+      setEditingSavedInvoice(false);
+
+      items.forEach((item) => {
+        addItem({
+          name: item.name,
+          price: item.price,
+          splitBetween: [], // User will assign people
+        });
+      });
+
+      // Navigate to items assignment screen
+      router.push("/assign-items");
+    }
+    // Error is already set by the hook
+  };
+
   const handleManualEntry = () => {
     clearInvoice();
     setEditingSavedInvoice(false);
     router.push("/assign-items");
   };
-
-  const queuedReceipts = queue.filter((job) => job.status === "queued");
-  const processingUploads = queue.filter(
-    (job) =>
-      job.status === "uploading" ||
-      job.status === "pending" ||
-      job.status === "scanning"
-  );
-  const failedUploads = queue.filter((job) => job.status === "failed");
-
-  const canProcess =
-    queuedReceipts.length > 0 && processingUploads.length === 0;
 
   return (
     <SafeAreaView
@@ -233,12 +204,14 @@ export default function UploadScreen() {
           {/* Camera Button */}
           <TouchableOpacity
             onPress={handleTakePhoto}
+            disabled={isLoading}
             style={{
               backgroundColor: colors.accent.primary,
               borderRadius: 16,
               padding: 24,
               marginBottom: 16,
               alignItems: "center",
+              opacity: isLoading ? 0.5 : 1,
             }}
             activeOpacity={0.7}
           >
@@ -268,6 +241,7 @@ export default function UploadScreen() {
           {/* File Picker Button */}
           <TouchableOpacity
             onPress={handleChooseFile}
+            disabled={isLoading}
             style={{
               backgroundColor: colors.background.secondary,
               borderWidth: 2,
@@ -276,6 +250,7 @@ export default function UploadScreen() {
               padding: 24,
               marginBottom: 16,
               alignItems: "center",
+              opacity: isLoading ? 0.5 : 1,
             }}
             activeOpacity={0.7}
           >
@@ -300,6 +275,143 @@ export default function UploadScreen() {
               Select an existing photo
             </Text>
           </TouchableOpacity>
+
+          {/* Preview Selected Images */}
+          {selectedImages.length > 0 && (
+            <View style={{ marginTop: 24 }}>
+              <Text
+                style={{
+                  color: colors.text.primary,
+                  fontWeight: "600",
+                  marginBottom: 12,
+                }}
+              >
+                Selected Receipts ({selectedImages.length})
+              </Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {selectedImages.map((image, index) => (
+                  <View
+                    key={index}
+                    style={{ marginRight: 12, position: "relative" }}
+                  >
+                    <Image
+                      source={{ uri: image.uri }}
+                      style={{
+                        width: 128,
+                        height: 192,
+                        borderRadius: 12,
+                      }}
+                      resizeMode="cover"
+                    />
+                    {!isLoading && (
+                      <TouchableOpacity
+                        onPress={() => handleRemoveImage(index)}
+                        style={{
+                          position: "absolute",
+                          top: 8,
+                          right: 8,
+                          backgroundColor: colors.error,
+                          borderRadius: 12,
+                          width: 24,
+                          height: 24,
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Ionicons name="close" size={16} color="white" />
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                ))}
+              </ScrollView>
+
+              {/* Proceed Button */}
+              <View style={{ marginTop: 16 }}>
+                <Button
+                  title={
+                    isLoading
+                      ? "Processing..."
+                      : `Proceed with ${selectedImages.length} Receipt${
+                          selectedImages.length > 1 ? "s" : ""
+                        }`
+                  }
+                  onPress={handleProceed}
+                  variant="primary"
+                  size="large"
+                  fullWidth
+                  disabled={selectedImages.length === 0}
+                  loading={isLoading}
+                  icon={
+                    !isLoading ? (
+                      <Ionicons
+                        name="sparkles"
+                        size={20}
+                        color={colors.text.inverse}
+                      />
+                    ) : undefined
+                  }
+                />
+              </View>
+
+              {/* Error Message */}
+              {error && (
+                <View
+                  style={{
+                    marginTop: 16,
+                    backgroundColor: colors.error + "20",
+                    borderRadius: 12,
+                    padding: 16,
+                    borderWidth: 1,
+                    borderColor: colors.error,
+                  }}
+                >
+                  <View
+                    style={{ flexDirection: "row", alignItems: "flex-start" }}
+                  >
+                    <Ionicons
+                      name="alert-circle"
+                      size={20}
+                      color={colors.error}
+                      style={{ marginRight: 8 }}
+                    />
+                    <View style={{ flex: 1 }}>
+                      <Text
+                        style={{
+                          color: colors.error,
+                          fontWeight: "600",
+                          marginBottom: 4,
+                        }}
+                      >
+                        Upload Failed
+                      </Text>
+                      <Text style={{ color: colors.error, fontSize: 14 }}>
+                        {error.message}
+                      </Text>
+                      {error.retryable && (
+                        <TouchableOpacity
+                          onPress={handleProceed}
+                          style={{ marginTop: 8 }}
+                        >
+                          <Text
+                            style={{
+                              color: colors.error,
+                              fontWeight: "600",
+                              textDecorationLine: "underline",
+                            }}
+                          >
+                            Tap to retry
+                          </Text>
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                    <TouchableOpacity onPress={clearError}>
+                      <Ionicons name="close" size={20} color={colors.error} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              )}
+            </View>
+          )}
 
           {/* Divider */}
           <View
@@ -333,6 +445,7 @@ export default function UploadScreen() {
             variant="outline"
             size="large"
             fullWidth
+            disabled={isLoading}
             icon={
               <Ionicons
                 name="create-outline"
@@ -341,181 +454,6 @@ export default function UploadScreen() {
               />
             }
           />
-
-          {/* Preview Selected Images */}
-          {selectedImages.length > 0 && (
-            <View style={{ marginTop: 24 }}>
-              <Text
-                style={{
-                  color: colors.text.primary,
-                  fontWeight: "600",
-                  marginBottom: 8,
-                }}
-              >
-                Selected Receipts ({selectedImages.length})
-              </Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                {selectedImages.map((uri, index) => (
-                  <Image
-                    key={index}
-                    source={{ uri }}
-                    style={{
-                      width: 128,
-                      height: 192,
-                      borderRadius: 12,
-                      marginRight: 12,
-                    }}
-                    resizeMode="cover"
-                  />
-                ))}
-              </ScrollView>
-            </View>
-          )}
-
-          {/* Queued Receipts */}
-          {queuedReceipts.length > 0 && (
-            <View style={{ marginTop: 24 }}>
-              <Text
-                style={{
-                  color: colors.text.primary,
-                  fontWeight: "600",
-                  marginBottom: 12,
-                }}
-              >
-                {queuedReceipts.length} receipt
-                {queuedReceipts.length > 1 ? "s" : ""} ready to process
-              </Text>
-              {queuedReceipts.map((job) => (
-                <View
-                  key={job.id}
-                  style={{
-                    backgroundColor: colors.background.secondary,
-                    borderRadius: 12,
-                    padding: 16,
-                    marginBottom: 12,
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <View style={{ flex: 1 }}>
-                    <Text
-                      style={{ color: colors.text.primary, fontWeight: "500" }}
-                    >
-                      {job.fileName}
-                    </Text>
-                    <Text
-                      style={{
-                        color: colors.text.tertiary,
-                        fontSize: 12,
-                        marginTop: 4,
-                      }}
-                    >
-                      Ready to scan
-                    </Text>
-                  </View>
-                  <TouchableOpacity
-                    onPress={() => cancelUpload(job.id)}
-                    style={{ marginLeft: 8 }}
-                  >
-                    <Ionicons
-                      name="trash-outline"
-                      size={20}
-                      color={colors.error}
-                    />
-                  </TouchableOpacity>
-                </View>
-              ))}
-
-              {/* Process All Button */}
-              <Button
-                title={`Process ${queuedReceipts.length} Receipt${
-                  queuedReceipts.length > 1 ? "s" : ""
-                }`}
-                onPress={processAllReceipts}
-                variant="primary"
-                size="large"
-                fullWidth
-                disabled={!canProcess}
-                icon={
-                  <Ionicons
-                    name="sparkles"
-                    size={20}
-                    color={colors.text.inverse}
-                  />
-                }
-              />
-            </View>
-          )}
-
-          {/* Processing Uploads */}
-          {processingUploads.length > 0 && (
-            <View style={{ marginTop: 24 }}>
-              <Text
-                style={{
-                  color: colors.text.primary,
-                  fontWeight: "600",
-                  marginBottom: 12,
-                }}
-              >
-                Processing {processingUploads.length} receipt
-                {processingUploads.length > 1 ? "s" : ""}
-              </Text>
-              {processingUploads.map((job) => (
-                <View
-                  key={job.id}
-                  style={{
-                    backgroundColor: colors.background.secondary,
-                    borderRadius: 12,
-                    padding: 16,
-                    marginBottom: 12,
-                  }}
-                >
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      marginBottom: 8,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: colors.text.primary,
-                        fontWeight: "500",
-                        flex: 1,
-                      }}
-                    >
-                      {job.fileName}
-                    </Text>
-                  </View>
-                  <ProgressBar progress={job.progress} />
-                  <Text
-                    style={{
-                      color: colors.text.tertiary,
-                      fontSize: 12,
-                      marginTop: 8,
-                    }}
-                  >
-                    {job.status === "uploading" && "Uploading..."}
-                    {job.status === "scanning" && "🤖 AI reading receipt..."}
-                    {job.status === "pending" && "Waiting..."}
-                  </Text>
-                </View>
-              ))}
-            </View>
-          )}
-
-          {/* Failed Uploads */}
-          {failedUploads.map((job) => (
-            <ErrorBanner
-              key={job.id}
-              message={job.error?.userMessage || "Upload failed"}
-              onRetry={() => retryUpload(job.id)}
-              retryCount={job.attempt}
-              onDismiss={() => cancelUpload(job.id)}
-            />
-          ))}
 
           {/* Info */}
           <View
@@ -540,11 +478,14 @@ export default function UploadScreen() {
                     marginBottom: 4,
                   }}
                 >
-                  Supported Files
+                  How it works
                 </Text>
                 <Text style={{ color: colors.text.secondary, fontSize: 14 }}>
-                  JPG, PNG, or PDF files under 10 MB{"\n"}
-                  Your receipt will be securely processed by AI
+                  1. Take a photo or select a receipt image{"\n"}
+                  2. Our AI will read and extract the items{"\n"}
+                  3. Review and assign items to your mates{"\n"}
+                  {"\n"}
+                  Supported: JPG, PNG under 10 MB
                 </Text>
               </View>
             </View>

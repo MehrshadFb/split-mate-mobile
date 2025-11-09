@@ -1,123 +1,193 @@
 // src/services/api.ts
-// API client with axios and retry logic
+// Simplified API client for receipt scanning
 
-import axios, { AxiosError, AxiosInstance, CancelTokenSource } from "axios";
-import { ApiError, ScanStatusResponse, ScanUploadResponse } from "../types/api";
-import { createScanError } from "../utils/errors";
+import axios, { AxiosInstance } from "axios";
 
 // Use environment variable for API base URL
 // In development: http://localhost:3000
 // In production: https://api.splitmate.app
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:3000";
 
+export interface ReceiptItem {
+  name: string;
+  price: number;
+}
+
+export interface UploadError {
+  message: string;
+  retryable: boolean;
+}
+
 class ApiService {
   private client: AxiosInstance;
-  private uploadCancelTokens: Map<string, CancelTokenSource> = new Map();
 
   constructor() {
     this.client = axios.create({
       baseURL: API_BASE_URL,
-      timeout: 30000, // 30 second timeout
+      timeout: 90000, // 90 second total timeout (upload + processing)
       headers: {
         "Content-Type": "application/json",
       },
     });
+  }
 
-    // Response interceptor for error handling
-    this.client.interceptors.response.use(
-      (response) => response,
-      (error: AxiosError) => {
-        const apiError: ApiError = {
-          code: error.code || "UNKNOWN_ERROR",
-          message: error.message,
-          statusCode: error.response?.status || 0,
+  /**
+   * Upload receipt images and wait for processing
+   * Returns the scanned items or throws an error
+   *
+   * Edge cases handled:
+   * - Server down (network error)
+   * - Server timeout
+   * - Gemini API failure
+   * - Invalid image (not a receipt)
+   * - Processing errors
+   */
+  async uploadReceipts(
+    images: Array<{
+      uri: string;
+      fileName: string;
+      mimeType: string;
+    }>
+  ): Promise<ReceiptItem[]> {
+    try {
+      // Step 1: Upload image(s) to server
+      const formData = new FormData();
+
+      images.forEach((image) => {
+        // @ts-ignore - React Native FormData accepts file objects differently
+        formData.append("receipt", {
+          uri: image.uri,
+          type: image.mimeType,
+          name: image.fileName,
+        });
+      });
+
+      const uploadResponse = await this.client.post<{
+        success: boolean;
+        data: {
+          scanJobId: string;
+          status: string;
+          message: string;
         };
-        throw createScanError(apiError, error.response?.status);
+      }>("/api/scan", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (!uploadResponse.data.success || !uploadResponse.data.data.scanJobId) {
+        throw new Error("Failed to upload receipt");
       }
-    );
-  }
 
-  /**
-   * Upload receipt image to server for Gemini processing
-   * Returns scanJobId immediately
-   */
-  async uploadReceipt(
-    fileUri: string,
-    fileName: string,
-    mimeType: string,
-    onProgress?: (progress: number) => void
-  ): Promise<ScanUploadResponse> {
-    const formData = new FormData();
+      const scanJobId = uploadResponse.data.data.scanJobId;
 
-    // @ts-ignore - React Native FormData accepts file objects differently
-    formData.append("receipt", {
-      uri: fileUri,
-      type: mimeType,
-      name: fileName,
-    });
+      // Step 2: Poll for results (max 60 seconds, every 2 seconds)
+      const maxPolls = 30; // 30 polls * 2 seconds = 60 seconds
+      let pollCount = 0;
 
-    // Create cancel token for this upload
-    const cancelTokenSource = axios.CancelToken.source();
-    const uploadId = `${Date.now()}-${fileName}`;
-    this.uploadCancelTokens.set(uploadId, cancelTokenSource);
+      while (pollCount < maxPolls) {
+        await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait 2 seconds
+        pollCount++;
 
-    try {
-      const response = await this.client.post<ScanUploadResponse>(
-        "/api/scan",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-          cancelToken: cancelTokenSource.token,
-          onUploadProgress: (progressEvent) => {
-            if (progressEvent.total) {
-              const progress = Math.round(
-                (progressEvent.loaded * 100) / progressEvent.total
-              );
-              onProgress?.(progress);
-            }
-          },
+        const statusResponse = await this.client.get<{
+          success: boolean;
+          data: {
+            status: "queued" | "scanning" | "scanned" | "failed";
+            result?: {
+              items: ReceiptItem[];
+            };
+            error?: {
+              code: string;
+              message: string;
+            };
+          };
+        }>(`/api/scan/${scanJobId}`);
+
+        const { status, result, error } = statusResponse.data.data;
+
+        if (status === "scanned" && result?.items) {
+          // Success! Return the items
+          return result.items;
+        } else if (status === "failed") {
+          // Gemini failed to process the image
+          const errorMessage = error?.message || "Failed to read receipt";
+
+          // Check if it's a Gemini-specific error
+          if (error?.code === "GEMINI_API_ERROR") {
+            throw {
+              message:
+                "AI service is currently unavailable. Please try again later.",
+              retryable: true,
+            } as UploadError;
+          } else if (error?.code === "INVALID_RECEIPT") {
+            throw {
+              message:
+                "This doesn't appear to be a valid receipt. Please try another image.",
+              retryable: false,
+            } as UploadError;
+          } else {
+            throw {
+              message: errorMessage,
+              retryable: true,
+            } as UploadError;
+          }
         }
-      );
+        // Otherwise keep polling (status is "queued" or "scanning")
+      }
 
-      return response.data;
-    } finally {
-      this.uploadCancelTokens.delete(uploadId);
-    }
-  }
+      // Timeout - took too long
+      throw {
+        message: "Processing is taking longer than expected. Please try again.",
+        retryable: true,
+      } as UploadError;
+    } catch (error: any) {
+      // Handle different error types
 
-  /**
-   * Cancel an ongoing upload
-   */
-  cancelUpload(uploadId: string): void {
-    const cancelToken = this.uploadCancelTokens.get(uploadId);
-    if (cancelToken) {
-      cancelToken.cancel("Upload cancelled by user");
-      this.uploadCancelTokens.delete(uploadId);
-    }
-  }
+      // If it's already our custom error, re-throw it
+      if (error.message && error.retryable !== undefined) {
+        throw error;
+      }
 
-  /**
-   * Poll scan job status
-   * Client should poll this endpoint every 2-3 seconds while status is 'queued' or 'scanning'
-   */
-  async getScanStatus(scanJobId: string): Promise<ScanStatusResponse> {
-    const response = await this.client.get<ScanStatusResponse>(
-      `/api/scan/${scanJobId}`
-    );
-    return response.data;
-  }
+      // Network errors (server down, no internet)
+      if (error.code === "ECONNABORTED" || error.code === "ERR_NETWORK") {
+        throw {
+          message:
+            "Cannot connect to server. Please check your internet connection.",
+          retryable: true,
+        } as UploadError;
+      }
 
-  /**
-   * Health check endpoint
-   */
-  async healthCheck(): Promise<boolean> {
-    try {
-      await this.client.get("/health");
-      return true;
-    } catch {
-      return false;
+      // Timeout
+      if (error.code === "ECONNABORTED" || error.message?.includes("timeout")) {
+        throw {
+          message: "Request timed out. Please try again.",
+          retryable: true,
+        } as UploadError;
+      }
+
+      // Server errors (5xx)
+      if (error.response?.status >= 500) {
+        throw {
+          message: "Server error. Please try again later.",
+          retryable: true,
+        } as UploadError;
+      }
+
+      // Client errors (4xx)
+      if (error.response?.status >= 400 && error.response?.status < 500) {
+        throw {
+          message:
+            error.response?.data?.message ||
+            "Invalid request. Please try again.",
+          retryable: false,
+        } as UploadError;
+      }
+
+      // Unknown error
+      throw {
+        message: "Something went wrong. Please try again.",
+        retryable: true,
+      } as UploadError;
     }
   }
 }
