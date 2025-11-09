@@ -193,9 +193,13 @@ async function processGeminiScan(scanJobId) {
       const base64Data = job.fileBuffer.toString("base64");
 
       const prompt = `
-        Analyze this receipt image and extract all items with their prices, including tax as a separate item.
+        Analyze this image. First, determine if this is a receipt or invoice for purchased items.
         
-        Please return ONLY a JSON array in this exact format:
+        If this is NOT a receipt/invoice (e.g., it's a wall, person, random object, etc.), return an empty array: []
+        
+        If this IS a receipt/invoice, extract all items with their prices, including tax as a separate item.
+        
+        Return ONLY a JSON array in this exact format:
         [
           {"name": "item name", "price": 12.99},
           {"name": "another item", "price": 5.50},
@@ -212,6 +216,7 @@ async function processGeminiScan(scanJobId) {
         - Prices should be numbers (not strings)
         - If you can't clearly read an item or price, skip it
         - Return only the JSON array, no other text or explanation
+        - If this is not a receipt, return []
       `;
 
       const imagePart = {
@@ -249,6 +254,10 @@ async function processGeminiScan(scanJobId) {
       }
 
       // Validate extracted items
+      if (!Array.isArray(extractedItems) || extractedItems.length === 0) {
+        throw new Error("No items found - this may not be a valid receipt");
+      }
+
       const validatedItems = extractedItems.map((item) => ({
         name: item.name || "Unknown Item",
         price:
@@ -257,6 +266,14 @@ async function processGeminiScan(scanJobId) {
             : parseFloat(item.price) || 0,
       }));
 
+      // Additional validation - check if we have at least one item with a valid price
+      const hasValidItems = validatedItems.some((item) => item.price > 0);
+      if (!hasValidItems) {
+        throw new Error(
+          "No valid items with prices found - this may not be a receipt"
+        );
+      }
+
       // Update job with success
       job.status = "scanned";
       job.result = { items: validatedItems };
@@ -264,7 +281,9 @@ async function processGeminiScan(scanJobId) {
       delete job.fileBuffer; // Clear buffer to save memory
       scanJobs.set(scanJobId, job);
 
-      console.log(`✓ Scan ${scanJobId} completed successfully`);
+      console.log(
+        `✓ Scan ${scanJobId} completed successfully with ${validatedItems.length} items`
+      );
 
       return;
     } catch (error) {
@@ -288,10 +307,25 @@ async function processGeminiScan(scanJobId) {
       } else {
         // Max retries reached - mark as failed
         job.status = "failed";
+
+        // Determine error code based on error message
+        let errorCode = "GEMINI_API_ERROR";
+        if (error.message.includes("timeout")) {
+          errorCode = "GEMINI_TIMEOUT";
+        } else if (
+          error.message.includes("No items found") ||
+          error.message.includes("No valid items")
+        ) {
+          errorCode = "INVALID_RECEIPT";
+        } else if (
+          error.message.includes("parse") ||
+          error.message.includes("JSON")
+        ) {
+          errorCode = "PARSE_FAILED";
+        }
+
         job.error = {
-          code: error.message.includes("timeout")
-            ? "GEMINI_TIMEOUT"
-            : "PARSE_FAILED",
+          code: errorCode,
           message: error.message,
         };
         job.updatedAt = new Date().toISOString();
