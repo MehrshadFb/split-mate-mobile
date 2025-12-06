@@ -76,7 +76,6 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const systemColorScheme = useColorScheme();
   const [theme, setThemeState] = useState<Theme>("auto");
-  const [isLoading, setIsLoading] = useState(true);
 
   // Determine actual color scheme based on theme setting
   const colorScheme: ColorScheme =
@@ -104,8 +103,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (error) {
       console.error("Failed to load theme:", error);
-    } finally {
-      setIsLoading(false);
     }
   };
 

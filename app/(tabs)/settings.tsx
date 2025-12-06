@@ -32,10 +32,9 @@ export default function SettingsScreen() {
       style={{ flex: 1, backgroundColor: colors.background.primary }}
       edges={["top", "left", "right"]}
     >
-      <ScrollView className="flex-1">
-        <View className="p-6">
-          {/* Header */}
-          <View className="mb-8">
+      <ScrollView style={{ flex: 1 }}>
+        <View style={{ padding: 24 }}>
+          <View style={{ marginBottom: 24 }}>
             <Text
               style={{
                 fontSize: 36,
@@ -51,8 +50,7 @@ export default function SettingsScreen() {
             </Text>
           </View>
 
-          {/* Appearance Section */}
-          <View className="mb-6">
+          <View style={{ marginBottom: 24 }}>
             <Text
               style={{
                 fontSize: 20,
@@ -71,7 +69,6 @@ export default function SettingsScreen() {
                 overflow: "hidden",
               }}
             >
-              {/* Light Theme Option */}
               <TouchableOpacity
                 style={{
                   flexDirection: "row",
@@ -117,7 +114,6 @@ export default function SettingsScreen() {
                 )}
               </TouchableOpacity>
 
-              {/* Dark Theme Option */}
               <TouchableOpacity
                 style={{
                   flexDirection: "row",
@@ -163,7 +159,6 @@ export default function SettingsScreen() {
                 )}
               </TouchableOpacity>
 
-              {/* Automatic Theme Option */}
               <TouchableOpacity
                 style={{
                   flexDirection: "row",
@@ -220,8 +215,7 @@ export default function SettingsScreen() {
             </View>
           </View>
 
-          {/* About Section */}
-          <View className="mb-6">
+          <View style={{ marginBottom: 24 }}>
             <Text
               style={{
                 fontSize: 20,
@@ -422,7 +416,6 @@ export default function SettingsScreen() {
             </View>
           </View>
 
-          {/* App Info */}
           <View
             style={{
               backgroundColor: colors.accent.light,

@@ -77,9 +77,9 @@ export default function ReceiptsScreen() {
       style={{ flex: 1, backgroundColor: colors.background.primary }}
       edges={["top", "left", "right"]}
     >
-      <ScrollView className="flex-1">
-        <View className="p-6">
-          <View className="mb-8">
+      <ScrollView style={{ flex: 1 }}>
+        <View style={{ padding: 24 }}>
+          <View style={{ marginBottom: 24 }}>
             <Text
               style={{
                 fontSize: 36,

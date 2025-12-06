@@ -83,13 +83,13 @@ export default function MatesScreen() {
                 fontSize: 36,
                 fontWeight: "bold",
                 color: colors.text.primary,
-                marginBottom: 12,
+                marginBottom: 8,
               }}
             >
               Who's Splitting?
             </Text>
             <Text style={{ fontSize: 18, color: colors.text.secondary }}>
-              Add everyone who’s sharing this bill.
+              Add everyone who's sharing this bill.
             </Text>
           </View>
 
