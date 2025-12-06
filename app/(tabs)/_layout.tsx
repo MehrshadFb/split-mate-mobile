@@ -1,55 +1,38 @@
 // app/(tabs)/_layout.tsx
 // Tab navigation layout
 
-import { Ionicons } from "@expo/vector-icons";
-import { Tabs } from "expo-router";
+import { Icon, Label, NativeTabs } from "expo-router/unstable-native-tabs";
+import { DynamicColorIOS } from "react-native";
 import { useTheme } from "../../src/contexts/ThemeContext";
 
 export default function TabLayout() {
   const { colors } = useTheme();
 
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: colors.accent.primary,
-        tabBarInactiveTintColor: colors.text.tertiary,
-        tabBarStyle: {
-          backgroundColor: colors.background.primary,
-          borderTopColor: colors.border,
-        },
-        animation: "shift",
-        lazy: false,
+    <NativeTabs
+      labelStyle={{
+        color: DynamicColorIOS({
+          dark: colors.text.primary,
+          light: colors.text.primary,
+        }),
       }}
-      initialRouteName="mates"
+      tintColor={DynamicColorIOS({
+        dark: colors.accent.primary,
+        light: colors.accent.primary,
+      })}
     >
-      <Tabs.Screen
-        name="mates"
-        options={{
-          title: "Mates",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="people" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="receipts"
-        options={{
-          title: "Receipts",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="receipt" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: "Settings",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="settings" size={size} color={color} />
-          ),
-        }}
-      />
-    </Tabs>
+      <NativeTabs.Trigger name="mates">
+        <Label>Mates</Label>
+        <Icon sf="person.3.fill" />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="receipts">
+        <Label>Receipts</Label>
+        <Icon sf="doc.text.fill" />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="settings">
+        <Label>Settings</Label>
+        <Icon sf="gearshape.fill" />
+      </NativeTabs.Trigger>
+    </NativeTabs>
   );
 }
