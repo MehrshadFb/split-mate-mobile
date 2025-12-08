@@ -6,16 +6,16 @@ import { usePreventRemove } from "@react-navigation/native";
 import { useNavigation, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
-  Alert,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Alert,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button } from "../src/components/Button";
 import { useTheme } from "../src/contexts/ThemeContext";
+import { Button } from "../src/shared/components/Button";
 import { useInvoiceStore } from "../src/stores/invoiceStore";
 import { Invoice, Item } from "../src/types/invoice";
 

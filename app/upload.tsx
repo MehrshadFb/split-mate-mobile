@@ -6,17 +6,17 @@ import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
-  Alert,
-  Image,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
+    Alert,
+    Image,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button } from "../src/components/Button";
 import { useTheme } from "../src/contexts/ThemeContext";
 import { useUpload } from "../src/hooks/useUpload";
+import { Button } from "../src/shared/components/Button";
 import { useInvoiceStore } from "../src/stores/invoiceStore";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB

@@ -4,7 +4,6 @@
 import React from "react";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button } from "../../src/components/Button";
 import { useTheme } from "../../src/contexts/ThemeContext";
 import {
   AddMateInput,
@@ -14,6 +13,7 @@ import {
   MIN_MATES_REQUIRED,
   useMatesManagement,
 } from "../../src/features/mates";
+import { Button } from "../../src/shared/components/Button";
 
 export default function MatesScreen() {
   const { colors } = useTheme();
