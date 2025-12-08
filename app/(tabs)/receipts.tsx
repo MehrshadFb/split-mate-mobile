@@ -1,76 +1,23 @@
 // app/(tabs)/receipts.tsx
 // Saved receipts overview
 
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import React, { useEffect } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import React from "react";
+import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button } from "../../src/components/Button";
 import { useTheme } from "../../src/contexts/ThemeContext";
-import { useInvoiceStore } from "../../src/stores/invoiceStore";
-import { Invoice } from "../../src/types/invoice";
+import {
+  EmptyReceiptsState,
+  formatSavedDate,
+  getReceiptTitle,
+  ReceiptsHeader,
+  ReceiptsList,
+  useReceiptsManagement,
+} from "../../src/features/receipts";
 
 export default function ReceiptsScreen() {
-  const router = useRouter();
   const { colors } = useTheme();
-  const {
-    savedInvoices,
-    loadSavedInvoices,
-    setInvoice,
-    setPeople,
-    calculateTotals,
-    setEditingSavedInvoice,
-  } = useInvoiceStore();
-
-  useEffect(() => {
-    loadSavedInvoices();
-  }, [loadSavedInvoices]);
-
-  const handleOpenSavedInvoice = (invoice: Invoice) => {
-    const cloned: Invoice = {
-      ...invoice,
-      people: [...invoice.people],
-      items: invoice.items.map((item) => ({
-        ...item,
-        splitBetween: [...item.splitBetween],
-      })),
-      totals: invoice.totals.map((person) => ({ ...person })),
-    };
-
-    setPeople(cloned.people);
-    setInvoice(cloned);
-    calculateTotals();
-    setEditingSavedInvoice(true);
-    router.push("/assign-items");
-  };
-
-  const formatSavedDate = (timestamp?: string) => {
-    if (!timestamp) {
-      return "";
-    }
-    const date = new Date(timestamp);
-    if (Number.isNaN(date.getTime())) {
-      return "";
-    }
-    return date.toLocaleString(undefined, {
-      month: "short",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    });
-  };
-
-  const getReceiptTitle = (invoice: Invoice) => {
-    if (invoice.title) {
-      return invoice.title;
-    }
-    // Generate default title based on date
-    const date = new Date(invoice.createdAt || Date.now());
-    const month = date.toLocaleDateString("en-US", { month: "short" });
-    const day = date.getDate();
-    return `Receipt ${month} ${day}`;
-  };
+  const { savedInvoices, handleOpenSavedInvoice, handleStartNew } =
+    useReceiptsManagement();
 
   return (
     <SafeAreaView
@@ -79,158 +26,21 @@ export default function ReceiptsScreen() {
     >
       <ScrollView style={{ flex: 1 }}>
         <View style={{ padding: 24 }}>
-          <View style={{ marginBottom: 24 }}>
-            <Text
-              style={{
-                fontSize: 36,
-                fontWeight: "bold",
-                color: colors.text.primary,
-                marginBottom: 8,
-              }}
-            >
-              Saved Receipts
-            </Text>
-            <Text style={{ fontSize: 18, color: colors.text.secondary }}>
-              Pick up a past split or keep everything organised.
-            </Text>
-          </View>
-
+          {/* Header */}
+          <ReceiptsHeader
+            title="Saved Receipts"
+            subtitle="Pick up a past split or keep everything organised."
+          />
+          {/* Receipts List or Empty State */}
           {savedInvoices.length === 0 ? (
-            <View
-              style={{
-                backgroundColor: colors.background.secondary,
-                borderRadius: 20,
-                padding: 32,
-                alignItems: "center",
-                borderWidth: 1,
-                borderColor: colors.border,
-              }}
-            >
-              <Ionicons
-                name="archive-outline"
-                size={48}
-                color={colors.text.tertiary}
-              />
-              <Text
-                style={{
-                  color: colors.text.primary,
-                  fontWeight: "600",
-                  fontSize: 20,
-                  marginTop: 16,
-                  textAlign: "center",
-                }}
-              >
-                Nothing saved yet
-              </Text>
-              <Text
-                style={{
-                  color: colors.text.secondary,
-                  marginTop: 8,
-                  textAlign: "center",
-                }}
-              >
-                When you save a split, it appears here for quick access.
-              </Text>
-              <View style={{ width: "100%", marginTop: 24 }}>
-                <Button
-                  title="Start a new receipt"
-                  onPress={() => router.push("/(tabs)/mates")}
-                  variant="primary"
-                  size="large"
-                  fullWidth
-                  icon={<Ionicons name="sparkles" size={20} color="white" />}
-                />
-              </View>
-            </View>
+            <EmptyReceiptsState onStartNew={handleStartNew} />
           ) : (
-            <View>
-              {savedInvoices.map((invoice) => (
-                <TouchableOpacity
-                  key={invoice.id}
-                  onPress={() => handleOpenSavedInvoice(invoice)}
-                  activeOpacity={0.8}
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    backgroundColor: colors.background.secondary,
-                    borderRadius: 18,
-                    padding: 18,
-                    marginBottom: 14,
-                    borderWidth: 1,
-                    borderColor: colors.border,
-                  }}
-                >
-                  <View
-                    style={{
-                      width: 50,
-                      height: 50,
-                      borderRadius: 16,
-                      backgroundColor: colors.accent.light,
-                      alignItems: "center",
-                      justifyContent: "center",
-                      marginRight: 14,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: colors.accent.primary,
-                        fontWeight: "700",
-                        fontSize: 20,
-                      }}
-                    >
-                      {invoice.items.length}
-                    </Text>
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text
-                      style={{
-                        color: colors.text.primary,
-                        fontWeight: "700",
-                        fontSize: 17,
-                      }}
-                    >
-                      {getReceiptTitle(invoice)}
-                    </Text>
-                    <Text
-                      style={{
-                        color: colors.text.secondary,
-                        marginTop: 4,
-                      }}
-                    >
-                      {formatSavedDate(invoice.savedAt || invoice.updatedAt)}
-                    </Text>
-                  </View>
-                  <View style={{ alignItems: "flex-end" }}>
-                    <Text
-                      style={{
-                        color: colors.accent.primary,
-                        fontWeight: "700",
-                        fontSize: 20,
-                      }}
-                    >
-                      ${invoice.totalAmount.toFixed(2)}
-                    </Text>
-                    <Text
-                      style={{
-                        color: colors.text.tertiary,
-                        marginTop: 4,
-                        fontSize: 12,
-                      }}
-                    >
-                      {invoice.people
-                        .map((person) => person[0]?.toUpperCase())
-                        .join(" · ")}
-                    </Text>
-                  </View>
-                  <Ionicons
-                    name="chevron-forward"
-                    size={22}
-                    color={colors.text.tertiary}
-                    style={{ marginLeft: 12 }}
-                  />
-                </TouchableOpacity>
-              ))}
-            </View>
+            <ReceiptsList
+              invoices={savedInvoices}
+              onSelectInvoice={handleOpenSavedInvoice}
+              getTitle={getReceiptTitle}
+              formatDate={formatSavedDate}
+            />
           )}
         </View>
       </ScrollView>
