@@ -4,7 +4,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Text, View } from "react-native";
-import { useTheme } from "../../../contexts/ThemeContext";
+import { useTheme } from "../../../shared/contexts/ThemeContext";
 import { Button } from "../../../shared/components/Button";
 
 interface EmptyReceiptsStateProps {

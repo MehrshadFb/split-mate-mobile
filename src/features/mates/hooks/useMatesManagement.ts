@@ -4,7 +4,7 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Alert } from "react-native";
-import { useInvoiceStore } from "../../../stores/invoiceStore";
+import { useInvoiceStore } from "../../../shared/stores/invoiceStore";
 import { MIN_MATES_REQUIRED } from "../constants/validation";
 
 export const useMatesManagement = () => {

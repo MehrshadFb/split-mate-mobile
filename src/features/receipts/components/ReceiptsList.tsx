@@ -3,7 +3,7 @@
 
 import React from "react";
 import { View } from "react-native";
-import { Invoice } from "../../../types/invoice";
+import { Invoice } from "../../../shared/types/invoice";
 import { ReceiptCard } from "./ReceiptCard";
 
 interface ReceiptsListProps {

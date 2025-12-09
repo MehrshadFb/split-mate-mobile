@@ -3,8 +3,8 @@
 
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
-import { useInvoiceStore } from "../../../stores/invoiceStore";
-import { Invoice } from "../../../types/invoice";
+import { useInvoiceStore } from "../../../shared/stores/invoiceStore";
+import { Invoice } from "../../../shared/types/invoice";
 
 export const useReceiptsManagement = () => {
   const router = useRouter();

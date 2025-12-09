@@ -5,7 +5,7 @@ import {
   calculateBackoffDelay,
   DEFAULT_RETRY_CONFIG,
   retryWithBackoff,
-} from "../src/utils/retry";
+} from "../src/shared/utils/retry";
 
 describe("Retry Utility", () => {
   describe("calculateBackoffDelay", () => {

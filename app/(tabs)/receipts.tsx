@@ -4,7 +4,7 @@
 import React from "react";
 import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useTheme } from "../../src/contexts/ThemeContext";
+import { useTheme } from "../../src/shared/contexts/ThemeContext";
 import {
   EmptyReceiptsState,
   formatSavedDate,

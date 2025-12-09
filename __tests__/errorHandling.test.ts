@@ -1,7 +1,7 @@
 // __tests__/errorHandling.test.ts
 // Unit tests for error handling and user messages
 
-import { createScanError, ErrorMessages } from "../src/utils/errors";
+import { createScanError, ErrorMessages } from "../src/shared/utils/errors";
 
 describe("Error Handling", () => {
   it("should create network error", () => {

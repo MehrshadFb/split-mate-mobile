@@ -2,7 +2,7 @@
 // Simplified upload hook - just handles loading state and errors
 
 import { useState } from "react";
-import { apiService, ReceiptItem, UploadError } from "../../services/api";
+import { apiService, ReceiptItem, UploadError } from "../services/api";
 
 export function useUpload() {
   const [isLoading, setIsLoading] = useState(false);

@@ -14,10 +14,10 @@ import {
     View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useTheme } from "../src/contexts/ThemeContext";
-import { useUpload } from "../src/hooks/useUpload";
+import { useTheme } from "../src/shared/contexts/ThemeContext";
+import { useUpload } from "../src/shared/hooks/useUpload";
 import { Button } from "../src/shared/components/Button";
-import { useInvoiceStore } from "../src/stores/invoiceStore";
+import { useInvoiceStore } from "../src/shared/stores/invoiceStore";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/jpg"];

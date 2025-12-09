@@ -1,7 +1,7 @@
 // src/features/receipts/utils/receiptFormatters.ts
 // Utility functions for formatting receipt data
 
-import { Invoice } from "../../../types/invoice";
+import { Invoice } from "../../../shared/types/invoice";
 
 export const formatSavedDate = (timestamp?: string): string => {
   if (!timestamp) {

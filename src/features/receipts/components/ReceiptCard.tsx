@@ -4,8 +4,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import { useTheme } from "../../../contexts/ThemeContext";
-import { Invoice } from "../../../types/invoice";
+import { useTheme } from "../../../shared/contexts/ThemeContext";
+import { Invoice } from "../../../shared/types/invoice";
 
 interface ReceiptCardProps {
   invoice: Invoice;

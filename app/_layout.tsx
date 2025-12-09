@@ -3,7 +3,7 @@
 
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { ThemeProvider, useTheme } from "../src/contexts/ThemeContext";
+import { ThemeProvider, useTheme } from "../src/shared/contexts/ThemeContext";
 import "./globals.css";
 
 function RootStack() {

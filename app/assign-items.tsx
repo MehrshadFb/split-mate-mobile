@@ -14,10 +14,10 @@ import {
     View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useTheme } from "../src/contexts/ThemeContext";
+import { useTheme } from "../src/shared/contexts/ThemeContext";
 import { Button } from "../src/shared/components/Button";
-import { useInvoiceStore } from "../src/stores/invoiceStore";
-import { Invoice, Item } from "../src/types/invoice";
+import { useInvoiceStore } from "../src/shared/stores/invoiceStore";
+import { Invoice, Item } from "../src/shared/types/invoice";
 
 export default function AssignItemsScreen() {
   const router = useRouter();

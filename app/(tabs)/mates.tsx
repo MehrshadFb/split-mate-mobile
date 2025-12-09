@@ -4,7 +4,7 @@
 import React from "react";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useTheme } from "../../src/contexts/ThemeContext";
+import { useTheme } from "../../src/shared/contexts/ThemeContext";
 import {
   AddMateInput,
   EmptyMatesState,

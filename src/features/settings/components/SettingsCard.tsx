@@ -3,7 +3,7 @@
 
 import React from "react";
 import { View, ViewStyle } from "react-native";
-import { useTheme } from "../../../contexts/ThemeContext";
+import { useTheme } from "../../../shared/contexts/ThemeContext";
 
 interface SettingsCardProps {
   children: React.ReactNode;
