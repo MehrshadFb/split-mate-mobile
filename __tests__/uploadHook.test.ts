@@ -1,8 +1,8 @@
 // __tests__/uploadHook.test.ts
 // Unit tests for upload hook
 
-import { act, renderHook, waitFor } from "@testing-library/react-native";
-import { useUpload } from "../src/shared/hooks/useUpload";
+import { act, renderHook } from "@testing-library/react-native";
+import { useUpload } from "../src/features/upload/hooks/useUpload";
 import { apiService } from "../src/shared/services/api";
 import * as storage from "../src/shared/utils/storage";
 

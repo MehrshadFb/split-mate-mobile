@@ -1,8 +1,8 @@
-// src/shared/hooks/useUpload.ts
+// src/features/upload/hooks/useUpload.ts
 // Custom hook for handling receipt upload operations
 
 import { useCallback, useState } from "react";
-import { apiService, ReceiptItem, UploadError } from "../services/api";
+import { apiService, ReceiptItem, UploadError } from "../../../shared/services/api";
 
 export interface UploadImage {
   uri: string;
