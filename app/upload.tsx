@@ -13,6 +13,7 @@ import {
   InfoCard,
   SelectedImagesList,
   UploadHeader,
+  UploadStatusDisplay,
 } from "../src/features/upload/components";
 import { useImageSelection, useUpload } from "../src/features/upload/hooks";
 import { Button } from "../src/shared/components/Button";
@@ -22,7 +23,8 @@ import { useInvoiceStore } from "../src/shared/stores/invoiceStore";
 export default function UploadScreen() {
   const router = useRouter();
   const { colors } = useTheme();
-  const { uploadReceipts, isLoading, error, clearError } = useUpload();
+  const { uploadReceipts, isLoading, uploadProgress, error, clearError } =
+    useUpload();
   const { addItem, clearInvoice, setEditingSavedInvoice } = useInvoiceStore();
   const {
     selectedImages,
@@ -93,6 +95,10 @@ export default function UploadScreen() {
             onProceed={handleProceed}
             isLoading={isLoading}
           />
+          {/* Upload Status Display */}
+          {isLoading && uploadProgress && (
+            <UploadStatusDisplay uploadProgress={uploadProgress} />
+          )}
           {/* Error Message */}
           {error && (
             <ErrorMessage

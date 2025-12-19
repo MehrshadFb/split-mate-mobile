@@ -2,7 +2,12 @@
 // Custom hook for handling receipt upload operations
 
 import { useCallback, useState } from "react";
-import { apiService, ReceiptItem, UploadError } from "../../../shared/services/api";
+import {
+  apiService,
+  ReceiptItem,
+  UploadError,
+  UploadProgress,
+} from "../../../shared/services/api";
 
 export interface UploadImage {
   uri: string;
@@ -13,13 +18,16 @@ export interface UploadImage {
 export interface UseUploadReturn {
   uploadReceipts: (images: UploadImage[]) => Promise<ReceiptItem[] | null>;
   isLoading: boolean;
+  uploadProgress: UploadProgress | null;
   error: UploadError | null;
   clearError: () => void;
 }
 
-
 export function useUpload(): UseUploadReturn {
   const [isLoading, setIsLoading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(
+    null
+  );
   const [error, setError] = useState<UploadError | null>(null);
 
   const handleUploadError = useCallback((err: unknown): UploadError => {
@@ -42,9 +50,12 @@ export function useUpload(): UseUploadReturn {
     async (images: UploadImage[]): Promise<ReceiptItem[] | null> => {
       setIsLoading(true);
       setError(null);
+      setUploadProgress(null);
 
       try {
-        const items = await apiService.uploadReceipts(images);
+        const items = await apiService.uploadReceipts(images, (progress) => {
+          setUploadProgress(progress);
+        });
         return items;
       } catch (err) {
         const uploadError = handleUploadError(err);
@@ -52,6 +63,7 @@ export function useUpload(): UseUploadReturn {
         return null;
       } finally {
         setIsLoading(false);
+        setUploadProgress(null);
       }
     },
     [handleUploadError]
@@ -64,6 +76,7 @@ export function useUpload(): UseUploadReturn {
   return {
     uploadReceipts,
     isLoading,
+    uploadProgress,
     error,
     clearError,
   };
