@@ -10,7 +10,7 @@ interface ReceiptsListProps {
   invoices: Invoice[];
   onSelectInvoice: (invoice: Invoice) => void;
   getTitle: (invoice: Invoice) => string;
-  formatDate: (timestamp?: string) => string;
+  formatDate: (invoice: Invoice) => string;
 }
 
 export const ReceiptsList: React.FC<ReceiptsListProps> = ({
@@ -26,7 +26,7 @@ export const ReceiptsList: React.FC<ReceiptsListProps> = ({
           key={invoice.id}
           invoice={invoice}
           title={getTitle(invoice)}
-          formattedDate={formatDate(invoice.savedAt || invoice.updatedAt)}
+          formattedDate={formatDate(invoice)}
           onPress={() => onSelectInvoice(invoice)}
         />
       ))}

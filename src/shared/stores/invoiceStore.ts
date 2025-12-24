@@ -15,6 +15,7 @@ interface InvoiceState {
   // Actions
   setInvoice: (invoice: Invoice) => void;
   setInvoiceTitle: (title: string) => void;
+  setInvoiceDate: (date: string) => void;
   addPerson: (name: string) => void;
   removePerson: (name: string) => void;
   setPeople: (people: string[]) => void;
@@ -51,6 +52,20 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
         currentInvoice: {
           ...state.currentInvoice,
           title,
+          updatedAt: new Date().toISOString(),
+        },
+        hasUnsavedChanges: true,
+      };
+    });
+  },
+
+  setInvoiceDate: (date) => {
+    set((state) => {
+      if (!state.currentInvoice) return state;
+      return {
+        currentInvoice: {
+          ...state.currentInvoice,
+          date,
           updatedAt: new Date().toISOString(),
         },
         hasUnsavedChanges: true,
@@ -99,13 +114,16 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
     set((state) => {
       if (!state.currentInvoice) {
         // Create new invoice if none exists
+        const now = new Date();
+        const today = now.toISOString().split('T')[0];
         const newInvoice: Invoice = {
           id: `invoice-${Date.now()}`,
+          date: today,
           items: [item],
           people: state.people,
           totals: [],
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          createdAt: now.toISOString(),
+          updatedAt: now.toISOString(),
           totalAmount: item.price,
         };
         return { currentInvoice: newInvoice };
@@ -241,6 +259,7 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
       ...currentInvoice,
       id: invoiceId,
       title: currentInvoice.title, // Explicitly preserve title
+      date: currentInvoice.date || new Date().toISOString().split('T')[0],
       items: currentInvoice.items.map((item) => ({
         ...item,
         splitBetween: [...item.splitBetween],

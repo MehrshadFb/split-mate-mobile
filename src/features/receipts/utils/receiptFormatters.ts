@@ -3,6 +3,21 @@
 
 import { Invoice } from "../../../shared/types/invoice";
 
+export const formatReceiptDate = (dateStr: string): string => {
+  if (!dateStr) {
+    return "";
+  }
+  const date = new Date(dateStr + "T00:00:00");
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+};
+
 export const formatSavedDate = (timestamp?: string): string => {
   if (!timestamp) {
     return "";
@@ -24,7 +39,7 @@ export const getReceiptTitle = (invoice: Invoice): string => {
     return invoice.title;
   }
   // Generate default title based on date
-  const date = new Date(invoice.createdAt || Date.now());
+  const date = new Date(invoice.date ? invoice.date + "T00:00:00" : invoice.createdAt || Date.now());
   const month = date.toLocaleDateString("en-US", { month: "short" });
   const day = date.getDate();
   return `Receipt ${month} ${day}`;

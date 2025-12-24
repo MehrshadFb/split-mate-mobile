@@ -10,6 +10,7 @@ import {
   EmptyItemsList,
   ItemCard,
   ManagePeopleSection,
+  ReceiptDatePicker,
   ReceiptTitleEditor,
   SplitSummary,
 } from "../src/features/assign-items/components";
@@ -25,7 +26,7 @@ import { useInvoiceStore } from "../src/shared/stores/invoiceStore";
 
 export default function AssignItemsScreen() {
   const { colors } = useTheme();
-  const { currentInvoice, people, editingSavedInvoice } = useInvoiceStore();
+  const { currentInvoice, people, editingSavedInvoice, setInvoiceDate } = useInvoiceStore();
   const {
     isEditingTitle,
     tempTitle,
@@ -84,6 +85,11 @@ export default function AssignItemsScreen() {
             onFocus={handleStartEditingTitle}
             onChange={handleChangeTitleText}
             onBlur={handleSaveTitle}
+          />
+          {/* Receipt Date Picker */}
+          <ReceiptDatePicker
+            value={currentInvoice.date || new Date().toISOString().split('T')[0]}
+            onChange={setInvoiceDate}
           />
           {/* Manage People Section */}
           <ManagePeopleSection
