@@ -55,7 +55,12 @@ export const ReceiptDatePicker: React.FC<ReceiptDatePickerProps> = ({
   };
 
   const handleOpenPicker = () => {
-    setPickerDate(new Date());
+    if (value) {
+      const date = new Date(value + "T00:00:00");
+      setPickerDate(isNaN(date.getTime()) ? new Date() : date);
+    } else {
+      setPickerDate(new Date());
+    }
     setShowPicker(true);
   };
 
@@ -118,19 +123,27 @@ export const ReceiptDatePicker: React.FC<ReceiptDatePickerProps> = ({
           visible={showPicker}
           onRequestClose={() => setShowPicker(false)}
         >
-          <View
+          <TouchableOpacity
             style={{
               flex: 1,
               justifyContent: "flex-end",
-              backgroundColor: "rgba(0, 0, 0, 0.5)",
             }}
+            activeOpacity={1}
+            onPress={() => setShowPicker(false)}
           >
-            <View
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={(e) => e.stopPropagation()}
               style={{
                 backgroundColor: colors.background.secondary,
                 borderTopLeftRadius: 20,
                 borderTopRightRadius: 20,
                 paddingBottom: 34,
+                shadowColor: colors.text.primary,
+                shadowOffset: { width: 0, height: -2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 8,
+                elevation: 5,
               }}
             >
               <DateTimePicker
@@ -153,7 +166,7 @@ export const ReceiptDatePicker: React.FC<ReceiptDatePickerProps> = ({
                 >
                   <Text
                     style={{
-                      color: "#FFFFFF",
+                      color: colors.text.inverse,
                       fontSize: 16,
                       fontWeight: "600",
                     }}
@@ -162,8 +175,8 @@ export const ReceiptDatePicker: React.FC<ReceiptDatePickerProps> = ({
                   </Text>
                 </TouchableOpacity>
               </View>
-            </View>
-          </View>
+            </TouchableOpacity>
+          </TouchableOpacity>
         </Modal>
       )}
     </View>
