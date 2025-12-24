@@ -82,7 +82,6 @@ export const SplitSummary: React.FC<SplitSummaryProps> = ({
             </Text>
           </View>
         </View>
-
         <View
           style={{
             backgroundColor: colors.accent.primary,
@@ -123,7 +122,6 @@ export const SplitSummary: React.FC<SplitSummaryProps> = ({
             color={colors.text.inverse}
           />
         </View>
-
         <View style={{ marginBottom: 12 }}>
           <Text
             style={{

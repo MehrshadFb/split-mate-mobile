@@ -98,7 +98,6 @@ export const ItemCard: React.FC<ItemCardProps> = ({
             placeholder="Item name"
             placeholderTextColor={colors.text.tertiary}
           />
-
           <Text
             style={{
               color: colors.text.secondary,
@@ -142,7 +141,6 @@ export const ItemCard: React.FC<ItemCardProps> = ({
               placeholderTextColor={colors.text.tertiary}
             />
           </View>
-
           <View style={{ flexDirection: "row", marginTop: 20 }}>
             <TouchableOpacity
               onPress={onSaveEdit}
@@ -273,7 +271,6 @@ export const ItemCard: React.FC<ItemCardProps> = ({
               </View>
             </View>
           </View>
-
           <View
             style={{
               height: 1,
@@ -281,7 +278,6 @@ export const ItemCard: React.FC<ItemCardProps> = ({
               marginBottom: 12,
             }}
           />
-
           <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
             {people.map((person) => {
               const isSelected = item.splitBetween.includes(person);

@@ -35,7 +35,6 @@ export const AssignItemsHeader: React.FC<AssignItemsHeaderProps> = ({
       >
         <Ionicons name="arrow-back" size={24} color={colors.text.primary} />
       </TouchableOpacity>
-
       {showDelete && onDelete && (
         <TouchableOpacity
           onPress={onDelete}
