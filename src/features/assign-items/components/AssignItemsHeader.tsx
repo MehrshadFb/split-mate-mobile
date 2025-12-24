@@ -41,7 +41,7 @@ export const AssignItemsHeader: React.FC<AssignItemsHeaderProps> = ({
           style={{ padding: 8 }}
           activeOpacity={0.7}
         >
-          <Ionicons name="close" size={28} color={colors.error} />
+          <Ionicons name="trash" size={28} color={colors.error} />
         </TouchableOpacity>
       )}
     </View>
