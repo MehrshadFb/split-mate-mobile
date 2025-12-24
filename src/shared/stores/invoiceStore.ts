@@ -4,6 +4,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { Invoice, Item, Person } from "../types/invoice";
+import { getLocalDateString } from "../utils/dateUtils";
 
 interface InvoiceState {
   currentInvoice: Invoice | null;
@@ -115,10 +116,9 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
       if (!state.currentInvoice) {
         // Create new invoice if none exists
         const now = new Date();
-        const today = now.toISOString().split('T')[0];
         const newInvoice: Invoice = {
           id: `invoice-${Date.now()}`,
-          date: today,
+          date: getLocalDateString(),
           items: [item],
           people: state.people,
           totals: [],
@@ -259,7 +259,7 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
       ...currentInvoice,
       id: invoiceId,
       title: currentInvoice.title, // Explicitly preserve title
-      date: currentInvoice.date || new Date().toISOString().split('T')[0],
+      date: currentInvoice.date || getLocalDateString(),
       items: currentInvoice.items.map((item) => ({
         ...item,
         splitBetween: [...item.splitBetween],

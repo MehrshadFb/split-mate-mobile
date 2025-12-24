@@ -23,6 +23,7 @@ import {
 import { Button } from "../src/shared/components/Button";
 import { useTheme } from "../src/shared/contexts/ThemeContext";
 import { useInvoiceStore } from "../src/shared/stores/invoiceStore";
+import { getLocalDateString } from "../src/shared/utils/dateUtils";
 
 export default function AssignItemsScreen() {
   const { colors } = useTheme();
@@ -88,7 +89,7 @@ export default function AssignItemsScreen() {
           />
           {/* Receipt Date Picker */}
           <ReceiptDatePicker
-            value={currentInvoice.date || new Date().toISOString().split('T')[0]}
+            value={currentInvoice.date || getLocalDateString()}
             onChange={setInvoiceDate}
           />
           {/* Manage People Section */}

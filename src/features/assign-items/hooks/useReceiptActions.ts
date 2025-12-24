@@ -7,6 +7,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Alert } from "react-native";
 import { useInvoiceStore } from "../../../shared/stores/invoiceStore";
 import { Invoice } from "../../../shared/types/invoice";
+import { getLocalDateString } from "../../../shared/utils/dateUtils";
 
 export const useReceiptActions = (
   getDisplayTitle: () => string,
@@ -139,10 +140,9 @@ export const useReceiptActions = (
   useEffect(() => {
     if (!currentInvoice && people.length > 0) {
       const now = new Date();
-      const today = now.toISOString().split('T')[0];
       const emptyInvoice: Invoice = {
         id: `invoice-${Date.now()}`,
-        date: today,
+        date: getLocalDateString(),
         items: [],
         people: people,
         totals: [],
