@@ -38,7 +38,6 @@ export const ManagePeopleSection: React.FC<ManagePeopleSectionProps> = ({
         overflow: "hidden",
       }}
     >
-      {/* Header - Collapsible */}
       <TouchableOpacity
         onPress={onToggleExpanded}
         style={{
@@ -91,8 +90,6 @@ export const ManagePeopleSection: React.FC<ManagePeopleSectionProps> = ({
           color={colors.text.tertiary}
         />
       </TouchableOpacity>
-
-      {/* Expandable Content */}
       {isExpanded && (
         <View
           style={{
@@ -101,7 +98,6 @@ export const ManagePeopleSection: React.FC<ManagePeopleSectionProps> = ({
             padding: 18,
           }}
         >
-          {/* Add Person Input */}
           <View style={{ marginBottom: 20 }}>
             <Text
               style={{
@@ -161,8 +157,6 @@ export const ManagePeopleSection: React.FC<ManagePeopleSectionProps> = ({
               </TouchableOpacity>
             </View>
           </View>
-
-          {/* People List */}
           {people.length > 0 && (
             <View>
               <Text
