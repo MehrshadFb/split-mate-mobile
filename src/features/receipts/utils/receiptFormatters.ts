@@ -38,9 +38,6 @@ export const getReceiptTitle = (invoice: Invoice): string => {
   if (invoice.title) {
     return invoice.title;
   }
-  // Generate default title based on date
-  const date = new Date(invoice.date ? invoice.date + "T00:00:00" : invoice.createdAt || Date.now());
-  const month = date.toLocaleDateString("en-US", { month: "short" });
-  const day = date.getDate();
-  return `Receipt ${month} ${day}`;
+  // Generate default title
+  return "Receipt";
 };

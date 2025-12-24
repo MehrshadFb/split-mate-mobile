@@ -13,11 +13,7 @@ export const useReceiptTitle = () => {
     if (currentInvoice?.title) {
       return currentInvoice.title;
     }
-    // Generate default title based on date
-    const date = new Date(currentInvoice?.createdAt || Date.now());
-    const month = date.toLocaleDateString("en-US", { month: "short" });
-    const day = date.getDate();
-    return `Receipt ${month} ${day}`;
+    return "Receipt";
   }, [currentInvoice]);
 
   const handleStartEditingTitle = useCallback(() => {

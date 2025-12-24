@@ -138,13 +138,16 @@ export const useReceiptActions = (
   // Initialize empty invoice if none exists (for manual entry)
   useEffect(() => {
     if (!currentInvoice && people.length > 0) {
+      const now = new Date();
+      const today = now.toISOString().split('T')[0];
       const emptyInvoice: Invoice = {
         id: `invoice-${Date.now()}`,
+        date: today,
         items: [],
         people: people,
         totals: [],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: now.toISOString(),
+        updatedAt: now.toISOString(),
         totalAmount: 0,
       };
       setInvoice(emptyInvoice);
