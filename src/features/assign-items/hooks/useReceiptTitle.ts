@@ -4,10 +4,6 @@
 import { useCallback, useState } from "react";
 import { useInvoiceStore } from "../../../shared/stores/invoiceStore";
 
-/**
- * Hook for managing receipt title editing state
- * @returns Methods and state for title management
- */
 export const useReceiptTitle = () => {
   const { currentInvoice, setInvoiceTitle, editingSavedInvoice, setHasUnsavedChanges } = useInvoiceStore();
   const [isEditingTitle, setIsEditingTitle] = useState(false);

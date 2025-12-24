@@ -11,10 +11,6 @@ interface EditingItem {
   price: string;
 }
 
-/**
- * Hook for managing items (add/edit/delete) in assign-items
- * @returns Methods and state for item management
- */
 export const useItemManagement = () => {
   const { currentInvoice, addItem, updateItem, deleteItem, togglePersonForItem } =
     useInvoiceStore();

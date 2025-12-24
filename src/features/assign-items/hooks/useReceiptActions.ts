@@ -8,10 +8,6 @@ import { Alert } from "react-native";
 import { useInvoiceStore } from "../../../shared/stores/invoiceStore";
 import { Invoice } from "../../../shared/types/invoice";
 
-/**
- * Hook for managing receipt save/delete/navigation actions
- * @returns Methods for receipt actions
- */
 export const useReceiptActions = (
   getDisplayTitle: () => string,
   isEditingTitle: boolean,

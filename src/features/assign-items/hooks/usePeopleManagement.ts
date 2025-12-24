@@ -6,10 +6,6 @@ import { Alert } from "react-native";
 import { useInvoiceStore } from "../../../shared/stores/invoiceStore";
 import { MIN_PEOPLE_REQUIRED } from "../constants";
 
-/**
- * Hook for managing people (add/remove) in assign-items
- * @returns Methods and state for people management
- */
 export const usePeopleManagement = () => {
   const {
     currentInvoice,
