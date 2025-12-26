@@ -28,10 +28,10 @@ export interface ScanJob {
 }
 
 export interface ParsedScanResult {
-  items: Array<{
+  items: {
     name: string;
     price: number;
-  }>;
+  }[];
 }
 
 export interface ScanError {

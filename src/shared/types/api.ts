@@ -23,10 +23,10 @@ export interface ScanStatusResponse {
     status: "queued" | "scanning" | "scanned" | "failed" | "retrying";
     progress?: number;
     result?: {
-      items: Array<{
+      items: {
         name: string;
         price: number;
-      }>;
+      }[];
     };
     error?: {
       code: string;

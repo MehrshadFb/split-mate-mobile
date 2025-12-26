@@ -27,8 +27,8 @@ export interface Invoice {
 }
 
 export interface ParsedReceiptData {
-  items: Array<{
+  items: {
     name: string;
     price: number;
-  }>;
+  }[];
 }

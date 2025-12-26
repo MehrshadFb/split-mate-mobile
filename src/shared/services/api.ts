@@ -51,11 +51,11 @@ class ApiService {
    * - Processing errors
    */
   async uploadReceipts(
-    images: Array<{
+    images: {
       uri: string;
       fileName: string;
       mimeType: string;
-    }>,
+    }[],
     onStatusChange?: (progress: UploadProgress) => void
   ): Promise<ReceiptItem[]> {
     try {

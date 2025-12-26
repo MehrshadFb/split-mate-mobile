@@ -51,7 +51,7 @@ export const EmptyMatesState: React.FC<EmptyMatesStateProps> = ({
           textAlign: "center",
         }}
       >
-        You'll head to upload after everyone is listed.
+        You&apos;ll head to upload after everyone is listed.
       </Text>
     </View>
   );
