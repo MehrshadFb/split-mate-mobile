@@ -14,12 +14,6 @@ interface UseShareReceiptReturn {
   shareReceipt: (invoice: Invoice) => Promise<void>;
 }
 
-/**
- * Generates a safe filename from invoice title and date
- * @param title - Invoice title
- * @param date - Invoice date
- * @returns Sanitized filename
- */
 function generateFileName(title: string, date: string): string {
   // Format date as YYYY-MM-DD
   const formattedDate = new Date(date).toISOString().split("T")[0];
@@ -33,10 +27,6 @@ function generateFileName(title: string, date: string): string {
   return `${sanitizedTitle}_${formattedDate}.pdf`;
 }
 
-/**
- * Hook for generating and sharing receipt PDFs
- * Handles PDF generation, file creation, and native sharing
- */
 export function useShareReceipt(): UseShareReceiptReturn {
   const [isGenerating, setIsGenerating] = useState(false);
 

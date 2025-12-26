@@ -22,20 +22,20 @@ export function generateReceiptHTML(invoice: Invoice): string {
   const itemsHTML = items
     .map(
       (item) => `
-        <tr>
-          <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
-            <div style="font-weight: 500; color: #111827; margin-bottom: 4px;">
+        <tr class="item-row">
+          <td>
+            <div class="item-name">
               ${escapeHtml(item.name)}
             </div>
             ${
               item.splitBetween.length > 0
-                ? `<div style="font-size: 12px; color: #6b7280;">
-                    Split: ${item.splitBetween.map(escapeHtml).join(", ")}
+                ? `<div class="item-split">
+                    Split between: ${item.splitBetween.map(escapeHtml).join(", ")}
                    </div>`
                 : ""
             }
           </td>
-          <td style="padding: 12px; text-align: right; font-weight: 600; color: #111827; border-bottom: 1px solid #e5e7eb;">
+          <td class="item-price">
             $${item.price.toFixed(2)}
           </td>
         </tr>
@@ -47,11 +47,11 @@ export function generateReceiptHTML(invoice: Invoice): string {
   const totalsHTML = totals
     .map(
       (person) => `
-        <tr>
-          <td style="padding: 10px 12px; color: #374151; font-weight: 500;">
+        <tr class="split-row">
+          <td class="person-name">
             ${escapeHtml(person.name)}
           </td>
-          <td style="padding: 10px 12px; text-align: right; font-weight: 600; color: #111827;">
+          <td class="person-total">
             $${person.total.toFixed(2)}
           </td>
         </tr>
@@ -74,73 +74,136 @@ export function generateReceiptHTML(invoice: Invoice): string {
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      line-height: 1.6;
-      color: #111827;
-      padding: 40px 20px;
-      background: #ffffff;
+      line-height: 1.5;
+      color: #1C1917;
+      padding: 32px 24px 60px 24px;
+      background: #FFFFFF;
     }
     .container {
-      max-width: 700px;
+      max-width: 650px;
       margin: 0 auto;
     }
     .header {
-      margin-bottom: 32px;
-      padding-bottom: 24px;
-      border-bottom: 2px solid #d97757;
+      margin-bottom: 36px;
+      padding-bottom: 20px;
+      border-bottom: 3px solid #D97757;
     }
     .title {
-      font-size: 28px;
+      font-size: 32px;
       font-weight: 700;
-      color: #111827;
-      margin-bottom: 8px;
+      color: #1C1917;
+      margin-bottom: 6px;
+      letter-spacing: -0.5px;
     }
     .date {
-      font-size: 14px;
-      color: #6b7280;
+      font-size: 15px;
+      color: #57534E;
+      font-weight: 500;
     }
     .section {
-      margin-bottom: 32px;
+      margin-bottom: 36px;
     }
     .section-title {
-      font-size: 18px;
-      font-weight: 600;
-      color: #111827;
-      margin-bottom: 16px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid #e5e7eb;
+      font-size: 20px;
+      font-weight: 700;
+      color: #1C1917;
+      margin-bottom: 18px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #E7E5E4;
     }
     table {
       width: 100%;
       border-collapse: collapse;
+      table-layout: fixed;
+    }
+    .items-table tbody tr {
+      border-bottom: 1px solid #E7E5E4;
+    }
+    .items-table tbody tr:last-child {
+      border-bottom: none;
+    }
+    .items-table td:first-child {
+      width: 70%;
+    }
+    .items-table td:last-child {
+      width: 30%;
+      text-align: right;
+    }
+    .item-row td {
+      padding: 14px 0;
+      vertical-align: top;
+    }
+    .item-name {
+      font-weight: 600;
+      color: #1C1917;
+      margin-bottom: 4px;
+      font-size: 16px;
+    }
+    .item-split {
+      font-size: 13px;
+      color: #78716C;
+      margin-top: 4px;
+    }
+    .item-price {
+      font-weight: 700;
+      color: #1C1917;
+      font-size: 16px;
+      white-space: nowrap;
     }
     .total-row {
-      background-color: #fef3e6;
-      font-weight: 700;
+      background-color: #FFF4ED;
+      border-top: 3px solid #D97757 !important;
+      border-bottom: 3px solid #D97757 !important;
     }
     .total-row td {
-      padding: 16px 12px !important;
-      font-size: 18px;
-      border-top: 2px solid #d97757;
-      border-bottom: 2px solid #d97757;
+      padding: 18px 16px !important;
+      font-size: 20px;
+      font-weight: 700;
+      color: #1C1917;
+    }
+    .total-row td:last-child {
+      text-align: right;
+    }
+    .split-table tbody tr {
+      border-bottom: 1px solid #F5F5F4;
+    }
+    .split-table tbody tr:last-child {
+      border-bottom: none;
+    }
+    .split-table td:first-child {
+      width: 65%;
+    }
+    .split-table td:last-child {
+      width: 35%;
+      text-align: right;
+    }
+    .split-row td {
+      padding: 12px 0;
+      vertical-align: top;
+    }
+    .person-name {
+      color: #1C1917;
+      font-weight: 600;
+      font-size: 15px;
+    }
+    .person-total {
+      font-weight: 700;
+      color: #D97757;
+      font-size: 16px;
+      white-space: nowrap;
     }
     .footer {
       margin-top: 48px;
-      padding-top: 24px;
-      border-top: 1px solid #e5e7eb;
+      padding-top: 20px;
+      padding-bottom: 24px;
+      border-top: 2px solid #E7E5E4;
       text-align: center;
-      color: #9ca3af;
-      font-size: 12px;
+      color: #78716C;
+      font-size: 13px;
     }
-    @media print {
-      body {
-        padding: 20px;
-      }
-      .footer {
-        position: fixed;
-        bottom: 20px;
-        left: 0;
-        right: 0;
-      }
+    .footer-brand {
+      font-weight: 600;
+      color: #D97757;
     }
   </style>
 </head>
@@ -155,7 +218,7 @@ export function generateReceiptHTML(invoice: Invoice): string {
     <!-- Items Section -->
     <div class="section">
       <div class="section-title">Items</div>
-      <table>
+      <table class="items-table">
         <tbody>
           ${itemsHTML}
           <tr class="total-row">
@@ -172,7 +235,7 @@ export function generateReceiptHTML(invoice: Invoice): string {
         ? `
     <div class="section">
       <div class="section-title">Split Summary</div>
-      <table>
+      <table class="split-table">
         <tbody>
           ${totalsHTML}
         </tbody>
@@ -184,7 +247,7 @@ export function generateReceiptHTML(invoice: Invoice): string {
 
     <!-- Footer -->
     <div class="footer">
-      Generated by SplitMate • ${new Date().toLocaleDateString("en-US")}
+      Generated by <span class="footer-brand">SplitMate</span> • ${new Date().toLocaleDateString("en-US")}
     </div>
   </div>
 </body>
