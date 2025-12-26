@@ -57,6 +57,11 @@ export function useShareReceipt(): UseShareReceiptReturn {
       const fileName = generateFileName(invoice.title || "Receipt", invoice.date);
       const targetFile = new File(Paths.cache, fileName);
       
+      // Delete existing file if it exists to avoid conflicts
+      if (targetFile.exists) {
+        targetFile.delete();
+      }
+      
       // Create a file instance from the generated PDF URI and copy it with proper name
       const sourceFile = new File(uri);
       sourceFile.copy(targetFile);
