@@ -6,19 +6,20 @@ import React from "react";
 import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
-  AssignItemsHeader,
-  EmptyItemsList,
-  ItemCard,
-  ManagePeopleSection,
-  ReceiptDatePicker,
-  ReceiptTitleEditor,
-  SplitSummary,
+    AssignItemsHeader,
+    EmptyItemsList,
+    ItemCard,
+    ManagePeopleSection,
+    ReceiptDatePicker,
+    ReceiptTitleEditor,
+    SplitSummary,
 } from "../src/features/assign-items/components";
 import {
-  useItemManagement,
-  usePeopleManagement,
-  useReceiptActions,
-  useReceiptTitle,
+    useItemManagement,
+    usePeopleManagement,
+    useReceiptActions,
+    useReceiptTitle,
+    useShareReceipt,
 } from "../src/features/assign-items/hooks";
 import { Button } from "../src/shared/components/Button";
 import { useTheme } from "../src/shared/contexts/ThemeContext";
@@ -38,6 +39,7 @@ export default function AssignItemsScreen() {
   } = useReceiptTitle();
   const { isSaving, handleSaveInvoice, handleBack, handleDeleteReceipt } =
     useReceiptActions(getDisplayTitle, isEditingTitle, tempTitle);
+  const { isGenerating, shareReceipt } = useShareReceipt();
   const {
     showManagePeople,
     setShowManagePeople,
@@ -78,6 +80,9 @@ export default function AssignItemsScreen() {
             onBack={handleBack}
             onDelete={handleDeleteReceipt}
             showDelete={editingSavedInvoice && !!currentInvoice?.id}
+            onShare={() => shareReceipt(currentInvoice)}
+            showShare={editingSavedInvoice && !!currentInvoice?.id}
+            isSharing={isGenerating}
           />
           {/* Receipt Title Editor */}
           <ReceiptTitleEditor
