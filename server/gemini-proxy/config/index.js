@@ -32,6 +32,11 @@ const config = {
     maxStoredJobs: getInt(process.env.MAX_STORED_JOBS, 1000),
     jobExpirationMs: getInt(process.env.JOB_EXPIRATION_MS, 3600000), // 1 hour default
   },
+  redis: {
+    upstashUrl: process.env.UPSTASH_REDIS_REST_URL,
+    upstashToken: process.env.UPSTASH_REDIS_REST_TOKEN,
+    enabled: !!(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN),
+  },
   security: {
     corsOrigins: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : '*',
     rateLimitWindowMs: getInt(process.env.RATE_LIMIT_WINDOW_MS, 60000),
