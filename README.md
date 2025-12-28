@@ -2,7 +2,7 @@
 
 A mobile app for splitting bills and receipts with AI-powered receipt scanning.
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 split-mate-mobile/
@@ -19,7 +19,7 @@ split-mate-mobile/
     └── package.json
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Mobile App Setup
 
@@ -41,7 +41,7 @@ npm start
 
 See [split-mate-api/README.md](split-mate-api/README.md) for detailed instructions.
 
-## 🔧 Development
+## Development
 
 ### Running Both Locally
 
@@ -57,24 +57,15 @@ cd split-mate-app
 npx expo start
 ```
 
-## 🚢 Deployment
-
-- **Mobile App**: Submit to Apple App Store / Google Play Store
-- **Backend API**: Deploy to Railway, Heroku, or similar platform
-
-## 📚 Documentation
+## Documentation
 
 - Mobile App: See [split-mate-app/](split-mate-app/)
 - Backend API: See [split-mate-api/](split-mate-api/)
 
-## 🔐 Environment Variables
+## Environment Variables
 
 Each project has its own `.env` file:
 - `split-mate-app/.env` - Mobile app configuration
 - `split-mate-api/.env` - Backend API configuration
 
 Copy the `.env.example` files in each folder to get started.
-
-## 📄 License
-
-MIT
