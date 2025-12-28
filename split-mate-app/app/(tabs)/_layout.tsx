@@ -10,12 +10,6 @@ export default function TabLayout() {
 
   return (
     <NativeTabs
-      labelStyle={{
-        color: DynamicColorIOS({
-          dark: colors.text.primary,
-          light: colors.text.primary,
-        }),
-      }}
       tintColor={DynamicColorIOS({
         dark: colors.accent.primary,
         light: colors.accent.primary,
