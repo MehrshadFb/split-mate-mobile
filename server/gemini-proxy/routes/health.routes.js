@@ -1,5 +1,6 @@
 const express = require('express');
 const { getJobService } = require('../services/job.service');
+const { checkRedisHealth, getRedisStats } = require('../config/upstash');
 
 const router = express.Router();
 
@@ -11,9 +12,11 @@ router.get('/', (req, res) => {
   });
 });
 
-router.get('/detailed', (req, res) => {
+router.get('/detailed', async (req, res) => {
   const jobService = getJobService();
   const stats = jobService.getStats();
+  const redisHealthy = await checkRedisHealth();
+  const redisStats = await getRedisStats();
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
@@ -24,6 +27,11 @@ router.get('/detailed', (req, res) => {
       unit: 'MB',
     },
     jobs: stats,
+    redis: {
+      enabled: redisStats !== null,
+      healthy: redisHealthy,
+      type: redisStats ? 'Upstash Redis' : 'In-Memory',
+    },
   });
 });
 
