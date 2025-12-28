@@ -134,6 +134,24 @@ Rules:
     categorizedError.code = code;
     return categorizedError;
   }
+
+  async checkHealth() {
+    try {
+      const testPrompt = 'Respond with: OK';
+      const geminiPromise = this.model.generateContent([testPrompt]);
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Health check timeout')), 5000)
+      );
+      await Promise.race([geminiPromise, timeoutPromise]);
+      return { healthy: true, model: config.gemini.model };
+    } catch (error) {
+      return { 
+        healthy: false, 
+        model: config.gemini.model,
+        error: error.message 
+      };
+    }
+  }
 }
 
 // Singleton instance

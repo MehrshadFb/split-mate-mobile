@@ -1,6 +1,7 @@
 const express = require('express');
 const { getJobService } = require('../services/job.service');
 const { checkRedisHealth, getRedisStats } = require('../config/upstash');
+const { getGeminiService } = require('../services/gemini.service');
 
 const router = express.Router();
 
@@ -14,9 +15,11 @@ router.get('/', (req, res) => {
 
 router.get('/detailed', async (req, res) => {
   const jobService = getJobService();
+  const geminiService = getGeminiService();
   const stats = jobService.getStats();
   const redisHealthy = await checkRedisHealth();
   const redisStats = await getRedisStats();
+  const geminiHealth = await geminiService.checkHealth();
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
@@ -31,6 +34,11 @@ router.get('/detailed', async (req, res) => {
       enabled: redisStats !== null,
       healthy: redisHealthy,
       type: redisStats ? 'Upstash Redis' : 'In-Memory',
+    },
+    gemini: {
+      healthy: geminiHealth.healthy,
+      model: geminiHealth.model,
+      error: geminiHealth.error || undefined,
     },
   });
 });
