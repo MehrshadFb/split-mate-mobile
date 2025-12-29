@@ -37,4 +37,6 @@ tmp/
 temp/
 *.tmp
 
+# Scripts
 test-rate-limit.js
+deploy.sh
