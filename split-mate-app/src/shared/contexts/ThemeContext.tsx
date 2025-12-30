@@ -1,8 +1,5 @@
-// src/contexts/ThemeContext.tsx
-// Theme context for managing app-wide theme
-
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useColorScheme } from "react-native";
 
 type Theme = "light" | "dark" | "auto";
@@ -77,7 +74,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const systemColorScheme = useColorScheme();
   const [theme, setThemeState] = useState<Theme>("auto");
 
-  // Determine actual color scheme based on theme setting
   const colorScheme: ColorScheme =
     theme === "auto"
       ? systemColorScheme || "light"

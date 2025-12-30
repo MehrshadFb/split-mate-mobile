@@ -1,6 +1,3 @@
-// src/stores/invoiceStore.ts
-// Zustand store for invoice state management
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { Invoice, Item, Person } from "../types/invoice";
@@ -12,8 +9,6 @@ interface InvoiceState {
   savedInvoices: Invoice[];
   editingSavedInvoice: boolean;
   hasUnsavedChanges: boolean;
-
-  // Actions
   setInvoice: (invoice: Invoice) => void;
   setInvoiceTitle: (title: string) => void;
   setInvoiceDate: (date: string) => void;
@@ -77,7 +72,6 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
   addPerson: (name) => {
     const trimmedName = name.trim();
     if (!trimmedName) return;
-
     set((state) => ({
       people: [...state.people, trimmedName],
       hasUnsavedChanges: true,
@@ -96,10 +90,8 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
   updateItem: (index, itemUpdate) => {
     set((state) => {
       if (!state.currentInvoice) return state;
-
       const newItems = [...state.currentInvoice.items];
       newItems[index] = { ...newItems[index], ...itemUpdate };
-
       return {
         currentInvoice: {
           ...state.currentInvoice,
@@ -114,7 +106,6 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
   addItem: (item) => {
     set((state) => {
       if (!state.currentInvoice) {
-        // Create new invoice if none exists
         const now = new Date();
         const newInvoice: Invoice = {
           id: `invoice-${Date.now()}`,
@@ -128,7 +119,6 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
         };
         return { currentInvoice: newInvoice };
       }
-
       return {
         currentInvoice: {
           ...state.currentInvoice,
@@ -143,9 +133,7 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
   deleteItem: (index) => {
     set((state) => {
       if (!state.currentInvoice) return state;
-
       const newItems = state.currentInvoice.items.filter((_, i) => i !== index);
-
       return {
         currentInvoice: {
           ...state.currentInvoice,
@@ -160,16 +148,13 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
   togglePersonForItem: (itemIndex, personName) => {
     set((state) => {
       if (!state.currentInvoice) return state;
-
       const newItems = [...state.currentInvoice.items];
       const item = newItems[itemIndex];
-
       if (item.splitBetween.includes(personName)) {
         item.splitBetween = item.splitBetween.filter((p) => p !== personName);
       } else {
         item.splitBetween = [...item.splitBetween, personName];
       }
-
       return {
         currentInvoice: {
           ...state.currentInvoice,
@@ -184,18 +169,14 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
   calculateTotals: () => {
     set((state) => {
       if (!state.currentInvoice) return state;
-
       // Create totals for ALL people, including those with no items assigned (they'll have $0)
       const newTotals: Person[] = state.people.map((person) => ({
         name: person,
         total: 0,
       }));
-
       let totalAmount = 0;
-
       state.currentInvoice.items.forEach((item) => {
         totalAmount += item.price;
-
         if (item.splitBetween.length > 0) {
           const splitAmount = item.price / item.splitBetween.length;
           item.splitBetween.forEach((person) => {
@@ -206,7 +187,6 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
           });
         }
       });
-
       return {
         currentInvoice: {
           ...state.currentInvoice,
@@ -244,21 +224,17 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
     if (!state.currentInvoice) {
       return null;
     }
-
-    // Recalculate totals to ensure saved data is up to date
-    state.calculateTotals();
+    state.calculateTotals(); // Recalculate totals to ensure saved data is up to date
     const { currentInvoice, savedInvoices } = get();
     if (!currentInvoice) {
       return null;
     }
-
     const now = new Date().toISOString();
     const invoiceId = currentInvoice.id || `invoice-${Date.now()}`;
-
     const invoiceToSave: Invoice = {
       ...currentInvoice,
       id: invoiceId,
-      title: currentInvoice.title, // Explicitly preserve title
+      title: currentInvoice.title,
       date: currentInvoice.date || getLocalDateString(),
       items: currentInvoice.items.map((item) => ({
         ...item,
@@ -269,12 +245,10 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
       updatedAt: now,
       savedAt: now,
     };
-
     const filtered = savedInvoices.filter(
       (invoice) => invoice.id !== invoiceId
     );
     const updatedInvoices = [invoiceToSave, ...filtered];
-
     try {
       await AsyncStorage.setItem(
         SAVED_INVOICES_KEY,
@@ -300,7 +274,6 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
     const updatedInvoices = savedInvoices.filter(
       (invoice) => invoice.id !== invoiceId
     );
-
     try {
       await AsyncStorage.setItem(
         SAVED_INVOICES_KEY,
@@ -314,5 +287,6 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
   },
 
   setEditingSavedInvoice: (value) => set({ editingSavedInvoice: value }),
+  
   setHasUnsavedChanges: (value) => set({ hasUnsavedChanges: value }),
 }));

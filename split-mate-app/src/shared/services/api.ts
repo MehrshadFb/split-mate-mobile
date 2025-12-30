@@ -1,11 +1,5 @@
-// src/services/api.ts
-// Simplified API client for receipt scanning
-
 import axios, { AxiosInstance } from "axios";
 
-// Use environment variable for API base URL
-// In development: http://localhost:3000
-// In production: https://api.splitmate.app
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:3000";
 
 export interface ReceiptItem {
@@ -39,17 +33,6 @@ class ApiService {
     });
   }
 
-  /**
-   * Upload receipt images and wait for processing
-   * Returns the scanned items or throws an error
-   *
-   * Edge cases handled:
-   * - Server down (network error)
-   * - Server timeout
-   * - Gemini API failure
-   * - Invalid image (not a receipt)
-   * - Processing errors
-   */
   async uploadReceipts(
     images: {
       uri: string;
@@ -141,7 +124,7 @@ class ApiService {
           }
 
           if (status === "scanned" && result?.items) {
-            // Success! Add items to our collection
+            // Add items to our list
             allItems.push(...result.items);
             scanSuccessful = true;
             
