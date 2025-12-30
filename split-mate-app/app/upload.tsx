@@ -30,7 +30,6 @@ export default function UploadScreen() {
     handleTakePhoto,
     handleChooseFromLibrary,
     removeImage,
-    clearImages,
   } = useImageSelection();
 
   const handleProceed = async () => {

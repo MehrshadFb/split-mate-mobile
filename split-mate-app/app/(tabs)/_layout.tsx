@@ -1,6 +1,3 @@
-// app/(tabs)/_layout.tsx
-// Tab navigation layout
-
 import { Icon, Label, NativeTabs } from "expo-router/unstable-native-tabs";
 import { DynamicColorIOS } from "react-native";
 import { useTheme } from "../../src/shared/contexts/ThemeContext";

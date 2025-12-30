@@ -25,7 +25,6 @@ export const FilePickerButton: React.FC<FilePickerButtonProps> = ({
         borderColor: colors.border,
         borderRadius: BORDER_RADIUS.lg,
         padding: SPACING["2xl"],
-        marginBottom: SPACING.lg,
         alignItems: "center",
         opacity: disabled ? 0.5 : 1,
       }}
