@@ -1,8 +1,6 @@
-// src/components/Button.tsx
-// Reusable button component with iOS-style design
-
 import React from "react";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import { BORDER_RADIUS, FONT_SIZE, FONT_WEIGHT, SPACING } from "../constants/design";
 import { useTheme } from "../contexts/ThemeContext";
 
 interface ButtonProps {
@@ -29,15 +27,15 @@ export function Button({
   const { colors } = useTheme();
 
   const sizeStyles = {
-    small: { paddingVertical: 8, paddingHorizontal: 16 },
-    medium: { paddingVertical: 12, paddingHorizontal: 24 },
-    large: { paddingVertical: 16, paddingHorizontal: 32 },
+    small: { paddingVertical: SPACING.sm, paddingHorizontal: SPACING.lg },
+    medium: { paddingVertical: SPACING.md, paddingHorizontal: SPACING.xl },
+    large: { paddingVertical: SPACING.lg, paddingHorizontal: SPACING["2xl"] },
   };
 
   const textSizeStyles = {
-    small: { fontSize: 14 },
-    medium: { fontSize: 16 },
-    large: { fontSize: 18 },
+    small: { fontSize: FONT_SIZE.sm },
+    medium: { fontSize: FONT_SIZE.base },
+    large: { fontSize: FONT_SIZE.lg },
   };
 
   const getVariantStyles = () => {
@@ -82,7 +80,7 @@ export function Button({
   return (
     <TouchableOpacity
       style={{
-        borderRadius: 12,
+        borderRadius: BORDER_RADIUS.md,
         alignItems: "center",
         justifyContent: "center",
         flexDirection: "row",
@@ -105,11 +103,11 @@ export function Button({
         />
       ) : (
         <>
-          {icon && <View style={{ marginRight: 8 }}>{icon}</View>}
+          {icon && <View style={{ marginRight: SPACING.sm }}>{icon}</View>}
           <Text
             style={{
               color: getTextColor(),
-              fontWeight: "600",
+              fontWeight: FONT_WEIGHT.semibold,
               ...textSizeStyles[size],
             }}
           >
