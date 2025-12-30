@@ -1,14 +1,12 @@
-// src/features/assign-items/hooks/useReceiptActions.ts
-// Hook for managing receipt actions (save/delete/navigation)
-
+import { useCallback, useEffect, useState } from "react";
 import { usePreventRemove } from "@react-navigation/native";
 import { useNavigation, useRouter } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
 import { Alert } from "react-native";
 import { useInvoiceStore } from "../../../shared/stores/invoiceStore";
 import { Invoice } from "../../../shared/types/invoice";
 import { getLocalDateString } from "../../../shared/utils/dateUtils";
 
+// TODO: refactor to separate concerns
 export const useReceiptActions = (
   getDisplayTitle: () => string,
   isEditingTitle: boolean,
@@ -32,7 +30,6 @@ export const useReceiptActions = (
     calculateTotals,
     setInvoiceTitle,
   } = useInvoiceStore();
-
   const [isSaving, setIsSaving] = useState(false);
 
   const clearExistingSession = useCallback(() => {
@@ -41,7 +38,6 @@ export const useReceiptActions = (
     setPeople([]);
   }, [setEditingSavedInvoice, clearInvoice, setPeople]);
 
-  // Clear session on unmount if editing existing invoice
   useEffect(() => {
     return () => {
       if (editingSavedInvoice) {
@@ -53,7 +49,6 @@ export const useReceiptActions = (
   const navigateToList = useCallback(
     (resetType: "new" | "existing") => {
       loadSavedInvoices();
-
       if (resetType === "existing") {
         clearExistingSession();
         // For existing receipts, go back with animation
@@ -75,17 +70,14 @@ export const useReceiptActions = (
     if (!currentInvoice) {
       return false;
     }
-
     // If title is being edited and has changed, save it first
     if (isEditingTitle && tempTitle.trim() !== getDisplayTitle()) {
       setInvoiceTitle(tempTitle.trim());
     }
-
     // Allow saving even with 0 items - user can add items later
     try {
       setIsSaving(true);
       const savedInvoice = await saveCurrentInvoice();
-
       if (savedInvoice) {
         navigateToList(editingSavedInvoice ? "existing" : "new");
         return true;
@@ -171,7 +163,6 @@ export const useReceiptActions = (
 
   const handleDeleteReceipt = useCallback(async () => {
     if (!currentInvoice?.id) return;
-
     Alert.alert(
       "Delete Receipt",
       "Are you sure you want to delete this receipt? This action cannot be undone.",

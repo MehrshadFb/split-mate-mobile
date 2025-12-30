@@ -1,6 +1,3 @@
-// src/features/assign-items/hooks/useReceiptTitle.ts
-// Hook for managing receipt title editing
-
 import { useCallback, useState } from "react";
 import { useInvoiceStore } from "../../../shared/stores/invoiceStore";
 
@@ -25,14 +22,10 @@ export const useReceiptTitle = () => {
 
   const handleSaveTitle = useCallback(() => {
     if (!isEditingTitle) return;
-
     const trimmed = tempTitle.trim();
     const currentTitle = getDisplayTitle();
-
-    // Only update if the title actually changed and is not empty
-    if (trimmed && trimmed !== currentTitle) {
+    if (trimmed && trimmed !== currentTitle) { // Only update if changed and not empty
       setInvoiceTitle(trimmed);
-      // Mark as unsaved change when editing a saved receipt
       if (editingSavedInvoice) {
         setHasUnsavedChanges(true);
       }

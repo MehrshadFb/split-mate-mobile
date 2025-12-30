@@ -1,6 +1,3 @@
-// src/features/assign-items/hooks/useItemManagement.ts
-// Hook for managing items in assign-items screen
-
 import { useCallback, useState } from "react";
 import { useInvoiceStore } from "../../../shared/stores/invoiceStore";
 import { Item } from "../../../shared/types/invoice";
@@ -14,12 +11,10 @@ interface EditingItem {
 export const useItemManagement = () => {
   const { currentInvoice, addItem, updateItem, deleteItem, togglePersonForItem } =
     useInvoiceStore();
-
   const [editingItem, setEditingItem] = useState<EditingItem | null>(null);
 
   const handleAddItem = useCallback(() => {
     if (!currentInvoice) return;
-
     const itemNumber = currentInvoice.items.length + 1;
     const newItem: Item = {
       name: `Item #${itemNumber}`,
@@ -39,14 +34,12 @@ export const useItemManagement = () => {
 
   const handleSaveEdit = useCallback(() => {
     if (!editingItem) return;
-
     const price =
       editingItem.price.trim() === "" ? 0 : parseFloat(editingItem.price);
     const name =
       editingItem.name.trim() === ""
         ? `Item #${editingItem.index + 1}`
         : editingItem.name;
-
     updateItem(editingItem.index, {
       name,
       price: isNaN(price) ? 0 : price,
@@ -69,7 +62,6 @@ export const useItemManagement = () => {
   const handleChangePrice = useCallback(
     (text: string) => {
       if (!editingItem) return;
-      // Allow empty string, numbers, and decimal point
       const validInput = /^\d*\.?\d{0,2}$/;
       if (text === "" || validInput.test(text)) {
         setEditingItem({ ...editingItem, price: text });

@@ -1,6 +1,3 @@
-// src/features/assign-items/hooks/usePeopleManagement.ts
-// Hook for managing people in assign-items screen
-
 import { useCallback, useState } from "react";
 import { Alert } from "react-native";
 import { useInvoiceStore } from "../../../shared/stores/invoiceStore";
@@ -16,7 +13,6 @@ export const usePeopleManagement = () => {
     editingSavedInvoice,
     setHasUnsavedChanges,
   } = useInvoiceStore();
-
   const [showManagePeople, setShowManagePeople] = useState(false);
   const [newPersonName, setNewPersonName] = useState("");
 
@@ -25,32 +21,22 @@ export const usePeopleManagement = () => {
     if (!trimmedName) {
       return;
     }
-
     const nameExists = people.some(
       (mate) => mate.toLowerCase() === trimmedName.toLowerCase()
     );
-
     if (nameExists) {
       Alert.alert("Duplicate name", "This person is already on the list.");
       return;
     }
-
-    // Add person to both the people array and the current invoice
     const updatedPeople = [...people, trimmedName];
     setPeople(updatedPeople);
-
-    // Update the current invoice's people array
     if (currentInvoice) {
       setInvoice({
         ...currentInvoice,
         people: updatedPeople,
       });
     }
-
-    // Recalculate totals to include the new person with $0
     calculateTotals();
-
-    // Mark as unsaved change when editing a saved receipt
     if (editingSavedInvoice) {
       setHasUnsavedChanges(true);
     }
@@ -68,7 +54,7 @@ export const usePeopleManagement = () => {
 
   const handleRemovePerson = useCallback(
     (personName: string) => {
-      // Check if removing this person would leave fewer than 2 people
+      // Precondition: Ensure minimum people requirement
       if (people.length <= MIN_PEOPLE_REQUIRED) {
         Alert.alert(
           "Cannot Remove",
@@ -77,12 +63,10 @@ export const usePeopleManagement = () => {
         );
         return;
       }
-
-      // Check if person is assigned to any items
+      // If the person is assigned to any items, prevent removal
       const hasAssignedItems = currentInvoice?.items.some((item) =>
         item.splitBetween.includes(personName)
       );
-
       if (hasAssignedItems) {
         Alert.alert(
           "Cannot Remove",
@@ -91,7 +75,6 @@ export const usePeopleManagement = () => {
         );
         return;
       }
-
       Alert.alert(
         "Remove Person",
         `Remove ${personName} from this receipt?`,
@@ -103,19 +86,13 @@ export const usePeopleManagement = () => {
             onPress: () => {
               const updatedPeople = people.filter((p) => p !== personName);
               setPeople(updatedPeople);
-
-              // Update the current invoice's people array
               if (currentInvoice) {
                 setInvoice({
                   ...currentInvoice,
                   people: updatedPeople,
                 });
               }
-
-              // Recalculate totals to remove the person from the summary
               calculateTotals();
-
-              // Mark as unsaved change when editing a saved receipt
               if (editingSavedInvoice) {
                 setHasUnsavedChanges(true);
               }

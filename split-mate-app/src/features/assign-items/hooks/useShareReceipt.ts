@@ -1,10 +1,7 @@
-// src/features/assign-items/hooks/useShareReceipt.ts
-// Hook for sharing receipt as PDF
-
+import { useState } from "react";
 import { File, Paths } from "expo-file-system";
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
-import { useState } from "react";
 import { Alert } from "react-native";
 import { Invoice } from "../../../shared/types/invoice";
 import { generateReceiptHTML } from "../../../shared/utils/pdfGenerator";
@@ -15,15 +12,11 @@ interface UseShareReceiptReturn {
 }
 
 function generateFileName(title: string, date: string): string {
-  // Format date as YYYY-MM-DD
-  const formattedDate = new Date(date).toISOString().split("T")[0];
-  
-  // Sanitize title: remove special characters, replace spaces with underscores
+  const formattedDate = new Date(date).toISOString().split("T")[0]; // YYYY-MM-DD
   const sanitizedTitle = (title || "Receipt")
     .replace(/[^a-zA-Z0-9\s-]/g, "")
     .replace(/\s+/g, "_")
     .substring(0, 50); // Limit length
-  
   return `${sanitizedTitle}_${formattedDate}.pdf`;
 }
 
@@ -33,9 +26,7 @@ export function useShareReceipt(): UseShareReceiptReturn {
   const shareReceipt = async (invoice: Invoice): Promise<void> => {
     try {
       setIsGenerating(true);
-
-      // Check if sharing is available on this device
-      const isSharingAvailable = await Sharing.isAvailableAsync();
+      const isSharingAvailable = await Sharing.isAvailableAsync(); // Check sharing availability
       if (!isSharingAvailable) {
         Alert.alert(
           "Sharing Not Available",
@@ -43,29 +34,21 @@ export function useShareReceipt(): UseShareReceiptReturn {
         );
         return;
       }
-
-      // Generate HTML content
-      const html = generateReceiptHTML(invoice);
-
+      const html = generateReceiptHTML(invoice); // Generate HTML content for the receipt
       // Generate PDF from HTML
       const { uri } = await Print.printToFileAsync({
         html,
         base64: false,
       });
-
-      // Generate proper filename
       const fileName = generateFileName(invoice.title || "Receipt", invoice.date);
       const targetFile = new File(Paths.cache, fileName);
-      
-      // Delete existing file if it exists to avoid conflicts
+      // Delete existing file if it exists to avoid conflicts, it might cause issues on some cases
       if (targetFile.exists) {
         targetFile.delete();
       }
-      
       // Create a file instance from the generated PDF URI and copy it with proper name
       const sourceFile = new File(uri);
       sourceFile.copy(targetFile);
-
       // Share the PDF file with proper filename
       await Sharing.shareAsync(targetFile.uri, {
         mimeType: "application/pdf",
@@ -74,11 +57,8 @@ export function useShareReceipt(): UseShareReceiptReturn {
       });
     } catch (error) {
       console.error("Error sharing receipt:", error);
-      
-      // Show user-friendly error message
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error occurred";
-      
       Alert.alert(
         "Share Failed",
         `Unable to share receipt: ${errorMessage}. Please try again.`,
