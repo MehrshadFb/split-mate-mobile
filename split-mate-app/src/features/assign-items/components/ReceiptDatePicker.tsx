@@ -41,7 +41,6 @@ export const ReceiptDatePicker: React.FC<ReceiptDatePickerProps> = ({
     if (Platform.OS === "android") {
       setShowPicker(false);
     }
-
     if (selectedDate) {
       setPickerDate(selectedDate);
       const year = selectedDate.getFullYear();
