@@ -1,8 +1,5 @@
-// src/features/mates/hooks/useMatesManagement.ts
-// Hook for managing mates state and validation logic
-
-import { useRouter } from "expo-router";
 import { useState } from "react";
+import { useRouter } from "expo-router";
 import { Alert } from "react-native";
 import { useInvoiceStore } from "../../../shared/stores/invoiceStore";
 import { MIN_MATES_REQUIRED } from "../constants/validation";
@@ -18,16 +15,13 @@ export const useMatesManagement = () => {
     if (!trimmedName) {
       return;
     }
-
     const nameExists = people.some(
       (mate) => mate.toLowerCase() === trimmedName.toLowerCase()
     );
-
     if (nameExists) {
       Alert.alert("Duplicate name", "This mate is already on the list.");
       return;
     }
-
     addPerson(trimmedName);
     setNewPersonName("");
   };
@@ -44,7 +38,6 @@ export const useMatesManagement = () => {
       );
       return;
     }
-
     setEditingSavedInvoice(false);
     router.push({
       pathname: "/upload",
