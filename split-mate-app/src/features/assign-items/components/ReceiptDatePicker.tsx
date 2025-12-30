@@ -144,14 +144,16 @@ export const ReceiptDatePicker: React.FC<ReceiptDatePickerProps> = ({
                 elevation: 5,
               }}
             >
-              <DateTimePicker
-                value={pickerDate}
-                mode="date"
-                display="spinner"
-                onChange={handleDateChange}
-                maximumDate={new Date()}
-                textColor={colors.text.primary}
-              />
+              <View style={{ alignItems: "center" }}>
+                <DateTimePicker
+                  value={pickerDate}
+                  mode="date"
+                  display="spinner"
+                  onChange={handleDateChange}
+                  maximumDate={new Date()}
+                  textColor={colors.text.primary}
+                />
+              </View>
               <View style={{ paddingHorizontal: SPACING.xl }}>
                 <TouchableOpacity
                   onPress={() => setShowPicker(false)}
