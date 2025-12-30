@@ -1,6 +1,3 @@
-// src/features/receipts/components/ReceiptsList.tsx
-// List of saved receipts
-
 import React from "react";
 import { View } from "react-native";
 import { Invoice } from "../../../shared/types/invoice";

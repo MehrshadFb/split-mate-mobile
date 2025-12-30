@@ -1,9 +1,7 @@
-// src/features/receipts/components/ReceiptCard.tsx
-// Individual receipt card component
-
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
+import { Ionicons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
+import { AVATAR_SIZE, BORDER_RADIUS, CARD_STYLES, FONT_SIZE, FONT_WEIGHT, ICON_SIZE, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
 import { Invoice } from "../../../shared/types/invoice";
 
@@ -30,29 +28,29 @@ export const ReceiptCard: React.FC<ReceiptCardProps> = ({
         flexDirection: "row",
         alignItems: "center",
         backgroundColor: colors.background.secondary,
-        borderRadius: 18,
-        padding: 18,
-        marginBottom: 14,
+        borderRadius: CARD_STYLES.borderRadius,
+        padding: CARD_STYLES.padding,
+        marginBottom: CARD_STYLES.marginBottom,
         borderWidth: 1,
         borderColor: colors.border,
       }}
     >
       <View
         style={{
-          width: 50,
-          height: 50,
-          borderRadius: 16,
+          width: AVATAR_SIZE.lg,
+          height: AVATAR_SIZE.lg,
+          borderRadius: BORDER_RADIUS.lg,
           backgroundColor: colors.accent.light,
           alignItems: "center",
           justifyContent: "center",
-          marginRight: 14,
+          marginRight: SPACING.md,
         }}
       >
         <Text
           style={{
             color: colors.accent.primary,
-            fontWeight: "700",
-            fontSize: 20,
+            fontWeight: FONT_WEIGHT.bold,
+            fontSize: FONT_SIZE.xl,
           }}
         >
           {invoice.items.length}
@@ -62,8 +60,8 @@ export const ReceiptCard: React.FC<ReceiptCardProps> = ({
         <Text
           style={{
             color: colors.text.primary,
-            fontWeight: "700",
-            fontSize: 17,
+            fontWeight: FONT_WEIGHT.bold,
+            fontSize: FONT_SIZE.base,
           }}
         >
           {title}
@@ -71,7 +69,7 @@ export const ReceiptCard: React.FC<ReceiptCardProps> = ({
         <Text
           style={{
             color: colors.text.secondary,
-            marginTop: 4,
+            marginTop: SPACING.xs,
           }}
         >
           {formattedDate}
@@ -81,8 +79,8 @@ export const ReceiptCard: React.FC<ReceiptCardProps> = ({
         <Text
           style={{
             color: colors.accent.primary,
-            fontWeight: "700",
-            fontSize: 20,
+            fontWeight: FONT_WEIGHT.bold,
+            fontSize: FONT_SIZE.xl,
           }}
         >
           ${invoice.totalAmount.toFixed(2)}
@@ -90,8 +88,8 @@ export const ReceiptCard: React.FC<ReceiptCardProps> = ({
         <Text
           style={{
             color: colors.text.tertiary,
-            marginTop: 4,
-            fontSize: 12,
+            marginTop: SPACING.xs,
+            fontSize: FONT_SIZE.xs,
           }}
         >
           {invoice.people.map((person) => person[0]?.toUpperCase()).join(" · ")}
@@ -99,9 +97,9 @@ export const ReceiptCard: React.FC<ReceiptCardProps> = ({
       </View>
       <Ionicons
         name="chevron-forward"
-        size={22}
+        size={ICON_SIZE.md + 2}
         color={colors.text.tertiary}
-        style={{ marginLeft: 12 }}
+        style={{ marginLeft: SPACING.md }}
       />
     </TouchableOpacity>
   );

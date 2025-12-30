@@ -1,11 +1,9 @@
-// src/features/receipts/components/EmptyReceiptsState.tsx
-// Empty state when no receipts have been saved
-
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
+import { Ionicons } from "@expo/vector-icons";
 import { Text, View } from "react-native";
-import { useTheme } from "../../../shared/contexts/ThemeContext";
 import { Button } from "../../../shared/components/Button";
+import { EMPTY_STATE_STYLES, FONT_WEIGHT, ICON_SIZE, SPACING } from "../../../shared/constants/design";
+import { useTheme } from "../../../shared/contexts/ThemeContext";
 
 interface EmptyReceiptsStateProps {
   onStartNew: () => void;
@@ -20,8 +18,8 @@ export const EmptyReceiptsState: React.FC<EmptyReceiptsStateProps> = ({
     <View
       style={{
         backgroundColor: colors.background.secondary,
-        borderRadius: 20,
-        padding: 32,
+        borderRadius: EMPTY_STATE_STYLES.borderRadius,
+        padding: EMPTY_STATE_STYLES.padding,
         alignItems: "center",
         borderWidth: 1,
         borderColor: colors.border,
@@ -29,15 +27,15 @@ export const EmptyReceiptsState: React.FC<EmptyReceiptsStateProps> = ({
     >
       <Ionicons
         name="archive-outline"
-        size={48}
+        size={EMPTY_STATE_STYLES.iconSize}
         color={colors.text.tertiary}
       />
       <Text
         style={{
           color: colors.text.primary,
-          fontWeight: "600",
-          fontSize: 20,
-          marginTop: 16,
+          fontWeight: FONT_WEIGHT.semibold,
+          fontSize: EMPTY_STATE_STYLES.titleSize,
+          marginTop: SPACING.lg,
           textAlign: "center",
         }}
       >
@@ -46,20 +44,20 @@ export const EmptyReceiptsState: React.FC<EmptyReceiptsStateProps> = ({
       <Text
         style={{
           color: colors.text.secondary,
-          marginTop: 8,
+          marginTop: EMPTY_STATE_STYLES.textGap,
           textAlign: "center",
         }}
       >
         When you save a split, it appears here for quick access.
       </Text>
-      <View style={{ width: "100%", marginTop: 24 }}>
+      <View style={{ width: "100%", marginTop: SPACING["2xl"] }}>
         <Button
           title="Start a new receipt"
           onPress={onStartNew}
           variant="primary"
           size="large"
           fullWidth
-          icon={<Ionicons name="sparkles" size={20} color="white" />}
+          icon={<Ionicons name="sparkles" size={ICON_SIZE.md} color="white" />}
         />
       </View>
     </View>
