@@ -1,9 +1,7 @@
-// src/features/upload/components/FilePickerButton.tsx
-// File picker button component
-
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
+import { Ionicons } from "@expo/vector-icons";
 import { Text, TouchableOpacity } from "react-native";
+import { BORDER_RADIUS, FONT_SIZE, FONT_WEIGHT, ICON_SIZE, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
 
 interface FilePickerButtonProps {
@@ -25,21 +23,21 @@ export const FilePickerButton: React.FC<FilePickerButtonProps> = ({
         backgroundColor: colors.background.secondary,
         borderWidth: 2,
         borderColor: colors.border,
-        borderRadius: 16,
-        padding: 24,
-        marginBottom: 16,
+        borderRadius: BORDER_RADIUS.lg,
+        padding: SPACING["2xl"],
+        marginBottom: SPACING.lg,
         alignItems: "center",
         opacity: disabled ? 0.5 : 1,
       }}
       activeOpacity={0.7}
     >
-      <Ionicons name="image" size={48} color={colors.accent.primary} />
+      <Ionicons name="image" size={ICON_SIZE["3xl"]} color={colors.accent.primary} />
       <Text
         style={{
           color: colors.text.primary,
-          fontWeight: "bold",
-          fontSize: 18,
-          marginTop: 12,
+          fontWeight: FONT_WEIGHT.bold,
+          fontSize: FONT_SIZE.lg,
+          marginTop: SPACING.md,
         }}
       >
         Choose from Library
@@ -47,8 +45,8 @@ export const FilePickerButton: React.FC<FilePickerButtonProps> = ({
       <Text
         style={{
           color: colors.text.secondary,
-          fontSize: 14,
-          marginTop: 4,
+          fontSize: FONT_SIZE.sm,
+          marginTop: SPACING.xs,
         }}
       >
         Select an existing photo

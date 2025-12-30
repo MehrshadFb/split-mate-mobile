@@ -1,9 +1,7 @@
-// src/features/upload/components/CameraButton.tsx
-// Camera capture button component
-
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
+import { Ionicons } from "@expo/vector-icons";
 import { Text, TouchableOpacity } from "react-native";
+import { BORDER_RADIUS, FONT_SIZE, FONT_WEIGHT, ICON_SIZE, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
 
 interface CameraButtonProps {
@@ -23,21 +21,21 @@ export const CameraButton: React.FC<CameraButtonProps> = ({
       disabled={disabled}
       style={{
         backgroundColor: colors.accent.primary,
-        borderRadius: 16,
-        padding: 24,
-        marginBottom: 16,
+        borderRadius: BORDER_RADIUS.lg,
+        padding: SPACING["2xl"],
+        marginBottom: SPACING.lg,
         alignItems: "center",
         opacity: disabled ? 0.5 : 1,
       }}
       activeOpacity={0.7}
     >
-      <Ionicons name="camera" size={48} color={colors.text.inverse} />
+      <Ionicons name="camera" size={ICON_SIZE["3xl"]} color={colors.text.inverse} />
       <Text
         style={{
           color: colors.text.inverse,
-          fontWeight: "bold",
-          fontSize: 18,
-          marginTop: 12,
+          fontWeight: FONT_WEIGHT.bold,
+          fontSize: FONT_SIZE.lg,
+          marginTop: SPACING.md,
         }}
       >
         Take Photo
@@ -45,8 +43,8 @@ export const CameraButton: React.FC<CameraButtonProps> = ({
       <Text
         style={{
           color: colors.text.inverse,
-          fontSize: 14,
-          marginTop: 4,
+          fontSize: FONT_SIZE.sm,
+          marginTop: SPACING.xs,
           opacity: 0.8,
         }}
       >

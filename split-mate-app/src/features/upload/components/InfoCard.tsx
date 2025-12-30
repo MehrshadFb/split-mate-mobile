@@ -1,9 +1,7 @@
-// src/features/upload/components/InfoCard.tsx
-// Information card about upload process
-
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
+import { Ionicons } from "@expo/vector-icons";
 import { Text, View } from "react-native";
+import { BORDER_RADIUS, FONT_SIZE, FONT_WEIGHT, ICON_SIZE, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
 
 export const InfoCard: React.FC = () => {
@@ -12,29 +10,29 @@ export const InfoCard: React.FC = () => {
   return (
     <View
       style={{
-        marginTop: 32,
+        marginTop: SPACING["3xl"],
         backgroundColor: colors.accent.light,
-        borderRadius: 12,
-        padding: 16,
+        borderRadius: BORDER_RADIUS.md,
+        padding: SPACING.lg,
       }}
     >
       <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
         <Ionicons
           name="information-circle"
-          size={20}
+          size={ICON_SIZE.md}
           color={colors.accent.primary}
         />
-        <View style={{ flex: 1, marginLeft: 12 }}>
+        <View style={{ flex: 1, marginLeft: SPACING.md }}>
           <Text
             style={{
               color: colors.accent.hover,
-              fontWeight: "600",
-              marginBottom: 4,
+              fontWeight: FONT_WEIGHT.semibold,
+              marginBottom: SPACING.xs,
             }}
           >
             How it works
           </Text>
-          <Text style={{ color: colors.text.secondary, fontSize: 14 }}>
+          <Text style={{ color: colors.text.secondary, fontSize: FONT_SIZE.sm }}>
             1. Take a photo or select a receipt image{"\n"}
             2. Our AI will read and extract the items{"\n"}
             3. Review and assign items to your mates{"\n"}

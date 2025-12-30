@@ -1,10 +1,8 @@
-// src/features/upload/components/SelectedImagesList.tsx
-// List of selected images with preview
-
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
+import { Ionicons } from "@expo/vector-icons";
 import { ScrollView, Text, View } from "react-native";
 import { Button } from "../../../shared/components/Button";
+import { FONT_WEIGHT, ICON_SIZE, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
 import { ImagePreview } from "./ImagePreview";
 
@@ -33,12 +31,12 @@ export const SelectedImagesList: React.FC<SelectedImagesListProps> = ({
   if (images.length === 0) return null;
 
   return (
-    <View style={{ marginTop: 24 }}>
+    <View style={{ marginTop: SPACING["2xl"] }}>
       <Text
         style={{
           color: colors.text.primary,
-          fontWeight: "600",
-          marginBottom: 12,
+          fontWeight: FONT_WEIGHT.semibold,
+          marginBottom: SPACING.md,
         }}
       >
         Selected Receipts ({images.length})
@@ -53,7 +51,7 @@ export const SelectedImagesList: React.FC<SelectedImagesListProps> = ({
           />
         ))}
       </ScrollView>
-      <View style={{ marginTop: 16 }}>
+      <View style={{ marginTop: SPACING.lg }}>
         <Button
           title={
             isLoading
@@ -70,7 +68,7 @@ export const SelectedImagesList: React.FC<SelectedImagesListProps> = ({
           loading={isLoading}
           icon={
             !isLoading ? (
-              <Ionicons name="sparkles" size={20} color={colors.text.inverse} />
+              <Ionicons name="sparkles" size={ICON_SIZE.md} color={colors.text.inverse} />
             ) : undefined
           }
         />

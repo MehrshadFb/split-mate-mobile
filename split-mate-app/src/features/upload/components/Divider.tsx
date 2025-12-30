@@ -1,8 +1,6 @@
-// src/features/upload/components/Divider.tsx
-// Divider component with text
-
 import React from "react";
 import { Text, View } from "react-native";
+import { FONT_SIZE, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
 
 interface DividerProps {
@@ -17,15 +15,15 @@ export const Divider: React.FC<DividerProps> = ({ text = "or" }) => {
       style={{
         flexDirection: "row",
         alignItems: "center",
-        marginVertical: 24,
+        marginVertical: SPACING["2xl"],
       }}
     >
       <View style={{ flex: 1, height: 1, backgroundColor: colors.border }} />
       <Text
         style={{
           color: colors.text.tertiary,
-          fontSize: 14,
-          marginHorizontal: 16,
+          fontSize: FONT_SIZE.sm,
+          marginHorizontal: SPACING.lg,
         }}
       >
         {text}

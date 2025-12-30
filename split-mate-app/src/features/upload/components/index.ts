@@ -1,6 +1,3 @@
-// src/features/upload/components/index.ts
-// Barrel export for upload components
-
 export { CameraButton } from "./CameraButton";
 export { Divider } from "./Divider";
 export { ErrorMessage } from "./ErrorMessage";

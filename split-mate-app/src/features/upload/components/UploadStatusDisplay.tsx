@@ -1,8 +1,6 @@
-// src/features/upload/components/UploadStatusDisplay.tsx
-// Upload status display component with progress tracking
-
 import React from "react";
 import { Text, View } from "react-native";
+import { BORDER_RADIUS, FONT_SIZE, FONT_WEIGHT, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
 import { UploadProgress } from "../../../shared/services/api";
 
@@ -72,11 +70,11 @@ export const UploadStatusDisplay: React.FC<UploadStatusDisplayProps> = ({
   return (
     <View
       style={{
-        marginTop: 20,
-        marginBottom: 16,
-        padding: 16,
+        marginTop: SPACING.xl,
+        marginBottom: SPACING.lg,
+        padding: SPACING.lg,
         backgroundColor: colors.background.secondary,
-        borderRadius: 16,
+        borderRadius: BORDER_RADIUS.lg,
         borderWidth: 1,
         borderColor: colors.border,
         alignItems: "center",
@@ -84,8 +82,8 @@ export const UploadStatusDisplay: React.FC<UploadStatusDisplayProps> = ({
     >
       <Text
         style={{
-          fontSize: 24,
-          marginBottom: 8,
+          fontSize: FONT_SIZE["2xl"],
+          marginBottom: SPACING.sm,
         }}
       >
         {getStatusEmoji()}
@@ -93,8 +91,8 @@ export const UploadStatusDisplay: React.FC<UploadStatusDisplayProps> = ({
       <Text
         style={{
           color: colors.text.primary,
-          fontSize: 16,
-          fontWeight: "600",
+          fontSize: FONT_SIZE.base,
+          fontWeight: FONT_WEIGHT.semibold,
           textAlign: "center",
         }}
       >
@@ -103,8 +101,8 @@ export const UploadStatusDisplay: React.FC<UploadStatusDisplayProps> = ({
       <Text
         style={{
           color: colors.text.secondary,
-          fontSize: 14,
-          marginTop: 4,
+          fontSize: FONT_SIZE.sm,
+          marginTop: SPACING.xs,
           textAlign: "center",
         }}
       >

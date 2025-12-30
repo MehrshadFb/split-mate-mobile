@@ -1,9 +1,7 @@
-// src/features/upload/components/ImagePreview.tsx
-// Image preview component with remove button
-
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
+import { Ionicons } from "@expo/vector-icons";
 import { Image, TouchableOpacity, View } from "react-native";
+import { BORDER_RADIUS, ICON_SIZE, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
 
 interface ImagePreviewProps {
@@ -20,13 +18,13 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
   const { colors } = useTheme();
 
   return (
-    <View style={{ marginRight: 12, position: "relative" }}>
+    <View style={{ marginRight: SPACING.md, position: "relative" }}>
       <Image
         source={{ uri }}
         style={{
           width: 128,
           height: 192,
-          borderRadius: 12,
+          borderRadius: BORDER_RADIUS.md,
         }}
         resizeMode="cover"
       />
@@ -35,17 +33,17 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
           onPress={onRemove}
           style={{
             position: "absolute",
-            top: 8,
-            right: 8,
+            top: SPACING.sm,
+            right: SPACING.sm,
             backgroundColor: colors.error,
-            borderRadius: 12,
-            width: 24,
-            height: 24,
+            borderRadius: BORDER_RADIUS.md,
+            width: SPACING["2xl"],
+            height: SPACING["2xl"],
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          <Ionicons name="close" size={16} color="white" />
+          <Ionicons name="close" size={ICON_SIZE.sm} color="white" />
         </TouchableOpacity>
       )}
     </View>

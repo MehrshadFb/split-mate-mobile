@@ -1,6 +1,4 @@
-// app/upload.tsx
-// Upload receipt screen - refactored with feature components
-
+import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { ScrollView, View } from "react-native";
@@ -17,6 +15,7 @@ import {
 } from "../src/features/upload/components";
 import { useImageSelection, useUpload } from "../src/features/upload/hooks";
 import { Button } from "../src/shared/components/Button";
+import { ICON_SIZE, SPACING } from "../src/shared/constants/design";
 import { useTheme } from "../src/shared/contexts/ThemeContext";
 import { useInvoiceStore } from "../src/shared/stores/invoiceStore";
 
@@ -74,7 +73,7 @@ export default function UploadScreen() {
       edges={["top", "left", "right"]}
     >
       <ScrollView style={{ flex: 1 }}>
-        <View style={{ padding: 24 }}>
+        <View style={{ padding: SPACING.xl }}>
           {/* Header */}
           <UploadHeader
             title="Upload Receipt"
@@ -119,7 +118,7 @@ export default function UploadScreen() {
             icon={
               <Ionicons
                 name="create-outline"
-                size={20}
+                size={ICON_SIZE.md}
                 color={colors.accent.primary}
               />
             }

@@ -1,9 +1,8 @@
-// src/features/upload/components/UploadHeader.tsx
-// Header component for upload screen
-
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { TouchableOpacity } from "react-native";
+import { PageHeader } from "../../../shared/components/PageHeader";
+import { ICON_SIZE, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
 
 interface UploadHeaderProps {
@@ -26,27 +25,13 @@ export const UploadHeader: React.FC<UploadHeaderProps> = ({
         style={{
           flexDirection: "row",
           alignItems: "center",
-          marginBottom: 24,
+          marginBottom: SPACING["2xl"],
         }}
         activeOpacity={0.7}
       >
-        <Ionicons name="arrow-back" size={24} color={colors.text.primary} />
+        <Ionicons name="arrow-back" size={ICON_SIZE.lg} color={colors.text.primary} />
       </TouchableOpacity>
-      <View style={{ marginBottom: 32 }}>
-        <Text
-          style={{
-            fontSize: 36,
-            fontWeight: "bold",
-            color: colors.text.primary,
-            marginBottom: 8,
-          }}
-        >
-          {title}
-        </Text>
-        <Text style={{ fontSize: 18, color: colors.text.secondary }}>
-          {subtitle}
-        </Text>
-      </View>
+      <PageHeader title={title} subtitle={subtitle} />
     </>
   );
 };
