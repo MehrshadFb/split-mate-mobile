@@ -1,6 +1,3 @@
-// src/features/receipts/utils/receiptFormatters.ts
-// Utility functions for formatting receipt data
-
 import { Invoice } from "../../../shared/types/invoice";
 
 export const formatReceiptDate = (dateStr: string): string => {
@@ -38,6 +35,5 @@ export const getReceiptTitle = (invoice: Invoice): string => {
   if (invoice.title) {
     return invoice.title;
   }
-  // Generate default title
-  return "Receipt";
+  return "Receipt"; // Default title if none provided
 };

@@ -1,8 +1,5 @@
-// src/features/receipts/hooks/useReceiptsManagement.ts
-// Hook for managing receipts state and operations
-
-import { useRouter } from "expo-router";
 import { useEffect } from "react";
+import { useRouter } from "expo-router";
 import { useInvoiceStore } from "../../../shared/stores/invoiceStore";
 import { Invoice } from "../../../shared/types/invoice";
 
@@ -31,7 +28,6 @@ export const useReceiptsManagement = () => {
       })),
       totals: invoice.totals.map((person) => ({ ...person })),
     };
-
     setPeople(cloned.people);
     setInvoice(cloned);
     calculateTotals();
