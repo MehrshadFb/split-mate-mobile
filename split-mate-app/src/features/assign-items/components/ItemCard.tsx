@@ -1,9 +1,7 @@
-// src/features/assign-items/components/ItemCard.tsx
-// Card component for displaying and editing an item
-
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
+import { Ionicons } from "@expo/vector-icons";
 import { Alert, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { AVATAR_SIZE, BORDER_RADIUS, CARD_STYLES, FONT_SIZE, FONT_WEIGHT, ICON_SIZE, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
 import { Item } from "../../../shared/types/invoice";
 
@@ -59,16 +57,12 @@ export const ItemCard: React.FC<ItemCardProps> = ({
     <View
       style={{
         backgroundColor: colors.background.secondary,
-        borderRadius: 16,
-        padding: 18,
-        marginBottom: 16,
+        borderRadius: CARD_STYLES.borderRadius,
+        padding: CARD_STYLES.padding,
+        marginBottom: SPACING.lg,
         borderWidth: 1,
         borderColor: colors.border,
-        shadowColor: "#000000",
-        shadowOpacity: 0.08,
-        shadowRadius: 12,
-        shadowOffset: { width: 0, height: 4 },
-        elevation: 2,
+        ...CARD_STYLES.shadow,
       }}
     >
       {isEditing ? (
@@ -76,8 +70,8 @@ export const ItemCard: React.FC<ItemCardProps> = ({
           <Text
             style={{
               color: colors.text.secondary,
-              fontWeight: "600",
-              marginBottom: 6,
+              fontWeight: FONT_WEIGHT.semibold,
+              marginBottom: SPACING.xs + 2,
             }}
           >
             Item name
@@ -87,11 +81,11 @@ export const ItemCard: React.FC<ItemCardProps> = ({
               backgroundColor: colors.background.primary,
               borderWidth: 1,
               borderColor: colors.border,
-              borderRadius: 10,
-              paddingHorizontal: 12,
-              paddingVertical: 10,
+              borderRadius: BORDER_RADIUS.md,
+              paddingHorizontal: SPACING.md,
+              paddingVertical: SPACING.md - 2,
               color: colors.text.primary,
-              marginBottom: 16,
+              marginBottom: SPACING.lg,
             }}
             value={editName}
             onChangeText={onChangeName}
@@ -101,8 +95,8 @@ export const ItemCard: React.FC<ItemCardProps> = ({
           <Text
             style={{
               color: colors.text.secondary,
-              fontWeight: "600",
-              marginBottom: 6,
+              fontWeight: FONT_WEIGHT.semibold,
+              marginBottom: SPACING.xs + 2,
             }}
           >
             Item price
@@ -114,16 +108,16 @@ export const ItemCard: React.FC<ItemCardProps> = ({
               backgroundColor: colors.background.primary,
               borderWidth: 1,
               borderColor: colors.border,
-              borderRadius: 10,
-              paddingHorizontal: 12,
+              borderRadius: BORDER_RADIUS.md,
+              paddingHorizontal: SPACING.md,
               paddingVertical: 2,
             }}
           >
             <Text
               style={{
                 color: colors.text.secondary,
-                fontSize: 16,
-                marginRight: 4,
+                fontSize: FONT_SIZE.base,
+                marginRight: SPACING.xs,
               }}
             >
               $
@@ -132,7 +126,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({
               style={{
                 flex: 1,
                 color: colors.text.primary,
-                paddingVertical: 8,
+                paddingVertical: SPACING.sm,
               }}
               value={editPrice}
               onChangeText={onChangePrice}
@@ -141,15 +135,15 @@ export const ItemCard: React.FC<ItemCardProps> = ({
               placeholderTextColor={colors.text.tertiary}
             />
           </View>
-          <View style={{ flexDirection: "row", marginTop: 20 }}>
+          <View style={{ flexDirection: "row", marginTop: SPACING.xl }}>
             <TouchableOpacity
               onPress={onSaveEdit}
               style={{
                 flex: 1,
                 backgroundColor: colors.accent.primary,
-                paddingVertical: 12,
-                borderRadius: 10,
-                marginRight: 12,
+                paddingVertical: SPACING.md,
+                borderRadius: BORDER_RADIUS.md,
+                marginRight: SPACING.md,
               }}
               activeOpacity={0.8}
             >
@@ -157,7 +151,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({
                 style={{
                   color: colors.text.inverse,
                   textAlign: "center",
-                  fontWeight: "700",
+                  fontWeight: FONT_WEIGHT.bold,
                 }}
               >
                 Save
@@ -168,8 +162,8 @@ export const ItemCard: React.FC<ItemCardProps> = ({
               style={{
                 flex: 1,
                 backgroundColor: colors.neutral[300],
-                paddingVertical: 12,
-                borderRadius: 10,
+                paddingVertical: SPACING.md,
+                borderRadius: BORDER_RADIUS.md,
               }}
               activeOpacity={0.8}
             >
@@ -177,7 +171,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({
                 style={{
                   color: colors.text.primary,
                   textAlign: "center",
-                  fontWeight: "700",
+                  fontWeight: FONT_WEIGHT.bold,
                 }}
               >
                 Cancel
@@ -191,23 +185,23 @@ export const ItemCard: React.FC<ItemCardProps> = ({
             style={{
               flexDirection: "row",
               alignItems: "center",
-              marginBottom: 18,
+              marginBottom: SPACING.lg + 2,
             }}
           >
             <View
               style={{
-                width: 48,
-                height: 48,
-                borderRadius: 12,
+                width: AVATAR_SIZE.lg,
+                height: AVATAR_SIZE.lg,
+                borderRadius: BORDER_RADIUS.md,
                 backgroundColor: colors.accent.light,
                 alignItems: "center",
                 justifyContent: "center",
-                marginRight: 12,
+                marginRight: SPACING.md,
               }}
             >
               <Ionicons
                 name="fast-food-outline"
-                size={22}
+                size={ICON_SIZE.md + 2}
                 color={colors.accent.primary}
               />
             </View>
@@ -215,8 +209,8 @@ export const ItemCard: React.FC<ItemCardProps> = ({
               <Text
                 style={{
                   color: colors.text.primary,
-                  fontWeight: "700",
-                  fontSize: 20,
+                  fontWeight: FONT_WEIGHT.bold,
+                  fontSize: FONT_SIZE.xl,
                 }}
               >
                 {item.name}
@@ -226,36 +220,36 @@ export const ItemCard: React.FC<ItemCardProps> = ({
               <Text
                 style={{
                   color: colors.accent.primary,
-                  fontWeight: "700",
-                  fontSize: 22,
+                  fontWeight: FONT_WEIGHT.bold,
+                  fontSize: FONT_SIZE.xl + 2,
                 }}
               >
                 ${item.price.toFixed(2)}
               </Text>
-              <View style={{ flexDirection: "row", marginTop: 10 }}>
+              <View style={{ flexDirection: "row", marginTop: SPACING.md - 2 }}>
                 <TouchableOpacity
                   onPress={onStartEdit}
                   style={{
-                    padding: 8,
-                    borderRadius: 8,
+                    padding: SPACING.sm,
+                    borderRadius: BORDER_RADIUS.sm,
                     backgroundColor: colors.background.primary,
                     borderWidth: 1,
                     borderColor: colors.border,
-                    marginRight: 8,
+                    marginRight: SPACING.sm,
                   }}
                   activeOpacity={0.8}
                 >
                   <Ionicons
                     name="pencil"
-                    size={18}
+                    size={ICON_SIZE.lg - 6}
                     color={colors.accent.primary}
                   />
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={handleDelete}
                   style={{
-                    padding: 8,
-                    borderRadius: 8,
+                    padding: SPACING.sm,
+                    borderRadius: BORDER_RADIUS.sm,
                     backgroundColor: colors.background.primary,
                     borderWidth: 1,
                     borderColor: colors.border,
@@ -264,7 +258,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({
                 >
                   <Ionicons
                     name="trash"
-                    size={18}
+                    size={ICON_SIZE.lg - 6}
                     color={colors.accent.primary}
                   />
                 </TouchableOpacity>
@@ -275,7 +269,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({
             style={{
               height: 1,
               backgroundColor: colors.border,
-              marginBottom: 12,
+              marginBottom: SPACING.md,
             }}
           />
           <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
@@ -288,11 +282,11 @@ export const ItemCard: React.FC<ItemCardProps> = ({
                   style={{
                     flexDirection: "row",
                     alignItems: "center",
-                    paddingHorizontal: 14,
-                    paddingVertical: 10,
-                    borderRadius: 24,
-                    marginRight: 8,
-                    marginBottom: 8,
+                    paddingHorizontal: SPACING.md + 2,
+                    paddingVertical: SPACING.md - 2,
+                    borderRadius: BORDER_RADIUS.xl + 4,
+                    marginRight: SPACING.sm,
+                    marginBottom: SPACING.sm,
                     backgroundColor: isSelected
                       ? colors.accent.primary
                       : colors.background.primary,
@@ -307,17 +301,17 @@ export const ItemCard: React.FC<ItemCardProps> = ({
                     name={
                       isSelected ? "checkmark-circle" : "person-add-outline"
                     }
-                    size={16}
+                    size={ICON_SIZE.sm}
                     color={
                       isSelected
                         ? colors.text.inverse
                         : colors.text.secondary
                     }
-                    style={{ marginRight: 6 }}
+                    style={{ marginRight: SPACING.xs + 2 }}
                   />
                   <Text
                     style={{
-                      fontWeight: "600",
+                      fontWeight: FONT_WEIGHT.semibold,
                       color: isSelected
                         ? colors.text.inverse
                         : colors.text.primary,

@@ -1,10 +1,8 @@
-// src/features/assign-items/components/ReceiptDatePicker.tsx
-// Date picker for receipt date
-
+import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import React, { useState } from "react";
 import { Modal, Platform, Text, TouchableOpacity, View } from "react-native";
+import { BORDER_RADIUS, FONT_SIZE, FONT_WEIGHT, ICON_SIZE, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
 
 interface ReceiptDatePickerProps {
@@ -65,13 +63,13 @@ export const ReceiptDatePicker: React.FC<ReceiptDatePickerProps> = ({
   };
 
   return (
-    <View style={{ marginBottom: 24 }}>
+    <View style={{ marginBottom: SPACING["2xl"] }}>
       <Text
         style={{
-          fontSize: 14,
-          fontWeight: "600",
+          fontSize: FONT_SIZE.sm,
+          fontWeight: FONT_WEIGHT.semibold,
           color: colors.text.secondary,
-          marginBottom: 8,
+          marginBottom: SPACING.sm,
           textTransform: "uppercase",
         }}
       >
@@ -83,17 +81,17 @@ export const ReceiptDatePicker: React.FC<ReceiptDatePickerProps> = ({
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: 16,
+          padding: SPACING.lg,
           backgroundColor: colors.background.primary,
-          borderRadius: 12,
+          borderRadius: BORDER_RADIUS.md,
           borderWidth: 2,
           borderColor: colors.border,
         }}
       >
         <Text
           style={{
-            fontSize: 17,
-            fontWeight: "600",
+            fontSize: FONT_SIZE.base,
+            fontWeight: FONT_WEIGHT.semibold,
             color: colors.text.primary,
           }}
         >
@@ -101,7 +99,7 @@ export const ReceiptDatePicker: React.FC<ReceiptDatePickerProps> = ({
         </Text>
         <Ionicons
           name="calendar-outline"
-          size={22}
+          size={ICON_SIZE.md + 2}
           color={colors.accent.primary}
         />
       </TouchableOpacity>
@@ -136,8 +134,8 @@ export const ReceiptDatePicker: React.FC<ReceiptDatePickerProps> = ({
               onPress={(e) => e.stopPropagation()}
               style={{
                 backgroundColor: colors.background.secondary,
-                borderTopLeftRadius: 20,
-                borderTopRightRadius: 20,
+                borderTopLeftRadius: BORDER_RADIUS.xl,
+                borderTopRightRadius: BORDER_RADIUS.xl,
                 paddingBottom: 34,
                 shadowColor: colors.text.primary,
                 shadowOffset: { width: 0, height: -2 },
@@ -154,21 +152,21 @@ export const ReceiptDatePicker: React.FC<ReceiptDatePickerProps> = ({
                 maximumDate={new Date()}
                 textColor={colors.text.primary}
               />
-              <View style={{ paddingHorizontal: 20 }}>
+              <View style={{ paddingHorizontal: SPACING.xl }}>
                 <TouchableOpacity
                   onPress={() => setShowPicker(false)}
                   style={{
-                    padding: 16,
+                    padding: SPACING.lg,
                     backgroundColor: colors.accent.primary,
-                    borderRadius: 12,
+                    borderRadius: BORDER_RADIUS.md,
                     alignItems: "center",
                   }}
                 >
                   <Text
                     style={{
                       color: colors.text.inverse,
-                      fontSize: 16,
-                      fontWeight: "600",
+                      fontSize: FONT_SIZE.base,
+                      fontWeight: FONT_WEIGHT.semibold,
                     }}
                   >
                     Done

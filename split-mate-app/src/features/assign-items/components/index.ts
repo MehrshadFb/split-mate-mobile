@@ -1,6 +1,3 @@
-// src/features/assign-items/components/index.ts
-// Barrel export for assign-items components
-
 export { AssignItemsHeader } from "./AssignItemsHeader";
 export { EmptyItemsList } from "./EmptyItemsList";
 export { ItemCard } from "./ItemCard";

@@ -1,8 +1,5 @@
-// app/assign-items.tsx
-// Items assignment screen - assign items to people (NOT a tab)
-
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
+import { Ionicons } from "@expo/vector-icons";
 import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -22,6 +19,7 @@ import {
     useShareReceipt,
 } from "../src/features/assign-items/hooks";
 import { Button } from "../src/shared/components/Button";
+import { ICON_SIZE, SPACING } from "../src/shared/constants/design";
 import { useTheme } from "../src/shared/contexts/ThemeContext";
 import { useInvoiceStore } from "../src/shared/stores/invoiceStore";
 import { getLocalDateString } from "../src/shared/utils/dateUtils";
@@ -140,7 +138,7 @@ export default function AssignItemsScreen() {
             size="medium"
             fullWidth
             icon={
-              <Ionicons name="add-circle-outline" size={20} color="#D97757" />
+              <Ionicons name="add-circle-outline" size={ICON_SIZE.md} color={colors.accent.primary} />
             }
           />
           {/* Split Summary */}
@@ -152,7 +150,7 @@ export default function AssignItemsScreen() {
               />
             )}
           {/* Save Button - Always visible */}
-          <View style={{ marginTop: 32, marginBottom: 20 }}>
+          <View style={{ marginTop: SPACING["2xl"], marginBottom: SPACING.xl }}>
             <Button
               title={editingSavedInvoice ? "Update Receipt" : "Save Receipt"}
               onPress={handleSaveInvoice}
@@ -163,7 +161,7 @@ export default function AssignItemsScreen() {
               icon={
                 <Ionicons
                   name="download-outline"
-                  size={20}
+                  size={ICON_SIZE.md}
                   color={colors.text.inverse}
                 />
               }

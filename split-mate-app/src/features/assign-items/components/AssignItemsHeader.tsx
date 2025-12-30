@@ -1,9 +1,7 @@
-// src/features/assign-items/components/AssignItemsHeader.tsx
-// Header component with back button and delete option
-
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
+import { Ionicons } from "@expo/vector-icons";
 import { TouchableOpacity, View } from "react-native";
+import { ICON_SIZE, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
 
 interface AssignItemsHeaderProps {
@@ -31,27 +29,27 @@ export const AssignItemsHeader: React.FC<AssignItemsHeaderProps> = ({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        marginBottom: 24,
+        marginBottom: SPACING["2xl"],
       }}
     >
       <TouchableOpacity
         onPress={onBack}
-        className="flex-row items-center"
+        style={{ flexDirection: "row", alignItems: "center" }}
         activeOpacity={0.7}
       >
-        <Ionicons name="arrow-back" size={24} color={colors.text.primary} />
+        <Ionicons name="arrow-back" size={ICON_SIZE.lg} color={colors.text.primary} />
       </TouchableOpacity>
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.lg }}>
         {showShare && onShare && (
           <TouchableOpacity
             onPress={onShare}
-            style={{ padding: 8 }}
+            style={{ padding: SPACING.sm }}
             activeOpacity={0.7}
             disabled={isSharing}
           >
             <Ionicons
               name={isSharing ? "hourglass-outline" : "share-outline"}
-              size={28}
+              size={ICON_SIZE.xl}
               color={isSharing ? colors.text.secondary : colors.text.primary}
             />
           </TouchableOpacity>
@@ -59,10 +57,10 @@ export const AssignItemsHeader: React.FC<AssignItemsHeaderProps> = ({
         {showDelete && onDelete && (
           <TouchableOpacity
             onPress={onDelete}
-            style={{ padding: 8 }}
+            style={{ padding: SPACING.sm }}
             activeOpacity={0.7}
           >
-            <Ionicons name="trash" size={28} color={colors.error} />
+            <Ionicons name="trash" size={ICON_SIZE.xl} color={colors.error} />
           </TouchableOpacity>
         )}
       </View>

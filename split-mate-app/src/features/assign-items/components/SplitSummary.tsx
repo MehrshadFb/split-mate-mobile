@@ -1,9 +1,7 @@
-// src/features/assign-items/components/SplitSummary.tsx
-// Summary section showing total and per-person breakdown
-
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
+import { Ionicons } from "@expo/vector-icons";
 import { Text, View } from "react-native";
+import { AVATAR_SIZE, BORDER_RADIUS, CARD_STYLES, FONT_SIZE, FONT_WEIGHT, ICON_SIZE, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
 
 interface PersonTotal {
@@ -23,12 +21,12 @@ export const SplitSummary: React.FC<SplitSummaryProps> = ({
   const { colors } = useTheme();
 
   return (
-    <View style={{ marginTop: 32 }}>
+    <View style={{ marginTop: SPACING["2xl"] }}>
       <View
         style={{
           backgroundColor: colors.background.secondary,
-          borderRadius: 20,
-          padding: 24,
+          borderRadius: BORDER_RADIUS.xl,
+          padding: SPACING.xl,
           borderWidth: 1,
           borderColor: colors.border,
           shadowColor: "#000000",
@@ -42,23 +40,23 @@ export const SplitSummary: React.FC<SplitSummaryProps> = ({
           style={{
             flexDirection: "row",
             alignItems: "center",
-            marginBottom: 20,
+            marginBottom: SPACING.xl,
           }}
         >
           <View
             style={{
-              width: 48,
-              height: 48,
-              borderRadius: 16,
+              width: ICON_SIZE["3xl"],
+              height: ICON_SIZE["3xl"],
+              borderRadius: BORDER_RADIUS.lg,
               backgroundColor: colors.accent.light,
               alignItems: "center",
               justifyContent: "center",
-              marginRight: 12,
+              marginRight: SPACING.md,
             }}
           >
             <Ionicons
               name="pie-chart-outline"
-              size={24}
+              size={ICON_SIZE.lg}
               color={colors.accent.primary}
             />
           </View>
@@ -66,8 +64,8 @@ export const SplitSummary: React.FC<SplitSummaryProps> = ({
             <Text
               style={{
                 color: colors.text.primary,
-                fontWeight: "700",
-                fontSize: 24,
+                fontWeight: FONT_WEIGHT.bold,
+                fontSize: FONT_SIZE["2xl"],
               }}
             >
               Split Summary
@@ -75,7 +73,8 @@ export const SplitSummary: React.FC<SplitSummaryProps> = ({
             <Text
               style={{
                 color: colors.text.secondary,
-                marginTop: 4,
+                marginTop: SPACING.xs,
+                fontSize: FONT_SIZE.sm,
               }}
             >
               Review the breakdown before you save this receipt.
@@ -85,9 +84,9 @@ export const SplitSummary: React.FC<SplitSummaryProps> = ({
         <View
           style={{
             backgroundColor: colors.accent.primary,
-            borderRadius: 18,
-            padding: 20,
-            marginBottom: 20,
+            borderRadius: BORDER_RADIUS.lg + 2,
+            padding: SPACING.xl,
+            marginBottom: SPACING.xl,
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
@@ -98,8 +97,8 @@ export const SplitSummary: React.FC<SplitSummaryProps> = ({
               style={{
                 color: colors.text.inverse,
                 opacity: 0.8,
-                fontSize: 14,
-                fontWeight: "600",
+                fontSize: FONT_SIZE.sm,
+                fontWeight: FONT_WEIGHT.semibold,
                 textTransform: "uppercase",
               }}
             >
@@ -108,9 +107,9 @@ export const SplitSummary: React.FC<SplitSummaryProps> = ({
             <Text
               style={{
                 color: colors.text.inverse,
-                fontWeight: "800",
-                fontSize: 32,
-                marginTop: 4,
+                fontWeight: FONT_WEIGHT.extrabold,
+                fontSize: FONT_SIZE["3xl"] + 4,
+                marginTop: SPACING.xs,
               }}
             >
               ${totalAmount.toFixed(2)}
@@ -118,17 +117,17 @@ export const SplitSummary: React.FC<SplitSummaryProps> = ({
           </View>
           <Ionicons
             name="wallet-outline"
-            size={32}
+            size={ICON_SIZE["2xl"]}
             color={colors.text.inverse}
           />
         </View>
-        <View style={{ marginBottom: 12 }}>
+        <View style={{ marginBottom: SPACING.md }}>
           <Text
             style={{
               color: colors.text.secondary,
-              fontSize: 14,
-              fontWeight: "600",
-              marginBottom: 12,
+              fontSize: FONT_SIZE.sm,
+              fontWeight: FONT_WEIGHT.semibold,
+              marginBottom: SPACING.md,
               textTransform: "uppercase",
             }}
           >
@@ -141,29 +140,29 @@ export const SplitSummary: React.FC<SplitSummaryProps> = ({
                 flexDirection: "row",
                 alignItems: "center",
                 backgroundColor: colors.background.primary,
-                borderRadius: 16,
-                padding: 16,
-                marginBottom: 12,
+                borderRadius: CARD_STYLES.borderRadius,
+                padding: CARD_STYLES.padding,
+                marginBottom: CARD_STYLES.marginBottom,
                 borderWidth: 1,
                 borderColor: colors.border,
               }}
             >
               <View
                 style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 12,
+                  width: AVATAR_SIZE.md + 4,
+                  height: AVATAR_SIZE.md + 4,
+                  borderRadius: BORDER_RADIUS.md,
                   backgroundColor: colors.accent.light,
                   alignItems: "center",
                   justifyContent: "center",
-                  marginRight: 12,
+                  marginRight: SPACING.md,
                 }}
               >
                 <Text
                   style={{
                     color: colors.accent.primary,
-                    fontWeight: "700",
-                    fontSize: 18,
+                    fontWeight: FONT_WEIGHT.bold,
+                    fontSize: FONT_SIZE.lg,
                   }}
                 >
                   {person.name.charAt(0).toUpperCase()}
@@ -173,8 +172,8 @@ export const SplitSummary: React.FC<SplitSummaryProps> = ({
                 <Text
                   style={{
                     color: colors.text.primary,
-                    fontWeight: "700",
-                    fontSize: 16,
+                    fontWeight: FONT_WEIGHT.bold,
+                    fontSize: FONT_SIZE.base,
                   }}
                 >
                   {person.name}
@@ -183,8 +182,8 @@ export const SplitSummary: React.FC<SplitSummaryProps> = ({
               <Text
                 style={{
                   color: colors.accent.primary,
-                  fontWeight: "700",
-                  fontSize: 18,
+                  fontWeight: FONT_WEIGHT.bold,
+                  fontSize: FONT_SIZE.lg,
                 }}
               >
                 ${person.total.toFixed(2)}

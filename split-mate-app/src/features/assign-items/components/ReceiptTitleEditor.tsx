@@ -1,8 +1,6 @@
-// src/features/assign-items/components/ReceiptTitleEditor.tsx
-// Editable receipt title input
-
 import React from "react";
 import { Text, TextInput, View } from "react-native";
+import { BORDER_RADIUS, FONT_SIZE, FONT_WEIGHT, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
 
 interface ReceiptTitleEditorProps {
@@ -23,13 +21,13 @@ export const ReceiptTitleEditor: React.FC<ReceiptTitleEditorProps> = ({
   const { colors } = useTheme();
 
   return (
-    <View style={{ marginBottom: 24 }}>
+    <View style={{ marginBottom: SPACING["2xl"] }}>
       <Text
         style={{
-          fontSize: 14,
-          fontWeight: "600",
+          fontSize: FONT_SIZE.sm,
+          fontWeight: FONT_WEIGHT.semibold,
           color: colors.text.secondary,
-          marginBottom: 8,
+          marginBottom: SPACING.sm,
           textTransform: "uppercase",
         }}
       >
@@ -41,12 +39,12 @@ export const ReceiptTitleEditor: React.FC<ReceiptTitleEditorProps> = ({
         onChangeText={onChange}
         onBlur={onBlur}
         style={{
-          fontSize: 24,
-          fontWeight: "700",
+          fontSize: FONT_SIZE["2xl"],
+          fontWeight: FONT_WEIGHT.bold,
           color: colors.text.primary,
-          padding: 16,
+          padding: SPACING.lg,
           backgroundColor: colors.background.primary,
-          borderRadius: 12,
+          borderRadius: BORDER_RADIUS.md,
           borderWidth: 2,
           borderColor: isEditing ? colors.accent.primary : colors.border,
         }}

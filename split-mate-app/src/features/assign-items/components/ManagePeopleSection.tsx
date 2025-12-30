@@ -1,9 +1,7 @@
-// src/features/assign-items/components/ManagePeopleSection.tsx
-// Collapsible section for managing people
-
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
+import { Ionicons } from "@expo/vector-icons";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { AVATAR_SIZE, BORDER_RADIUS, FONT_SIZE, FONT_WEIGHT, ICON_SIZE, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
 
 interface ManagePeopleSectionProps {
@@ -31,8 +29,8 @@ export const ManagePeopleSection: React.FC<ManagePeopleSectionProps> = ({
     <View
       style={{
         backgroundColor: colors.background.secondary,
-        borderRadius: 16,
-        marginBottom: 20,
+        borderRadius: BORDER_RADIUS.lg,
+        marginBottom: SPACING.xl,
         borderWidth: 1,
         borderColor: colors.border,
         overflow: "hidden",
@@ -44,7 +42,7 @@ export const ManagePeopleSection: React.FC<ManagePeopleSectionProps> = ({
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: 18,
+          padding: SPACING.lg + 2,
           backgroundColor: colors.background.secondary,
         }}
         activeOpacity={0.7}
@@ -52,23 +50,23 @@ export const ManagePeopleSection: React.FC<ManagePeopleSectionProps> = ({
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <View
             style={{
-              width: 40,
-              height: 40,
+              width: AVATAR_SIZE.md,
+              height: AVATAR_SIZE.md,
               backgroundColor: colors.accent.light,
-              borderRadius: 12,
+              borderRadius: BORDER_RADIUS.md,
               alignItems: "center",
               justifyContent: "center",
-              marginRight: 12,
+              marginRight: SPACING.md,
             }}
           >
-            <Ionicons name="people" size={22} color={colors.accent.primary} />
+            <Ionicons name="people" size={ICON_SIZE.md + 2} color={colors.accent.primary} />
           </View>
           <View>
             <Text
               style={{
                 color: colors.text.primary,
-                fontWeight: "700",
-                fontSize: 17,
+                fontWeight: FONT_WEIGHT.bold,
+                fontSize: FONT_SIZE.base,
               }}
             >
               Manage People
@@ -76,7 +74,7 @@ export const ManagePeopleSection: React.FC<ManagePeopleSectionProps> = ({
             <Text
               style={{
                 color: colors.text.secondary,
-                fontSize: 13,
+                fontSize: FONT_SIZE.xs + 1,
                 marginTop: 2,
               }}
             >
@@ -86,7 +84,7 @@ export const ManagePeopleSection: React.FC<ManagePeopleSectionProps> = ({
         </View>
         <Ionicons
           name={isExpanded ? "chevron-up" : "chevron-down"}
-          size={24}
+          size={ICON_SIZE.lg}
           color={colors.text.tertiary}
         />
       </TouchableOpacity>
@@ -95,16 +93,16 @@ export const ManagePeopleSection: React.FC<ManagePeopleSectionProps> = ({
           style={{
             borderTopWidth: 1,
             borderTopColor: colors.border,
-            padding: 18,
+            padding: SPACING.lg + 2,
           }}
         >
-          <View style={{ marginBottom: 20 }}>
+          <View style={{ marginBottom: SPACING.xl }}>
             <Text
               style={{
                 color: colors.text.secondary,
-                fontSize: 13,
-                fontWeight: "600",
-                marginBottom: 10,
+                fontSize: FONT_SIZE.xs + 1,
+                fontWeight: FONT_WEIGHT.semibold,
+                marginBottom: SPACING.md - 2,
                 textTransform: "uppercase",
                 letterSpacing: 0.5,
               }}
@@ -118,12 +116,12 @@ export const ManagePeopleSection: React.FC<ManagePeopleSectionProps> = ({
                   backgroundColor: colors.background.primary,
                   borderWidth: 1,
                   borderColor: colors.border,
-                  borderRadius: 12,
-                  paddingHorizontal: 14,
-                  paddingVertical: 12,
+                  borderRadius: BORDER_RADIUS.md,
+                  paddingHorizontal: SPACING.md + 2,
+                  paddingVertical: SPACING.md,
                   color: colors.text.primary,
-                  fontSize: 16,
-                  marginRight: 10,
+                  fontSize: FONT_SIZE.base,
+                  marginRight: SPACING.md - 2,
                 }}
                 placeholder="Enter name"
                 placeholderTextColor={colors.text.tertiary}
@@ -137,8 +135,8 @@ export const ManagePeopleSection: React.FC<ManagePeopleSectionProps> = ({
                 onPress={onAddPerson}
                 style={{
                   backgroundColor: colors.accent.primary,
-                  borderRadius: 12,
-                  paddingHorizontal: 24,
+                  borderRadius: BORDER_RADIUS.md,
+                  paddingHorizontal: SPACING["2xl"],
                   alignItems: "center",
                   justifyContent: "center",
                   minWidth: 70,
@@ -148,8 +146,8 @@ export const ManagePeopleSection: React.FC<ManagePeopleSectionProps> = ({
                 <Text
                   style={{
                     color: colors.text.inverse,
-                    fontWeight: "700",
-                    fontSize: 15,
+                    fontWeight: FONT_WEIGHT.bold,
+                    fontSize: FONT_SIZE.sm + 1,
                   }}
                 >
                   Add
@@ -162,9 +160,9 @@ export const ManagePeopleSection: React.FC<ManagePeopleSectionProps> = ({
               <Text
                 style={{
                   color: colors.text.secondary,
-                  fontSize: 13,
-                  fontWeight: "600",
-                  marginBottom: 10,
+                  fontSize: FONT_SIZE.xs + 1,
+                  fontWeight: FONT_WEIGHT.semibold,
+                  marginBottom: SPACING.md - 2,
                   textTransform: "uppercase",
                   letterSpacing: 0.5,
                 }}
@@ -179,9 +177,9 @@ export const ManagePeopleSection: React.FC<ManagePeopleSectionProps> = ({
                     alignItems: "center",
                     justifyContent: "space-between",
                     backgroundColor: colors.background.primary,
-                    borderRadius: 12,
-                    padding: 14,
-                    marginBottom: index === people.length - 1 ? 0 : 10,
+                    borderRadius: BORDER_RADIUS.md,
+                    padding: SPACING.md + 2,
+                    marginBottom: index === people.length - 1 ? 0 : SPACING.md - 2,
                   }}
                 >
                   <View
@@ -193,20 +191,20 @@ export const ManagePeopleSection: React.FC<ManagePeopleSectionProps> = ({
                   >
                     <View
                       style={{
-                        width: 38,
-                        height: 38,
+                        width: AVATAR_SIZE.sm + 6,
+                        height: AVATAR_SIZE.sm + 6,
                         backgroundColor: colors.accent.light,
-                        borderRadius: 19,
+                        borderRadius: BORDER_RADIUS.full,
                         alignItems: "center",
                         justifyContent: "center",
-                        marginRight: 12,
+                        marginRight: SPACING.md,
                       }}
                     >
                       <Text
                         style={{
                           color: colors.accent.primary,
-                          fontWeight: "700",
-                          fontSize: 16,
+                          fontWeight: FONT_WEIGHT.bold,
+                          fontSize: FONT_SIZE.base,
                         }}
                       >
                         {person.charAt(0).toUpperCase()}
@@ -215,8 +213,8 @@ export const ManagePeopleSection: React.FC<ManagePeopleSectionProps> = ({
                     <Text
                       style={{
                         color: colors.text.primary,
-                        fontWeight: "600",
-                        fontSize: 16,
+                        fontWeight: FONT_WEIGHT.semibold,
+                        fontSize: FONT_SIZE.base,
                       }}
                     >
                       {person}
@@ -225,14 +223,14 @@ export const ManagePeopleSection: React.FC<ManagePeopleSectionProps> = ({
                   <TouchableOpacity
                     onPress={() => onRemovePerson(person)}
                     style={{
-                      padding: 6,
-                      borderRadius: 8,
+                      padding: SPACING.xs + 2,
+                      borderRadius: BORDER_RADIUS.sm,
                     }}
                     activeOpacity={0.6}
                   >
                     <Ionicons
                       name="close-circle"
-                      size={24}
+                      size={ICON_SIZE.lg}
                       color={colors.error}
                     />
                   </TouchableOpacity>

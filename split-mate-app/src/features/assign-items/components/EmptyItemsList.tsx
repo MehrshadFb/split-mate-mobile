@@ -1,9 +1,7 @@
-// src/features/assign-items/components/EmptyItemsList.tsx
-// Empty state for items list
-
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
+import { Ionicons } from "@expo/vector-icons";
 import { Text, View } from "react-native";
+import { EMPTY_STATE_STYLES, FONT_WEIGHT, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
 
 export const EmptyItemsList: React.FC = () => {
@@ -13,23 +11,25 @@ export const EmptyItemsList: React.FC = () => {
     <View
       style={{
         backgroundColor: colors.background.secondary,
-        borderRadius: 12,
-        padding: 32,
+        borderRadius: EMPTY_STATE_STYLES.borderRadius,
+        padding: EMPTY_STATE_STYLES.padding,
         alignItems: "center",
-        marginBottom: 12,
+        marginBottom: SPACING.md,
+        borderWidth: 1,
+        borderColor: colors.border,
       }}
     >
       <Ionicons
         name="receipt-outline"
-        size={48}
+        size={EMPTY_STATE_STYLES.iconSize}
         color={colors.text.tertiary}
       />
       <Text
         style={{
           color: colors.text.primary,
-          fontSize: 18,
-          fontWeight: "600",
-          marginTop: 12,
+          fontSize: EMPTY_STATE_STYLES.titleSize,
+          fontWeight: FONT_WEIGHT.semibold,
+          marginTop: EMPTY_STATE_STYLES.iconGap,
           textAlign: "center",
         }}
       >
@@ -39,7 +39,7 @@ export const EmptyItemsList: React.FC = () => {
         style={{
           color: colors.text.secondary,
           textAlign: "center",
-          marginTop: 8,
+          marginTop: EMPTY_STATE_STYLES.textGap,
         }}
       >
         Add items manually using the button below
