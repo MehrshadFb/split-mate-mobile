@@ -33,11 +33,11 @@ export const InfoCard: React.FC = () => {
             How it works
           </Text>
           <Text style={{ color: colors.text.secondary, fontSize: FONT_SIZE.sm }}>
-            1. Take a photo or select a receipt image{"\n"}
-            2. Our AI will read and extract the items{"\n"}
-            3. Review and assign items to your mates{"\n"}
+            1. Upload a photo of your receipt{"\n"}
+            2. AI extracts all items and prices{"\n"}
+            3. Assign items and see who owes what{"\n"}
             {"\n"}
-            Supported: JPG, PNG under 10 MB
+            Accepts JPG & PNG up to 10 MB
           </Text>
         </View>
       </View>

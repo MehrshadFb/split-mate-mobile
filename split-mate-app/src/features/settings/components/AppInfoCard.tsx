@@ -29,8 +29,7 @@ export const AppInfoCard: React.FC = () => {
             About SplitMate
           </Text>
           <Text style={{ color: colors.text.secondary, fontSize: FONT_SIZE.sm }}>
-            SplitMate uses AI to help you split bills fairly. Upload receipts,
-            assign items, and see who owes what - all in seconds.
+            Split bills fairly in seconds. Just upload a receipt, assign items, and let it do the math.
           </Text>
         </View>
       </View>

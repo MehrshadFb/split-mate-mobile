@@ -24,7 +24,7 @@ export default function SettingsScreen() {
           {/* Header */}
           <SettingsHeader
             title="Settings"
-            subtitle="Customize your app experience"
+            subtitle="Make SplitMate work the way you want."
           />
           {/* Appearance Section */}
           <SettingsSection title="Appearance">

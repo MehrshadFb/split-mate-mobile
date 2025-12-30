@@ -40,7 +40,7 @@ export const EmptyMatesState: React.FC<EmptyMatesStateProps> = ({
           textAlign: "center",
         }}
       >
-        Add at least {minRequired} mates
+        Add at least {minRequired} people
       </Text>
       <Text
         style={{
@@ -49,7 +49,7 @@ export const EmptyMatesState: React.FC<EmptyMatesStateProps> = ({
           textAlign: "center",
         }}
       >
-        You&apos;ll head to upload after everyone is listed.
+        Once everyone's added, you can upload a receipt.
       </Text>
     </View>
   );

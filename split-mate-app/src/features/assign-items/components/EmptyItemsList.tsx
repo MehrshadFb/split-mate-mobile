@@ -33,7 +33,7 @@ export const EmptyItemsList: React.FC = () => {
           textAlign: "center",
         }}
       >
-        No Items Yet
+        No items yet
       </Text>
       <Text
         style={{
@@ -42,7 +42,7 @@ export const EmptyItemsList: React.FC = () => {
           marginTop: EMPTY_STATE_STYLES.textGap,
         }}
       >
-        Add items manually using the button below
+        Tap below to add your first item
       </Text>
     </View>
   );

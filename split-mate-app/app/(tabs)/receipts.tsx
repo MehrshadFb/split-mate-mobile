@@ -27,7 +27,7 @@ export default function ReceiptsScreen() {
           {/* Header */}
           <ReceiptsHeader
             title="Saved Receipts"
-            subtitle="Pick up a past split or keep everything organised."
+            subtitle="Resume a previous split or review past expenses."
           />
           {/* Receipts List or Empty State */}
           {savedInvoices.length === 0 ? (

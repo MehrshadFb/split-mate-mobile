@@ -49,7 +49,7 @@ export const FilePickerButton: React.FC<FilePickerButtonProps> = ({
           marginTop: SPACING.xs,
         }}
       >
-        Select an existing photo
+        Pick a photo from your gallery
       </Text>
     </TouchableOpacity>
   );

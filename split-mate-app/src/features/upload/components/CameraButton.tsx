@@ -48,7 +48,7 @@ export const CameraButton: React.FC<CameraButtonProps> = ({
           opacity: 0.8,
         }}
       >
-        Use your camera to capture the receipt
+        Snap a quick photo of your receipt
       </Text>
     </TouchableOpacity>
   );

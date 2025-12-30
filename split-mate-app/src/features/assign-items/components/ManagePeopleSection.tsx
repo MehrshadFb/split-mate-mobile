@@ -107,7 +107,7 @@ export const ManagePeopleSection: React.FC<ManagePeopleSectionProps> = ({
                 letterSpacing: 0.5,
               }}
             >
-              Add New Person
+              Add Someone
             </Text>
             <View style={{ flexDirection: "row" }}>
               <TextInput

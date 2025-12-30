@@ -43,8 +43,8 @@ export const UploadStatusDisplay: React.FC<UploadStatusDisplayProps> = ({
           : "Queued for processing...";
       case "scanning":
         return isMultiple
-          ? `AI is reading receipt ${current}/${total}...`
-          : "AI is reading your receipt...";
+          ? `Reading receipt ${current} of ${total}...`
+          : "Reading your receipt...";
       case "scanned":
         return "Almost done!";
       default:
@@ -55,13 +55,13 @@ export const UploadStatusDisplay: React.FC<UploadStatusDisplayProps> = ({
   const getStatusSubtitle = () => {
     switch (uploadProgress.status) {
       case "uploading":
-        return "Sending image to server";
+        return "Uploading your image...";
       case "queued":
-        return "Waiting for AI to start";
+        return "Almost ready to scan";
       case "scanning":
-        return "Extracting items and prices";
+        return "Finding items and prices";
       case "scanned":
-        return "Finalizing results";
+        return "Wrapping up";
       default:
         return "";
     }

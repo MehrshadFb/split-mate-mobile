@@ -39,7 +39,7 @@ export const EmptyReceiptsState: React.FC<EmptyReceiptsStateProps> = ({
           textAlign: "center",
         }}
       >
-        Nothing saved yet
+        No receipts yet
       </Text>
       <Text
         style={{
@@ -48,11 +48,11 @@ export const EmptyReceiptsState: React.FC<EmptyReceiptsStateProps> = ({
           textAlign: "center",
         }}
       >
-        When you save a split, it appears here for quick access.
+        Your saved splits will appear here.
       </Text>
       <View style={{ width: "100%", marginTop: SPACING["2xl"] }}>
         <Button
-          title="Start a new receipt"
+          title="Split Your First Bill"
           onPress={onStartNew}
           variant="primary"
           size="large"

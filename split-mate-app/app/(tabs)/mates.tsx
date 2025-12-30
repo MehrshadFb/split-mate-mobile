@@ -41,7 +41,7 @@ export default function MatesScreen() {
           {/* Header */}
           <MatesHeader
             title="Who's Splitting?"
-            subtitle="Add everyone who's sharing this bill."
+            subtitle="Add everyone sharing the bill. You can always edit this later."
           />
           {/* Add Mate Input */}
           <AddMateInput

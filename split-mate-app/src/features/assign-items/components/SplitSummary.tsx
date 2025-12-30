@@ -77,7 +77,7 @@ export const SplitSummary: React.FC<SplitSummaryProps> = ({
                 fontSize: FONT_SIZE.sm,
               }}
             >
-              Review the breakdown before you save this receipt.
+              Here's what everyone owes.
             </Text>
           </View>
         </View>
@@ -131,7 +131,7 @@ export const SplitSummary: React.FC<SplitSummaryProps> = ({
               textTransform: "uppercase",
             }}
           >
-            How much each person owes
+            Individual Totals
           </Text>
           {totals.map((person) => (
             <View
