@@ -1,6 +1,3 @@
-// src/features/settings/components/AboutSection.tsx
-// About app section with version info and links
-
 import React from "react";
 import { Linking } from "react-native";
 import { APP_BUILD, APP_LINKS, APP_VERSION } from "../constants/appInfo";

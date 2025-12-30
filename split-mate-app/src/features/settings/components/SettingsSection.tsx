@@ -1,8 +1,6 @@
-// src/features/settings/components/SettingsSection.tsx
-// Section container with title
-
 import React from "react";
 import { Text, View } from "react-native";
+import { FONT_WEIGHT, SECTION_STYLES } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
 
 interface SettingsSectionProps {
@@ -17,13 +15,13 @@ export const SettingsSection: React.FC<SettingsSectionProps> = ({
   const { colors } = useTheme();
 
   return (
-    <View style={{ marginBottom: 24 }}>
+    <View style={{ marginBottom: SECTION_STYLES.marginBottom }}>
       <Text
         style={{
-          fontSize: 20,
-          fontWeight: "600",
+          fontSize: SECTION_STYLES.titleSize,
+          fontWeight: FONT_WEIGHT.semibold,
           color: colors.text.primary,
-          marginBottom: 16,
+          marginBottom: SECTION_STYLES.titleGap,
         }}
       >
         {title}

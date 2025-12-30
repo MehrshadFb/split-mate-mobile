@@ -1,8 +1,6 @@
-// src/features/settings/components/SettingsCard.tsx
-// Card container for grouped settings
-
 import React from "react";
 import { View, ViewStyle } from "react-native";
+import { BORDER_RADIUS } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
 
 interface SettingsCardProps {
@@ -20,7 +18,7 @@ export const SettingsCard: React.FC<SettingsCardProps> = ({
     <View
       style={{
         backgroundColor: colors.background.secondary,
-        borderRadius: 12,
+        borderRadius: BORDER_RADIUS.lg,
         overflow: "hidden",
         ...style,
       }}

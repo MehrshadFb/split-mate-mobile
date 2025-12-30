@@ -1,9 +1,7 @@
-// src/features/settings/components/ThemeSelector.tsx
-// Theme selection component
-
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
+import { Ionicons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
+import { FONT_SIZE, FONT_WEIGHT, ICON_SIZE, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
 import { SettingsCard } from "./SettingsCard";
 
@@ -49,7 +47,7 @@ export const ThemeSelector: React.FC = () => {
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: 16,
+            padding: SPACING.lg,
             ...(index < themeOptions.length - 1 && {
               borderBottomWidth: 1,
               borderBottomColor: colors.border,
@@ -67,15 +65,15 @@ export const ThemeSelector: React.FC = () => {
           >
             <Ionicons
               name={option.icon}
-              size={24}
+              size={ICON_SIZE.lg}
               color={colors.accent.primary}
             />
-            <View style={{ marginLeft: 12 }}>
+            <View style={{ marginLeft: SPACING.md }}>
               <Text
                 style={{
                   color: colors.text.primary,
-                  fontWeight: "500",
-                  fontSize: 16,
+                  fontWeight: FONT_WEIGHT.medium,
+                  fontSize: FONT_SIZE.base,
                 }}
               >
                 {option.label}
@@ -84,7 +82,7 @@ export const ThemeSelector: React.FC = () => {
                 <Text
                   style={{
                     color: colors.text.tertiary,
-                    fontSize: 12,
+                    fontSize: FONT_SIZE.xs,
                     marginTop: 2,
                   }}
                 >
@@ -96,7 +94,7 @@ export const ThemeSelector: React.FC = () => {
           {theme === option.id && (
             <Ionicons
               name="checkmark-circle"
-              size={24}
+              size={ICON_SIZE.lg}
               color={colors.accent.primary}
             />
           )}

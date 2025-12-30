@@ -1,9 +1,7 @@
-// src/features/settings/components/SettingsItem.tsx
-// Reusable settings item component
-
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
+import { Ionicons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
+import { FONT_SIZE, FONT_WEIGHT, ICON_SIZE, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
 
 interface SettingsItemProps {
@@ -35,7 +33,7 @@ export const SettingsItem: React.FC<SettingsItemProps> = ({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        padding: 16,
+        padding: SPACING.lg,
         ...(showBorder && {
           borderBottomWidth: 1,
           borderBottomColor: colors.border,
@@ -51,13 +49,13 @@ export const SettingsItem: React.FC<SettingsItemProps> = ({
           flex: 1,
         }}
       >
-        <Ionicons name={icon} size={24} color={colors.accent.primary} />
-        <View style={{ marginLeft: 12, flex: 1 }}>
+        <Ionicons name={icon} size={ICON_SIZE.lg} color={colors.accent.primary} />
+        <View style={{ marginLeft: SPACING.md, flex: 1 }}>
           <Text
             style={{
               color: colors.text.primary,
-              fontWeight: "500",
-              fontSize: 16,
+              fontWeight: FONT_WEIGHT.medium,
+              fontSize: FONT_SIZE.base,
             }}
           >
             {label}
@@ -66,7 +64,7 @@ export const SettingsItem: React.FC<SettingsItemProps> = ({
             <Text
               style={{
                 color: colors.text.tertiary,
-                fontSize: 12,
+                fontSize: FONT_SIZE.xs,
                 marginTop: 2,
               }}
             >
@@ -75,14 +73,14 @@ export const SettingsItem: React.FC<SettingsItemProps> = ({
           )}
         </View>
       </View>
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.sm }}>
         {value && (
           <Text style={{ color: colors.text.secondary }}>{value}</Text>
         )}
         {showChevron && (
           <Ionicons
             name="open-outline"
-            size={20}
+            size={ICON_SIZE.md}
             color={colors.text.tertiary}
           />
         )}
