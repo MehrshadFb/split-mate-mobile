@@ -1,6 +1,3 @@
-// src/utils/errors.ts
-// User-friendly error messages and error handling utilities
-
 import { ScanError } from "../types/scan";
 
 export const ErrorMessages = {
@@ -17,9 +14,6 @@ export const ErrorMessages = {
   SERVER_ERROR: "Server error. Please try again later.",
 };
 
-/**
- * Convert API/network errors to user-friendly ScanError
- */
 export function createScanError(error: any, statusCode?: number): ScanError {
   // Network errors
   if (error.message === "Network request failed" || !statusCode) {
@@ -30,7 +24,6 @@ export function createScanError(error: any, statusCode?: number): ScanError {
       retryable: true,
     };
   }
-
   // Rate limiting
   if (statusCode === 429) {
     return {
@@ -40,7 +33,6 @@ export function createScanError(error: any, statusCode?: number): ScanError {
       retryable: true,
     };
   }
-
   // Server errors (5xx)
   if (statusCode >= 500) {
     return {
@@ -50,7 +42,6 @@ export function createScanError(error: any, statusCode?: number): ScanError {
       retryable: true,
     };
   }
-
   // File validation errors (4xx)
   if (statusCode === 413) {
     return {
@@ -60,7 +51,6 @@ export function createScanError(error: any, statusCode?: number): ScanError {
       retryable: false,
     };
   }
-
   if (statusCode === 415) {
     return {
       code: "FILE_UNSUPPORTED",
@@ -69,8 +59,7 @@ export function createScanError(error: any, statusCode?: number): ScanError {
       retryable: false,
     };
   }
-
-  // Gemini timeout
+  // Gemini validation errors
   if (error.code === "GEMINI_TIMEOUT") {
     return {
       code: "GEMINI_TIMEOUT",
@@ -79,8 +68,6 @@ export function createScanError(error: any, statusCode?: number): ScanError {
       retryable: true,
     };
   }
-
-  // Gemini parse failure
   if (error.code === "PARSE_FAILED") {
     return {
       code: "PARSE_FAILED",
@@ -89,7 +76,6 @@ export function createScanError(error: any, statusCode?: number): ScanError {
       retryable: false,
     };
   }
-
   // Default unknown error
   return {
     code: "UNKNOWN_ERROR",

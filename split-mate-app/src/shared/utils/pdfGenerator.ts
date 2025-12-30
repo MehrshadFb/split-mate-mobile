@@ -1,13 +1,5 @@
-// src/shared/utils/pdfGenerator.ts
-// Generates HTML for PDF export of receipts
-
 import { Invoice } from "../types/invoice";
 
-/**
- * Generates an HTML string for receipt PDF export
- * @param invoice - The invoice data to generate PDF from
- * @returns HTML string formatted for PDF generation
- */
 export function generateReceiptHTML(invoice: Invoice): string {
   const { title, date, items, totals, totalAmount } = invoice;
   
@@ -255,11 +247,6 @@ export function generateReceiptHTML(invoice: Invoice): string {
   `.trim();
 }
 
-/**
- * Escapes HTML special characters to prevent XSS
- * @param text - Text to escape
- * @returns Escaped text safe for HTML insertion
- */
 function escapeHtml(text: string): string {
   const map: Record<string, string> = {
     "&": "&amp;",

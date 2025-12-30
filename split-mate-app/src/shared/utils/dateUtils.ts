@@ -1,10 +1,3 @@
-// src/shared/utils/dateUtils.ts
-// Utility functions for date handling
-
-/**
- * Get current local date in YYYY-MM-DD format
- * (not UTC - uses device's local timezone)
- */
 export const getLocalDateString = (date: Date = new Date()): string => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");

@@ -1,6 +1,3 @@
-// src/utils/storage.ts
-// AsyncStorage utilities for persisting upload queue
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { QueuedUpload } from "../types/scan";
 
