@@ -1,9 +1,7 @@
-// src/features/mates/components/MateCard.tsx
-// Individual mate card with avatar and remove button
-
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
+import { Ionicons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
+import { AVATAR_SIZE, CARD_STYLES, FONT_SIZE, FONT_WEIGHT, ICON_SIZE, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
 
 interface MateCardProps {
@@ -18,9 +16,9 @@ export const MateCard: React.FC<MateCardProps> = ({ name, onRemove }) => {
     <View
       style={{
         backgroundColor: colors.background.secondary,
-        borderRadius: 12,
-        padding: 16,
-        marginBottom: 10,
+        borderRadius: CARD_STYLES.borderRadius,
+        padding: CARD_STYLES.padding,
+        marginBottom: CARD_STYLES.marginBottom,
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
@@ -35,19 +33,19 @@ export const MateCard: React.FC<MateCardProps> = ({ name, onRemove }) => {
       >
         <View
           style={{
-            width: 40,
-            height: 40,
+            width: AVATAR_SIZE.md,
+            height: AVATAR_SIZE.md,
             backgroundColor: colors.accent.light,
-            borderRadius: 20,
+            borderRadius: AVATAR_SIZE.md / 2,
             alignItems: "center",
             justifyContent: "center",
-            marginRight: 12,
+            marginRight: SPACING.md,
           }}
         >
           <Text
             style={{
               color: colors.accent.primary,
-              fontWeight: "bold",
+              fontWeight: FONT_WEIGHT.bold,
             }}
           >
             {name.charAt(0).toUpperCase()}
@@ -56,15 +54,15 @@ export const MateCard: React.FC<MateCardProps> = ({ name, onRemove }) => {
         <Text
           style={{
             color: colors.text.primary,
-            fontWeight: "500",
-            fontSize: 16,
+            fontWeight: FONT_WEIGHT.medium,
+            fontSize: FONT_SIZE.base,
           }}
         >
           {name}
         </Text>
       </View>
       <TouchableOpacity onPress={onRemove} activeOpacity={0.7}>
-        <Ionicons name="close" size={20} color={colors.error} />
+        <Ionicons name="close" size={ICON_SIZE.md} color={colors.error} />
       </TouchableOpacity>
     </View>
   );

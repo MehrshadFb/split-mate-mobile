@@ -1,9 +1,7 @@
-// src/features/mates/components/EmptyMatesState.tsx
-// Empty state when no mates have been added
-
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
+import { Ionicons } from "@expo/vector-icons";
 import { Text, View } from "react-native";
+import { EMPTY_STATE_STYLES, FONT_WEIGHT, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
 
 interface EmptyMatesStateProps {
@@ -21,24 +19,24 @@ export const EmptyMatesState: React.FC<EmptyMatesStateProps> = ({
         alignItems: "center",
         justifyContent: "center",
         backgroundColor: colors.background.secondary,
-        borderRadius: 16,
-        padding: 28,
+        borderRadius: EMPTY_STATE_STYLES.borderRadius,
+        padding: EMPTY_STATE_STYLES.padding,
         borderWidth: 1,
         borderColor: colors.border,
-        marginBottom: 32,
+        marginBottom: SPACING["xl"],
       }}
     >
       <Ionicons
         name="people-outline"
-        size={36}
+        size={EMPTY_STATE_STYLES.iconSize}
         color={colors.text.tertiary}
       />
       <Text
         style={{
           color: colors.text.primary,
-          fontWeight: "600",
-          fontSize: 18,
-          marginTop: 12,
+          fontWeight: FONT_WEIGHT.semibold,
+          fontSize: EMPTY_STATE_STYLES.titleSize,
+          marginTop: EMPTY_STATE_STYLES.iconGap,
           textAlign: "center",
         }}
       >
@@ -47,7 +45,7 @@ export const EmptyMatesState: React.FC<EmptyMatesStateProps> = ({
       <Text
         style={{
           color: colors.text.secondary,
-          marginTop: 6,
+          marginTop: EMPTY_STATE_STYLES.textGap,
           textAlign: "center",
         }}
       >

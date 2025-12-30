@@ -1,8 +1,6 @@
-// src/features/mates/components/AddMateInput.tsx
-// Input field with add button for adding new mates
-
 import React from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { BORDER_RADIUS, FONT_SIZE, FONT_WEIGHT, INPUT_STYLES, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
 
 interface AddMateInputProps {
@@ -19,19 +17,19 @@ export const AddMateInput: React.FC<AddMateInputProps> = ({
   const { colors } = useTheme();
 
   return (
-    <View style={{ flexDirection: "row", marginBottom: 20 }}>
+    <View style={{ flexDirection: "row", marginBottom: SPACING.xl }}>
       <TextInput
         style={{
           flex: 1,
           backgroundColor: colors.background.secondary,
-          borderWidth: 1,
+          borderWidth: INPUT_STYLES.borderWidth,
           borderColor: colors.border,
-          borderRadius: 12,
-          paddingHorizontal: 16,
-          paddingVertical: 12,
+          borderRadius: INPUT_STYLES.borderRadius,
+          paddingHorizontal: INPUT_STYLES.paddingHorizontal,
+          paddingVertical: INPUT_STYLES.paddingVertical,
           color: colors.text.primary,
-          fontSize: 16,
-          marginRight: 8,
+          fontSize: INPUT_STYLES.fontSize,
+          marginRight: SPACING.sm,
         }}
         placeholder="Enter name"
         placeholderTextColor={colors.text.tertiary}
@@ -45,8 +43,8 @@ export const AddMateInput: React.FC<AddMateInputProps> = ({
         onPress={onSubmit}
         style={{
           backgroundColor: colors.accent.primary,
-          borderRadius: 12,
-          paddingHorizontal: 24,
+          borderRadius: BORDER_RADIUS.md,
+          paddingHorizontal: SPACING["2xl"],
           alignItems: "center",
           justifyContent: "center",
         }}
@@ -55,8 +53,8 @@ export const AddMateInput: React.FC<AddMateInputProps> = ({
         <Text
           style={{
             color: colors.text.inverse,
-            fontWeight: "600",
-            fontSize: 16,
+            fontWeight: FONT_WEIGHT.semibold,
+            fontSize: FONT_SIZE.base,
           }}
         >
           Add

@@ -1,8 +1,6 @@
-// src/features/mates/components/MatesList.tsx
-// List container for all mates
-
 import React from "react";
 import { Text, View } from "react-native";
+import { FONT_WEIGHT, SECTION_STYLES, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
 import { MateCard } from "./MateCard";
 
@@ -15,13 +13,13 @@ export const MatesList: React.FC<MatesListProps> = ({ people, onRemove }) => {
   const { colors } = useTheme();
 
   return (
-    <View style={{ marginBottom: 32 }}>
+    <View style={{ marginBottom: SPACING.sm }}>
       <Text
         style={{
-          fontSize: 18,
-          fontWeight: "600",
+          fontSize: SECTION_STYLES.titleSize,
+          fontWeight: FONT_WEIGHT.semibold,
           color: colors.text.primary,
-          marginBottom: 12,
+          marginBottom: SECTION_STYLES.titleGap,
         }}
       >
         People ({people.length})

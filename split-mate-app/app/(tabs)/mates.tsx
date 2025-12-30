@@ -1,9 +1,7 @@
-// app/(tabs)/mates.tsx
-// Mates management screen - add/remove people for bill splitting
-
 import React from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { SPACING } from "../../src/shared/constants/design";
 import { useTheme } from "../../src/shared/contexts/ThemeContext";
 import {
   AddMateInput,
@@ -37,7 +35,7 @@ export default function MatesScreen() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <ScrollView
-          contentContainerStyle={{ padding: 24, paddingBottom: 120 }}
+          contentContainerStyle={{ padding: SPACING.xl, paddingBottom: 120 }}
           keyboardShouldPersistTaps="handled"
         >
           {/* Header */}
@@ -58,16 +56,14 @@ export default function MatesScreen() {
             <EmptyMatesState minRequired={MIN_MATES_REQUIRED} />
           )}
           {/* Continue Button */}
-          <View style={{ paddingTop: 12 }}>
-            <Button
-              title="Continue"
-              onPress={handleContinue}
-              variant="primary"
-              size="large"
-              fullWidth
-              disabled={!canContinue}
-            />
-          </View>
+          <Button
+            title="Continue"
+            onPress={handleContinue}
+            variant="primary"
+            size="large"
+            fullWidth
+            disabled={!canContinue}
+          />
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
