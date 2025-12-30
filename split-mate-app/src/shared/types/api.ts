@@ -1,6 +1,3 @@
-// src/types/api.ts
-// API request/response types
-
 export interface ApiError {
   code: string;
   message: string;

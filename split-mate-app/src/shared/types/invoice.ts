@@ -1,6 +1,3 @@
-// src/types/invoice.ts
-// Domain types for invoice data model - matches web app structure
-
 export interface Item {
   name: string;
   price: number;

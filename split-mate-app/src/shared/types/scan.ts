@@ -1,6 +1,3 @@
-// src/types/scan.ts
-// Types for scan job status and lifecycle
-
 export type ScanJobStatus =
   | "pending" // Queued for upload
   | "uploading" // Upload in progress
@@ -41,7 +38,6 @@ export interface ScanError {
   retryable: boolean;
 }
 
-// Upload queue item - persisted to AsyncStorage
 export interface QueuedUpload {
   id: string;
   fileUri: string;
