@@ -1,8 +1,5 @@
-// src/features/upload/hooks/useImageSelection.ts
-// Hook for managing image selection and validation
-
-import * as ImagePicker from "expo-image-picker";
 import { useCallback, useState } from "react";
+import * as ImagePicker from "expo-image-picker";
 import { Alert } from "react-native";
 import { validateFile } from "../utils/fileValidation";
 
@@ -19,7 +16,6 @@ export const useImageSelection = () => {
   const handleTakePhoto = useCallback(async () => {
     try {
       const { status } = await ImagePicker.requestCameraPermissionsAsync();
-
       if (status !== "granted") {
         Alert.alert(
           "Permission Required",
@@ -27,19 +23,16 @@ export const useImageSelection = () => {
         );
         return;
       }
-
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: ["images"],
         quality: 0.8,
         allowsEditing: true,
         aspect: [3, 4],
       });
-
       if (!result.canceled && result.assets[0]) {
         const asset = result.assets[0];
         const mimeType = asset.mimeType || "image/jpeg";
         const isValid = validateFile(asset.uri, mimeType, asset.fileSize);
-
         if (isValid) {
           setSelectedImages((prev) => [
             ...prev,
@@ -66,12 +59,10 @@ export const useImageSelection = () => {
         allowsEditing: true,
         aspect: [3, 4],
       });
-
       if (!result.canceled && result.assets[0]) {
         const asset = result.assets[0];
         const mimeType = asset.mimeType || "image/jpeg";
         const isValid = validateFile(asset.uri, mimeType, asset.fileSize);
-
         if (isValid) {
           setSelectedImages((prev) => [
             ...prev,

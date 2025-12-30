@@ -31,7 +31,6 @@ export const UploadStatusDisplay: React.FC<UploadStatusDisplayProps> = ({
   const getStatusTitle = () => {
     const { status, current, total } = uploadProgress;
     const isMultiple = total > 1;
-
     switch (status) {
       case "uploading":
         return isMultiple

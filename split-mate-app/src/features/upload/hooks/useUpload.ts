@@ -1,6 +1,3 @@
-// src/features/upload/hooks/useUpload.ts
-// Custom hook for handling receipt upload operations
-
 import { useCallback, useState } from "react";
 import {
   apiService,
@@ -32,14 +29,12 @@ export function useUpload(): UseUploadReturn {
 
   const handleUploadError = useCallback((err: unknown): UploadError => {
     const defaultMessage = "Something went wrong. Please try again.";
-    
     if (err && typeof err === "object" && "message" in err) {
       return {
         message: (err as any).message || defaultMessage,
         retryable: (err as any).retryable !== false, // Default to retryable
       };
     }
-    
     return {
       message: defaultMessage,
       retryable: true,
@@ -51,7 +46,6 @@ export function useUpload(): UseUploadReturn {
       setIsLoading(true);
       setError(null);
       setUploadProgress(null);
-
       try {
         const items = await apiService.uploadReceipts(images, (progress) => {
           setUploadProgress(progress);
