@@ -1,6 +1,6 @@
 # SplitMate
 
-A mobile app for splitting bills and receipts with AI-powered receipt scanning.
+SplitMate is a modern mobile application designed to simplify the often tedious process of splitting bills and expenses among friends, roommates, or colleagues. Powered by AI-driven receipt scanning technology, the app allows users to effortlessly capture receipts using their phone's camera, automatically extracting item names, prices, and totals with high accuracy. Users can add their "mates" to the app and seamlessly assign individual items from a scanned receipt to the right people, eliminating the confusion and awkwardness that often comes with dividing shared expenses.
 
 ## Project Structure
 
