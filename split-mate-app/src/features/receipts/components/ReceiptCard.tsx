@@ -1,6 +1,7 @@
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
+import * as Haptics from "expo-haptics";
 import { AVATAR_SIZE, BORDER_RADIUS, CARD_STYLES, FONT_SIZE, FONT_WEIGHT, ICON_SIZE, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
 import { Invoice } from "../../../shared/types/invoice";
@@ -20,10 +21,15 @@ export const ReceiptCard: React.FC<ReceiptCardProps> = ({
 }) => {
   const { colors } = useTheme();
 
+  const handlePress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    onPress();
+  };
+
   return (
     <TouchableOpacity
-      onPress={onPress}
-      activeOpacity={0.8}
+      onPress={handlePress}
+      activeOpacity={0.7}
       style={{
         flexDirection: "row",
         alignItems: "center",

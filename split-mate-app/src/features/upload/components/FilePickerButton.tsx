@@ -1,6 +1,7 @@
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { Text, TouchableOpacity } from "react-native";
+import * as Haptics from "expo-haptics";
 import { BORDER_RADIUS, FONT_SIZE, FONT_WEIGHT, ICON_SIZE, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
 
@@ -15,9 +16,14 @@ export const FilePickerButton: React.FC<FilePickerButtonProps> = ({
 }) => {
   const { colors } = useTheme();
 
+  const handlePress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    onPress();
+  };
+
   return (
     <TouchableOpacity
-      onPress={onPress}
+      onPress={handlePress}
       disabled={disabled}
       style={{
         backgroundColor: colors.background.secondary,
@@ -28,7 +34,7 @@ export const FilePickerButton: React.FC<FilePickerButtonProps> = ({
         alignItems: "center",
         opacity: disabled ? 0.5 : 1,
       }}
-      activeOpacity={0.7}
+      activeOpacity={0.8}
     >
       <Ionicons name="image" size={ICON_SIZE["3xl"]} color={colors.accent.primary} />
       <Text

@@ -1,6 +1,7 @@
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { TouchableOpacity, View } from "react-native";
+import * as Haptics from "expo-haptics";
 import { ICON_SIZE, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
 
@@ -23,6 +24,21 @@ export const AssignItemsHeader: React.FC<AssignItemsHeaderProps> = ({
 }) => {
   const { colors } = useTheme();
 
+  const handleBack = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    onBack();
+  };
+
+  const handleShare = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    onShare?.();
+  };
+
+  const handleDelete = () => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+    onDelete?.();
+  };
+
   return (
     <View
       style={{
@@ -33,18 +49,18 @@ export const AssignItemsHeader: React.FC<AssignItemsHeaderProps> = ({
       }}
     >
       <TouchableOpacity
-        onPress={onBack}
+        onPress={handleBack}
         style={{ flexDirection: "row", alignItems: "center" }}
-        activeOpacity={0.7}
+        activeOpacity={0.6}
       >
         <Ionicons name="arrow-back" size={ICON_SIZE.lg} color={colors.text.primary} />
       </TouchableOpacity>
       <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.lg }}>
         {showShare && onShare && (
           <TouchableOpacity
-            onPress={onShare}
+            onPress={handleShare}
             style={{ padding: SPACING.sm }}
-            activeOpacity={0.7}
+            activeOpacity={0.6}
             disabled={isSharing}
           >
             <Ionicons
@@ -56,9 +72,9 @@ export const AssignItemsHeader: React.FC<AssignItemsHeaderProps> = ({
         )}
         {showDelete && onDelete && (
           <TouchableOpacity
-            onPress={onDelete}
+            onPress={handleDelete}
             style={{ padding: SPACING.sm }}
-            activeOpacity={0.7}
+            activeOpacity={0.6}
           >
             <Ionicons name="trash" size={ICON_SIZE.xl} color={colors.error} />
           </TouchableOpacity>

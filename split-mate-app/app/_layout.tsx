@@ -13,13 +13,16 @@ function RootStack() {
         screenOptions={{
           headerShown: false,
           gestureEnabled: true,
-          animation: "default",
+          animation: "slide_from_right",
+          gestureDirection: "horizontal",
+          fullScreenGestureEnabled: true,
+          animationDuration: 250,
           contentStyle: {
             backgroundColor: colors.background.primary,
           },
         }}
       >
-        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="(tabs)" options={{ animation: "none" }} />
         <Stack.Screen name="upload" />
         <Stack.Screen name="assign-items" />
       </Stack>

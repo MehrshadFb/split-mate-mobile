@@ -1,6 +1,7 @@
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native";
+import * as Haptics from "expo-haptics";
 import { PageHeader } from "../../../shared/components/PageHeader";
 import { ICON_SIZE, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
@@ -18,16 +19,21 @@ export const UploadHeader: React.FC<UploadHeaderProps> = ({
 }) => {
   const { colors } = useTheme();
 
+  const handleBack = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    onBack();
+  };
+
   return (
     <>
       <TouchableOpacity
-        onPress={onBack}
+        onPress={handleBack}
         style={{
           flexDirection: "row",
           alignItems: "center",
           marginBottom: SPACING["2xl"],
         }}
-        activeOpacity={0.7}
+        activeOpacity={0.6}
       >
         <Ionicons name="arrow-back" size={ICON_SIZE.lg} color={colors.text.primary} />
       </TouchableOpacity>
