@@ -66,9 +66,9 @@ export function generateReceiptHTML(invoice: Invoice): string {
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      line-height: 1.5;
+      line-height: 1.6;
       color: #1C1917;
-      padding: 32px 24px 60px 24px;
+      padding: 40px 24px;
       background: #FFFFFF;
     }
     .container {
@@ -76,31 +76,31 @@ export function generateReceiptHTML(invoice: Invoice): string {
       margin: 0 auto;
     }
     .header {
-      margin-bottom: 36px;
-      padding-bottom: 20px;
+      margin-bottom: 32px;
+      padding-bottom: 16px;
       border-bottom: 3px solid #D97757;
     }
     .title {
       font-size: 32px;
       font-weight: 700;
       color: #1C1917;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
       letter-spacing: -0.5px;
     }
     .date {
-      font-size: 15px;
+      font-size: 14px;
       color: #57534E;
       font-weight: 500;
     }
     .section {
-      margin-bottom: 36px;
+      margin-bottom: 32px;
     }
     .section-title {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 700;
       color: #1C1917;
-      margin-bottom: 18px;
-      padding-bottom: 10px;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
       border-bottom: 2px solid #E7E5E4;
     }
     table {
@@ -109,37 +109,43 @@ export function generateReceiptHTML(invoice: Invoice): string {
       table-layout: fixed;
     }
     .items-table tbody tr {
-      border-bottom: 1px solid #E7E5E4;
+      border-bottom: 1px solid #F5F5F4;
     }
-    .items-table tbody tr:last-child {
+    .items-table tbody tr:last-of-type:not(.total-row) {
       border-bottom: none;
     }
     .items-table td:first-child {
       width: 70%;
+      padding-right: 16px;
     }
     .items-table td:last-child {
       width: 30%;
       text-align: right;
+      padding-left: 16px;
     }
     .item-row td {
-      padding: 14px 0;
-      vertical-align: top;
+      padding: 16px 0;
+      vertical-align: middle;
+    }
+    .item-row:first-of-type td {
+      padding-top: 4px;
     }
     .item-name {
       font-weight: 600;
       color: #1C1917;
-      margin-bottom: 4px;
-      font-size: 16px;
+      font-size: 15px;
+      line-height: 1.4;
+      margin-bottom: 6px;
     }
     .item-split {
       font-size: 13px;
       color: #78716C;
-      margin-top: 4px;
+      line-height: 1.4;
     }
     .item-price {
       font-weight: 700;
       color: #1C1917;
-      font-size: 16px;
+      font-size: 15px;
       white-space: nowrap;
     }
     .total-row {
@@ -148,10 +154,11 @@ export function generateReceiptHTML(invoice: Invoice): string {
       border-bottom: 3px solid #D97757 !important;
     }
     .total-row td {
-      padding: 18px 16px !important;
-      font-size: 20px;
+      padding: 20px 16px !important;
+      font-size: 18px;
       font-weight: 700;
       color: #1C1917;
+      vertical-align: middle;
     }
     .total-row td:last-child {
       text-align: right;
@@ -163,35 +170,40 @@ export function generateReceiptHTML(invoice: Invoice): string {
       border-bottom: none;
     }
     .split-table td:first-child {
-      width: 65%;
+      width: 60%;
+      padding-right: 16px;
     }
     .split-table td:last-child {
-      width: 35%;
+      width: 40%;
       text-align: right;
+      padding-left: 16px;
     }
     .split-row td {
-      padding: 12px 0;
-      vertical-align: top;
+      padding: 16px 0;
+      vertical-align: middle;
+    }
+    .split-row:first-of-type td {
+      padding-top: 4px;
     }
     .person-name {
       color: #1C1917;
       font-weight: 600;
       font-size: 15px;
+      line-height: 1.4;
     }
     .person-total {
       font-weight: 700;
       color: #D97757;
-      font-size: 16px;
+      font-size: 15px;
       white-space: nowrap;
     }
     .footer {
-      margin-top: 48px;
-      padding-top: 20px;
-      padding-bottom: 24px;
+      margin-top: 40px;
+      padding-top: 16px;
       border-top: 2px solid #E7E5E4;
       text-align: center;
       color: #78716C;
-      font-size: 13px;
+      font-size: 12px;
     }
     .footer-brand {
       font-weight: 600;
