@@ -10,6 +10,7 @@ interface ThemeContextType {
   colorScheme: ColorScheme;
   setTheme: (theme: Theme) => Promise<void>;
   colors: typeof lightColors;
+  isThemeLoaded: boolean;
 }
 
 const lightColors = {
@@ -73,6 +74,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const systemColorScheme = useColorScheme();
   const [theme, setThemeState] = useState<Theme>("auto");
+  const [isThemeLoaded, setIsThemeLoaded] = useState(false);
 
   const colorScheme: ColorScheme =
     theme === "auto"
@@ -99,6 +101,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (error) {
       console.error("Failed to load theme:", error);
+    } finally {
+      setIsThemeLoaded(true);
     }
   };
 
@@ -113,7 +117,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, colorScheme, setTheme, colors }}>
+    <ThemeContext.Provider
+      value={{ theme, colorScheme, setTheme, colors, isThemeLoaded }}
+    >
       {children}
     </ThemeContext.Provider>
   );
