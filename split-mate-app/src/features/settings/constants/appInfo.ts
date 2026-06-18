@@ -1,6 +1,9 @@
 import * as Application from "expo-application";
-import Constants from "expo-constants";
+import Constants, { ExecutionEnvironment } from "expo-constants";
 import { Platform } from "react-native";
+
+const isExpoGo =
+  Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
 
 const appConfigBuild = Platform.select({
   ios: Constants.expoConfig?.ios?.buildNumber,
@@ -8,11 +11,15 @@ const appConfigBuild = Platform.select({
 });
 
 export const APP_VERSION =
-  Application.nativeApplicationVersion ??
-  Constants.expoConfig?.version ??
-  "Unknown";
+  isExpoGo
+    ? Constants.expoConfig?.version ?? "Unknown"
+    : Application.nativeApplicationVersion ??
+      Constants.expoConfig?.version ??
+      "Unknown";
 export const APP_BUILD =
-  Application.nativeBuildVersion ?? appConfigBuild ?? "Unknown";
+  isExpoGo
+    ? appConfigBuild ?? "dev"
+    : Application.nativeBuildVersion ?? appConfigBuild ?? "Unknown";
 
 export const APP_LINKS = {
   github: "https://github.com/MehrshadFb/SplitMate-Mobile",
