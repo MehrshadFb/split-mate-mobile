@@ -24,7 +24,7 @@ export const AboutSection: React.FC = () => {
       <SettingsItem
         icon="information-circle"
         label="Version"
-        value={`${APP_VERSION} (${APP_BUILD})`}
+        value={APP_VERSION}
       />
       <SettingsItem
         icon="logo-github"

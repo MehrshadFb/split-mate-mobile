@@ -1,6 +1,5 @@
 import React from "react";
 import { ScrollView, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import {
   EmptyReceiptsState,
   formatReceiptDate,
@@ -18,11 +17,11 @@ export default function ReceiptsScreen() {
     useReceiptsManagement();
 
   return (
-    <SafeAreaView
-      style={{ flex: 1, backgroundColor: colors.background.primary }}
-      edges={["top", "left", "right"]}
-    >
-      <ScrollView style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: colors.background.primary }}>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentInsetAdjustmentBehavior="automatic"
+      >
         <View style={{ padding: SPACING.xl }}>
           {/* Header */}
           <ReceiptsHeader
@@ -42,6 +41,6 @@ export default function ReceiptsScreen() {
           )}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }

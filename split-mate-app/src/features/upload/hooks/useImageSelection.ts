@@ -26,8 +26,6 @@ export const useImageSelection = () => {
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: ["images"],
         quality: 0.8,
-        allowsEditing: true,
-        aspect: [3, 4],
       });
       if (!result.canceled && result.assets[0]) {
         const asset = result.assets[0];
@@ -56,8 +54,6 @@ export const useImageSelection = () => {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],
         quality: 0.8,
-        allowsEditing: true,
-        aspect: [3, 4],
       });
       if (!result.canceled && result.assets[0]) {
         const asset = result.assets[0];
