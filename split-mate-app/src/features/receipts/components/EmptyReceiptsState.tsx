@@ -57,7 +57,7 @@ export const EmptyReceiptsState: React.FC<EmptyReceiptsStateProps> = ({
           variant="primary"
           size="large"
           fullWidth
-          icon={<Ionicons name="sparkles" size={ICON_SIZE.md} color="white" />}
+          icon={<Ionicons name="sparkles" size={ICON_SIZE.md} color={colors.text.inverse} />}
         />
       </View>
     </View>
