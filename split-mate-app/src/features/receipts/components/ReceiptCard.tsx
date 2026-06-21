@@ -28,6 +28,11 @@ export const ReceiptCard: React.FC<ReceiptCardProps> = ({
       : paymentProgress.isPaid
       ? "Paid"
       : `${paymentProgress.paidCount}/${paymentProgress.owedCount} paid`;
+  const paymentStatusColor = colors.accent.primary;
+  const paymentPillBackground =
+    paymentProgress.owedCount === 0
+      ? colors.neutral[100]
+      : colors.accent.light;
 
   const handlePress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -46,7 +51,9 @@ export const ReceiptCard: React.FC<ReceiptCardProps> = ({
         padding: CARD_STYLES.padding,
         marginBottom: CARD_STYLES.marginBottom,
         borderWidth: 1,
-        borderColor: paymentProgress.isPaid ? colors.success : colors.border,
+        borderColor: paymentProgress.isPaid
+          ? colors.accent.primary
+          : colors.border,
       }}
     >
       <View
@@ -55,7 +62,7 @@ export const ReceiptCard: React.FC<ReceiptCardProps> = ({
           height: AVATAR_SIZE.lg,
           borderRadius: BORDER_RADIUS.lg,
           backgroundColor: paymentProgress.isPaid
-            ? colors.success
+            ? colors.accent.primary
             : colors.accent.light,
           alignItems: "center",
           justifyContent: "center",
@@ -109,20 +116,28 @@ export const ReceiptCard: React.FC<ReceiptCardProps> = ({
         >
           ${invoice.totalAmount.toFixed(2)}
         </Text>
-        <Text
+        <View
           style={{
-            color: paymentProgress.isPaid
-              ? colors.success
-              : colors.text.tertiary,
+            backgroundColor: paymentPillBackground,
+            borderRadius: BORDER_RADIUS.full,
+            paddingHorizontal: SPACING.sm,
+            paddingVertical: SPACING.xs,
             marginTop: SPACING.xs,
-            fontSize: FONT_SIZE.xs,
-            fontWeight: paymentProgress.isPaid
-              ? FONT_WEIGHT.semibold
-              : FONT_WEIGHT.normal,
           }}
         >
-          {paymentLabel}
-        </Text>
+          <Text
+            style={{
+              color:
+                paymentProgress.owedCount === 0
+                  ? colors.text.tertiary
+                  : paymentStatusColor,
+              fontSize: FONT_SIZE.xs,
+              fontWeight: FONT_WEIGHT.semibold,
+            }}
+          >
+            {paymentLabel}
+          </Text>
+        </View>
       </View>
       <Ionicons
         name="chevron-forward"

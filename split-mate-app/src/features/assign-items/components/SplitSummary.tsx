@@ -140,6 +140,11 @@ export const SplitSummary: React.FC<SplitSummaryProps> = ({
           {totals.map((person) => {
             const owesMoney = person.total > 0;
             const isPaid = paidBy.includes(person.name);
+            const statusLabel = isPaid
+              ? "Paid"
+              : owesMoney
+              ? "Unpaid"
+              : "No balance";
             return (
               <View
                 key={person.name}
@@ -151,7 +156,7 @@ export const SplitSummary: React.FC<SplitSummaryProps> = ({
                   padding: CARD_STYLES.padding,
                   marginBottom: CARD_STYLES.marginBottom,
                   borderWidth: 1,
-                  borderColor: isPaid ? colors.success : colors.border,
+                  borderColor: isPaid ? colors.accent.primary : colors.border,
                 }}
               >
                 <TouchableOpacity
@@ -167,19 +172,25 @@ export const SplitSummary: React.FC<SplitSummaryProps> = ({
                   style={{
                     width: AVATAR_SIZE.md + 4,
                     height: AVATAR_SIZE.md + 4,
+                    borderRadius: BORDER_RADIUS.full,
+                    borderWidth: 1.5,
+                    borderColor: isPaid ? colors.accent.primary : colors.border,
+                    backgroundColor: isPaid
+                      ? colors.accent.primary
+                      : colors.background.secondary,
                     alignItems: "center",
                     justifyContent: "center",
                     marginRight: SPACING.md,
                     opacity: owesMoney ? 1 : 0.45,
                   }}
                 >
-                  <Ionicons
-                    name={isPaid ? "checkmark-circle" : "ellipse-outline"}
-                    size={ICON_SIZE.xl}
-                    color={
-                      isPaid ? colors.success : colors.text.tertiary
-                    }
-                  />
+                  {isPaid && (
+                    <Ionicons
+                      name="checkmark"
+                      size={ICON_SIZE.md}
+                      color={colors.text.inverse}
+                    />
+                  )}
                 </TouchableOpacity>
                 <View style={{ flex: 1 }}>
                   <Text
@@ -191,24 +202,38 @@ export const SplitSummary: React.FC<SplitSummaryProps> = ({
                   >
                     {person.name}
                   </Text>
-                  {isPaid && (
+                  <View
+                    style={{
+                      alignSelf: "flex-start",
+                      backgroundColor: isPaid
+                        ? colors.accent.light
+                        : owesMoney
+                        ? colors.accent.light
+                        : colors.neutral[100],
+                      borderRadius: BORDER_RADIUS.full,
+                      paddingHorizontal: SPACING.sm,
+                      paddingVertical: SPACING.xs,
+                      marginTop: SPACING.xs,
+                    }}
+                  >
                     <Text
                       style={{
-                        color: colors.success,
+                        color: isPaid
+                          ? colors.accent.primary
+                          : owesMoney
+                          ? colors.accent.primary
+                          : colors.text.tertiary,
                         fontSize: FONT_SIZE.xs,
                         fontWeight: FONT_WEIGHT.semibold,
-                        marginTop: SPACING.xs,
                       }}
                     >
-                      Paid
+                      {statusLabel}
                     </Text>
-                  )}
+                  </View>
                 </View>
                 <Text
                   style={{
-                    color: isPaid
-                      ? colors.text.tertiary
-                      : colors.accent.primary,
+                    color: colors.accent.primary,
                     fontWeight: FONT_WEIGHT.bold,
                     fontSize: FONT_SIZE.lg,
                     textDecorationLine: isPaid ? "line-through" : "none",
