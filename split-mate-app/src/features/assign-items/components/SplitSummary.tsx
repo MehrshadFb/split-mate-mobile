@@ -1,6 +1,6 @@
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { Text, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { AVATAR_SIZE, BORDER_RADIUS, CARD_STYLES, FONT_SIZE, FONT_WEIGHT, ICON_SIZE, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
 
@@ -12,11 +12,15 @@ interface PersonTotal {
 interface SplitSummaryProps {
   totalAmount: number;
   totals: PersonTotal[];
+  paidBy: string[];
+  onTogglePersonPaid: (personName: string) => void;
 }
 
 export const SplitSummary: React.FC<SplitSummaryProps> = ({
   totalAmount,
   totals,
+  paidBy,
+  onTogglePersonPaid,
 }) => {
   const { colors } = useTheme();
 
@@ -133,63 +137,88 @@ export const SplitSummary: React.FC<SplitSummaryProps> = ({
           >
             Individual Totals
           </Text>
-          {totals.map((person) => (
-            <View
-              key={person.name}
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                backgroundColor: colors.background.primary,
-                borderRadius: CARD_STYLES.borderRadius,
-                padding: CARD_STYLES.padding,
-                marginBottom: CARD_STYLES.marginBottom,
-                borderWidth: 1,
-                borderColor: colors.border,
-              }}
-            >
+          {totals.map((person) => {
+            const owesMoney = person.total > 0;
+            const isPaid = paidBy.includes(person.name);
+            return (
               <View
+                key={person.name}
                 style={{
-                  width: AVATAR_SIZE.md + 4,
-                  height: AVATAR_SIZE.md + 4,
-                  borderRadius: BORDER_RADIUS.md,
-                  backgroundColor: colors.accent.light,
+                  flexDirection: "row",
                   alignItems: "center",
-                  justifyContent: "center",
-                  marginRight: SPACING.md,
+                  backgroundColor: colors.background.primary,
+                  borderRadius: CARD_STYLES.borderRadius,
+                  padding: CARD_STYLES.padding,
+                  marginBottom: CARD_STYLES.marginBottom,
+                  borderWidth: 1,
+                  borderColor: isPaid ? colors.success : colors.border,
                 }}
               >
+                <TouchableOpacity
+                  onPress={() => onTogglePersonPaid(person.name)}
+                  disabled={!owesMoney}
+                  activeOpacity={0.75}
+                  accessibilityRole="checkbox"
+                  accessibilityState={{
+                    checked: isPaid,
+                    disabled: !owesMoney,
+                  }}
+                  accessibilityLabel={`${person.name} paid status`}
+                  style={{
+                    width: AVATAR_SIZE.md + 4,
+                    height: AVATAR_SIZE.md + 4,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginRight: SPACING.md,
+                    opacity: owesMoney ? 1 : 0.45,
+                  }}
+                >
+                  <Ionicons
+                    name={isPaid ? "checkmark-circle" : "ellipse-outline"}
+                    size={ICON_SIZE.xl}
+                    color={
+                      isPaid ? colors.success : colors.text.tertiary
+                    }
+                  />
+                </TouchableOpacity>
+                <View style={{ flex: 1 }}>
+                  <Text
+                    style={{
+                      color: colors.text.primary,
+                      fontWeight: FONT_WEIGHT.bold,
+                      fontSize: FONT_SIZE.base,
+                    }}
+                  >
+                    {person.name}
+                  </Text>
+                  {isPaid && (
+                    <Text
+                      style={{
+                        color: colors.success,
+                        fontSize: FONT_SIZE.xs,
+                        fontWeight: FONT_WEIGHT.semibold,
+                        marginTop: SPACING.xs,
+                      }}
+                    >
+                      Paid
+                    </Text>
+                  )}
+                </View>
                 <Text
                   style={{
-                    color: colors.accent.primary,
+                    color: isPaid
+                      ? colors.text.tertiary
+                      : colors.accent.primary,
                     fontWeight: FONT_WEIGHT.bold,
                     fontSize: FONT_SIZE.lg,
+                    textDecorationLine: isPaid ? "line-through" : "none",
                   }}
                 >
-                  {person.name.charAt(0).toUpperCase()}
+                  ${person.total.toFixed(2)}
                 </Text>
               </View>
-              <View style={{ flex: 1 }}>
-                <Text
-                  style={{
-                    color: colors.text.primary,
-                    fontWeight: FONT_WEIGHT.bold,
-                    fontSize: FONT_SIZE.base,
-                  }}
-                >
-                  {person.name}
-                </Text>
-              </View>
-              <Text
-                style={{
-                  color: colors.accent.primary,
-                  fontWeight: FONT_WEIGHT.bold,
-                  fontSize: FONT_SIZE.lg,
-                }}
-              >
-                ${person.total.toFixed(2)}
-              </Text>
-            </View>
-          ))}
+            );
+          })}
         </View>
       </View>
     </View>

@@ -16,6 +16,7 @@ export interface Invoice {
   items: Item[];
   people: string[];
   totals: Person[];
+  paidBy: string[];
   scanJobId?: string;
   createdAt: string;
   updatedAt: string;

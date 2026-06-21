@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { Invoice, Item, Person } from "../types/invoice";
 import { getLocalDateString } from "../utils/dateUtils";
+import { getOwedPeople } from "../utils/paymentStatus";
 
 interface InvoiceState {
   currentInvoice: Invoice | null;
@@ -19,6 +20,7 @@ interface InvoiceState {
   addItem: (item: Item) => void;
   deleteItem: (index: number) => void;
   togglePersonForItem: (itemIndex: number, personName: string) => void;
+  togglePersonPaid: (personName: string) => void;
   calculateTotals: () => void;
   clearInvoice: () => void;
   resetSession: () => void;
@@ -39,7 +41,10 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
   hasUnsavedChanges: false,
 
   setInvoice: (invoice) =>
-    set({ currentInvoice: invoice, hasUnsavedChanges: false }),
+    set({
+      currentInvoice: { ...invoice, paidBy: invoice.paidBy ?? [] },
+      hasUnsavedChanges: false,
+    }),
 
   setInvoiceTitle: (title) => {
     set((state) => {
@@ -113,6 +118,7 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
           items: [item],
           people: state.people,
           totals: [],
+          paidBy: [],
           createdAt: now.toISOString(),
           updatedAt: now.toISOString(),
           totalAmount: item.price,
@@ -166,6 +172,30 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
     get().calculateTotals();
   },
 
+  togglePersonPaid: (personName) => {
+    set((state) => {
+      if (!state.currentInvoice) return state;
+      const personTotal = state.currentInvoice.totals.find(
+        (person) => person.name === personName
+      );
+      if (!personTotal || personTotal.total <= 0) return state;
+
+      const paidBy = state.currentInvoice.paidBy ?? [];
+      const nextPaidBy = paidBy.includes(personName)
+        ? paidBy.filter((person) => person !== personName)
+        : [...paidBy, personName];
+
+      return {
+        currentInvoice: {
+          ...state.currentInvoice,
+          paidBy: nextPaidBy,
+          updatedAt: new Date().toISOString(),
+        },
+        hasUnsavedChanges: true,
+      };
+    });
+  },
+
   calculateTotals: () => {
     set((state) => {
       if (!state.currentInvoice) return state;
@@ -187,11 +217,15 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
           });
         }
       });
+      const owedPeople = getOwedPeople({ totals: newTotals });
       return {
         currentInvoice: {
           ...state.currentInvoice,
           people: state.people, // Ensure invoice's people array is synced
           totals: newTotals, // This includes everyone, even with $0
+          paidBy: (state.currentInvoice.paidBy ?? []).filter((person) =>
+            owedPeople.includes(person)
+          ),
           totalAmount,
           updatedAt: new Date().toISOString(),
         },
@@ -212,7 +246,11 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
   loadSavedInvoices: async () => {
     try {
       const json = await AsyncStorage.getItem(SAVED_INVOICES_KEY);
-      const invoices: Invoice[] = json ? JSON.parse(json) : [];
+      const parsedInvoices: Invoice[] = json ? JSON.parse(json) : [];
+      const invoices = parsedInvoices.map((invoice) => ({
+        ...invoice,
+        paidBy: invoice.paidBy ?? [],
+      }));
       set({ savedInvoices: invoices });
     } catch (error) {
       console.error("Failed to load saved invoices:", error);
@@ -242,6 +280,7 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
       })),
       totals: currentInvoice.totals.map((person) => ({ ...person })),
       people: [...currentInvoice.people],
+      paidBy: [...(currentInvoice.paidBy ?? [])],
       updatedAt: now,
       savedAt: now,
     };

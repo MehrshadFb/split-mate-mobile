@@ -27,6 +27,7 @@ export const useReceiptsManagement = () => {
         splitBetween: [...item.splitBetween],
       })),
       totals: invoice.totals.map((person) => ({ ...person })),
+      paidBy: invoice.paidBy ?? [],
     };
     setPeople(cloned.people);
     setInvoice(cloned);

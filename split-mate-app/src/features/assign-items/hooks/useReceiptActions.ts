@@ -138,6 +138,7 @@ export const useReceiptActions = (
         items: [],
         people: people,
         totals: [],
+        paidBy: [],
         createdAt: now.toISOString(),
         updatedAt: now.toISOString(),
         totalAmount: 0,

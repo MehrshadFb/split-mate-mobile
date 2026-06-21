@@ -26,7 +26,13 @@ import { getLocalDateString } from "../src/shared/utils/dateUtils";
 
 export default function AssignItemsScreen() {
   const { colors } = useTheme();
-  const { currentInvoice, people, editingSavedInvoice, setInvoiceDate } = useInvoiceStore();
+  const {
+    currentInvoice,
+    people,
+    editingSavedInvoice,
+    setInvoiceDate,
+    togglePersonPaid,
+  } = useInvoiceStore();
   const {
     isEditingTitle,
     tempTitle,
@@ -147,6 +153,8 @@ export default function AssignItemsScreen() {
               <SplitSummary
                 totalAmount={totalAmount}
                 totals={currentInvoice.totals}
+                paidBy={currentInvoice.paidBy ?? []}
+                onTogglePersonPaid={togglePersonPaid}
               />
             )}
           {/* Save Button - Always visible */}
