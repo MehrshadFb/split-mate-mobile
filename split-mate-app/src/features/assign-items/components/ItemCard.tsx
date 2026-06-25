@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { Alert, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { AVATAR_SIZE, BORDER_RADIUS, CARD_STYLES, FONT_SIZE, FONT_WEIGHT, ICON_SIZE, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
 import { Item } from "../../../shared/types/invoice";
 import { isCustomSplit } from "../../../shared/utils/splitCalculations";
-import { CustomSplitModal } from "./CustomSplitModal";
 
 interface ItemCardProps {
   item: Item;
@@ -21,7 +20,7 @@ interface ItemCardProps {
   onChangePrice: (text: string) => void;
   onDelete: () => void;
   onTogglePerson: (person: string) => void;
-  onUpdateShares: (shares: Record<string, number> | undefined) => void;
+  onAdjustSplit: () => void;
 }
 
 export const ItemCard: React.FC<ItemCardProps> = ({
@@ -38,10 +37,9 @@ export const ItemCard: React.FC<ItemCardProps> = ({
   onChangePrice,
   onDelete,
   onTogglePerson,
-  onUpdateShares,
+  onAdjustSplit,
 }) => {
   const { colors } = useTheme();
-  const [showSplitModal, setShowSplitModal] = useState(false);
   const canAdjustSplit = item.splitBetween.length >= 2 && item.price > 0;
   const hasCustomSplit = isCustomSplit(item.splitBetween, item.shares);
 
@@ -333,7 +331,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({
           {canAdjustSplit && (
             <View style={{ marginTop: SPACING.md, alignItems: "flex-start" }}>
               <TouchableOpacity
-                onPress={() => setShowSplitModal(true)}
+                onPress={onAdjustSplit}
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
@@ -376,18 +374,6 @@ export const ItemCard: React.FC<ItemCardProps> = ({
           )}
         </>
       )}
-      <CustomSplitModal
-        visible={showSplitModal}
-        itemName={item.name}
-        price={item.price}
-        splitBetween={item.splitBetween}
-        shares={item.shares}
-        onClose={() => setShowSplitModal(false)}
-        onSave={(shares) => {
-          onUpdateShares(shares);
-          setShowSplitModal(false);
-        }}
-      />
     </View>
   );
 };

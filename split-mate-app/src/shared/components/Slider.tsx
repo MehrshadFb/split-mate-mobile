@@ -46,6 +46,12 @@ export const Slider: React.FC<SliderProps> = ({
   const translateX = useSharedValue(0);
   const scale = useSharedValue(1);
   const isDragging = useRef(false);
+  const callbacksRef = useRef({
+    onValueChange,
+    onSlidingStart,
+    onSlidingComplete,
+  });
+  callbacksRef.current = { onValueChange, onSlidingStart, onSlidingComplete };
 
   const range = Math.max(0.0001, maximumValue - minimumValue);
   const effectiveWidth = Math.max(1, containerWidth - THUMB_SIZE);
@@ -88,36 +94,26 @@ export const Slider: React.FC<SliderProps> = ({
         scale.value = withTiming(1.15, { duration: 120 });
         const next = clamp(evt.nativeEvent.locationX);
         translateX.value = next;
-        onValueChange(toValue(next));
-        onSlidingStart?.();
+        callbacksRef.current.onValueChange(toValue(next));
+        callbacksRef.current.onSlidingStart?.();
       },
       onPanResponderMove: (evt) => {
         const next = clamp(evt.nativeEvent.locationX);
         translateX.value = next;
-        onValueChange(toValue(next));
+        callbacksRef.current.onValueChange(toValue(next));
       },
       onPanResponderRelease: (evt) => {
         const next = clamp(evt.nativeEvent.locationX);
         isDragging.current = false;
         scale.value = withTiming(1, { duration: 140 });
-        onSlidingComplete?.(toValue(next));
+        callbacksRef.current.onSlidingComplete?.(toValue(next));
       },
       onPanResponderTerminate: () => {
         isDragging.current = false;
         scale.value = withTiming(1, { duration: 140 });
       },
     });
-  }, [
-    disabled,
-    effectiveWidth,
-    minimumValue,
-    range,
-    onValueChange,
-    onSlidingStart,
-    onSlidingComplete,
-    scale,
-    translateX,
-  ]);
+  }, [disabled, effectiveWidth, minimumValue, range, scale, translateX]);
 
   const filledStyle = useAnimatedStyle(() => ({
     width: translateX.value,
