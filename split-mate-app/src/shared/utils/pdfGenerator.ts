@@ -1,29 +1,40 @@
 import { Invoice } from "../types/invoice";
+import { computeSplitAmounts, isCustomSplit } from "./splitCalculations";
 
 export function generateReceiptHTML(invoice: Invoice): string {
   const { title, date, items, totals, totalAmount } = invoice;
-  
-  // Format date for display
+
   const formattedDate = new Date(date).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
   });
 
-  // Generate items rows
   const itemsHTML = items
-    .map(
-      (item) => `
+    .map((item) => {
+      const perPerson = computeSplitAmounts(
+        item.price,
+        item.splitBetween,
+        item.shares
+      );
+      const splitParts = item.splitBetween
+        .map(
+          (person, i) =>
+            `<span class="split-person">${escapeHtml(person)} <span class="split-amount">$${perPerson[i].toFixed(2)}</span></span>`
+        )
+        .join('<span class="split-sep">•</span>');
+      const customBadge = isCustomSplit(item.splitBetween, item.shares)
+        ? `<span class="custom-badge">Custom</span>`
+        : "";
+      return `
         <tr class="item-row">
           <td>
             <div class="item-name">
-              ${escapeHtml(item.name)}
+              ${escapeHtml(item.name)}${customBadge}
             </div>
             ${
               item.splitBetween.length > 0
-                ? `<div class="item-split">
-                    Split between: ${item.splitBetween.map(escapeHtml).join(", ")}
-                   </div>`
+                ? `<div class="item-split">${splitParts}</div>`
                 : ""
             }
           </td>
@@ -31,8 +42,8 @@ export function generateReceiptHTML(invoice: Invoice): string {
             $${item.price.toFixed(2)}
           </td>
         </tr>
-      `
-    )
+      `;
+    })
     .join("");
 
   // Generate totals rows
@@ -140,7 +151,35 @@ export function generateReceiptHTML(invoice: Invoice): string {
     .item-split {
       font-size: 13px;
       color: #78716C;
-      line-height: 1.4;
+      line-height: 1.6;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
+    .split-person {
+      white-space: nowrap;
+    }
+    .split-amount {
+      font-weight: 600;
+      color: #1C1917;
+    }
+    .split-sep {
+      color: #D6D3D1;
+      font-weight: 400;
+    }
+    .custom-badge {
+      display: inline-block;
+      margin-left: 8px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background-color: #FFF4ED;
+      color: #D97757;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      vertical-align: middle;
     }
     .item-price {
       font-weight: 700;
