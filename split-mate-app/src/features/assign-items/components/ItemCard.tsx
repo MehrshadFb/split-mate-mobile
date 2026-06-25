@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { Alert, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { AVATAR_SIZE, BORDER_RADIUS, CARD_STYLES, FONT_SIZE, FONT_WEIGHT, ICON_SIZE, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
 import { Item } from "../../../shared/types/invoice";
+import { isCustomSplit } from "../../../shared/utils/splitCalculations";
+import { CustomSplitModal } from "./CustomSplitModal";
 
 interface ItemCardProps {
   item: Item;
@@ -19,6 +21,7 @@ interface ItemCardProps {
   onChangePrice: (text: string) => void;
   onDelete: () => void;
   onTogglePerson: (person: string) => void;
+  onUpdateShares: (shares: Record<string, number> | undefined) => void;
 }
 
 export const ItemCard: React.FC<ItemCardProps> = ({
@@ -35,8 +38,12 @@ export const ItemCard: React.FC<ItemCardProps> = ({
   onChangePrice,
   onDelete,
   onTogglePerson,
+  onUpdateShares,
 }) => {
   const { colors } = useTheme();
+  const [showSplitModal, setShowSplitModal] = useState(false);
+  const canAdjustSplit = item.splitBetween.length >= 2 && item.price > 0;
+  const hasCustomSplit = isCustomSplit(item.splitBetween, item.shares);
 
   const handleDelete = () => {
     Alert.alert(
@@ -323,8 +330,64 @@ export const ItemCard: React.FC<ItemCardProps> = ({
               );
             })}
           </View>
+          {canAdjustSplit && (
+            <View style={{ marginTop: SPACING.md, alignItems: "flex-start" }}>
+              <TouchableOpacity
+                onPress={() => setShowSplitModal(true)}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  paddingHorizontal: SPACING.md,
+                  paddingVertical: SPACING.sm,
+                  borderRadius: BORDER_RADIUS.full,
+                  backgroundColor: hasCustomSplit
+                    ? colors.accent.light
+                    : "transparent",
+                  borderWidth: 1,
+                  borderColor: hasCustomSplit
+                    ? colors.accent.primary
+                    : colors.border,
+                }}
+                activeOpacity={0.7}
+              >
+                <Ionicons
+                  name="options-outline"
+                  size={ICON_SIZE.sm}
+                  color={
+                    hasCustomSplit
+                      ? colors.accent.primary
+                      : colors.text.secondary
+                  }
+                  style={{ marginRight: SPACING.xs + 2 }}
+                />
+                <Text
+                  style={{
+                    color: hasCustomSplit
+                      ? colors.accent.primary
+                      : colors.text.secondary,
+                    fontWeight: FONT_WEIGHT.semibold,
+                    fontSize: FONT_SIZE.sm,
+                  }}
+                >
+                  {hasCustomSplit ? "Custom split" : "Adjust portions"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </>
       )}
+      <CustomSplitModal
+        visible={showSplitModal}
+        itemName={item.name}
+        price={item.price}
+        splitBetween={item.splitBetween}
+        shares={item.shares}
+        onClose={() => setShowSplitModal(false)}
+        onSave={(shares) => {
+          onUpdateShares(shares);
+          setShowSplitModal(false);
+        }}
+      />
     </View>
   );
 };

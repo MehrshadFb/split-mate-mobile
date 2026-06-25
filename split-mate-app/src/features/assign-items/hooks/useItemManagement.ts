@@ -9,8 +9,14 @@ interface EditingItem {
 }
 
 export const useItemManagement = () => {
-  const { currentInvoice, addItem, updateItem, deleteItem, togglePersonForItem } =
-    useInvoiceStore();
+  const {
+    currentInvoice,
+    addItem,
+    updateItem,
+    deleteItem,
+    togglePersonForItem,
+    setItemShares,
+  } = useInvoiceStore();
   const [editingItem, setEditingItem] = useState<EditingItem | null>(null);
 
   const handleAddItem = useCallback(() => {
@@ -84,6 +90,13 @@ export const useItemManagement = () => {
     [togglePersonForItem]
   );
 
+  const handleUpdateShares = useCallback(
+    (itemIndex: number, shares: Record<string, number> | undefined) => {
+      setItemShares(itemIndex, shares);
+    },
+    [setItemShares]
+  );
+
   return {
     editingItem,
     handleAddItem,
@@ -94,5 +107,6 @@ export const useItemManagement = () => {
     handleChangePrice,
     handleDeleteItem,
     handleTogglePerson,
+    handleUpdateShares,
   };
 };

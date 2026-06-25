@@ -62,6 +62,7 @@ export default function AssignItemsScreen() {
     handleChangePrice,
     handleDeleteItem,
     handleTogglePerson,
+    handleUpdateShares,
   } = useItemManagement();
 
   if (!currentInvoice) {
@@ -132,6 +133,7 @@ export default function AssignItemsScreen() {
                   onChangePrice={handleChangePrice}
                   onDelete={() => handleDeleteItem(index)}
                   onTogglePerson={(person) => handleTogglePerson(index, person)}
+                  onUpdateShares={(shares) => handleUpdateShares(index, shares)}
                 />
               ))
             )}
