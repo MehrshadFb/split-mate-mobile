@@ -177,27 +177,28 @@ export const CustomSplitModal: React.FC<CustomSplitModalProps> = ({
       transparent
       onRequestClose={handleClose}
     >
-      <Pressable
-        onPress={handleClose}
-        style={{
-          flex: 1,
-          backgroundColor: "rgba(0,0,0,0.4)",
-          justifyContent: "flex-end",
-        }}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <Pressable
-          onPress={(e) => e.stopPropagation()}
+          onPress={handleClose}
           style={{
-            backgroundColor: colors.background.primary,
-            borderTopLeftRadius: BORDER_RADIUS.xl,
-            borderTopRightRadius: BORDER_RADIUS.xl,
-            maxHeight: "90%",
+            flex: 1,
+            backgroundColor: "rgba(0,0,0,0.4)",
+            justifyContent: "flex-end",
           }}
         >
-          <SafeAreaView edges={["bottom"]}>
-            <KeyboardAvoidingView
-              behavior={Platform.OS === "ios" ? "padding" : undefined}
-            >
+          <Pressable
+            onPress={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: colors.background.primary,
+              borderTopLeftRadius: BORDER_RADIUS.xl,
+              borderTopRightRadius: BORDER_RADIUS.xl,
+              maxHeight: "90%",
+            }}
+          >
+            <SafeAreaView edges={["bottom"]}>
               <View
                 style={{
                   flexDirection: "row",
@@ -547,10 +548,10 @@ export const CustomSplitModal: React.FC<CustomSplitModalProps> = ({
                   </Text>
                 </TouchableOpacity>
               </View>
-            </KeyboardAvoidingView>
-          </SafeAreaView>
+            </SafeAreaView>
+          </Pressable>
         </Pressable>
-      </Pressable>
+      </KeyboardAvoidingView>
     </Modal>
   );
 };
