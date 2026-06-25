@@ -3,6 +3,7 @@ import { create } from "zustand";
 import { Invoice, Item, Person } from "../types/invoice";
 import { getLocalDateString } from "../utils/dateUtils";
 import { getOwedPeople } from "../utils/paymentStatus";
+import { computeSplitAmounts, pruneShares } from "../utils/splitCalculations";
 
 interface InvoiceState {
   currentInvoice: Invoice | null;
@@ -20,6 +21,10 @@ interface InvoiceState {
   addItem: (item: Item) => void;
   deleteItem: (index: number) => void;
   togglePersonForItem: (itemIndex: number, personName: string) => void;
+  setItemShares: (
+    itemIndex: number,
+    shares: Record<string, number> | undefined
+  ) => void;
   togglePersonPaid: (personName: string) => void;
   calculateTotals: () => void;
   clearInvoice: () => void;
@@ -96,7 +101,16 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
     set((state) => {
       if (!state.currentInvoice) return state;
       const newItems = [...state.currentInvoice.items];
-      newItems[index] = { ...newItems[index], ...itemUpdate };
+      const existing = newItems[index];
+      if (!existing) return state;
+      const merged: Item = { ...existing, ...itemUpdate };
+      const priceChanged =
+        typeof itemUpdate.price === "number" &&
+        itemUpdate.price !== existing.price;
+      if (priceChanged) {
+        merged.shares = undefined;
+      }
+      newItems[index] = merged;
       return {
         currentInvoice: {
           ...state.currentInvoice,
@@ -155,12 +169,38 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
     set((state) => {
       if (!state.currentInvoice) return state;
       const newItems = [...state.currentInvoice.items];
-      const item = newItems[itemIndex];
-      if (item.splitBetween.includes(personName)) {
-        item.splitBetween = item.splitBetween.filter((p) => p !== personName);
-      } else {
-        item.splitBetween = [...item.splitBetween, personName];
-      }
+      const existing = newItems[itemIndex];
+      if (!existing) return state;
+      const isAssigned = existing.splitBetween.includes(personName);
+      const nextSplitBetween = isAssigned
+        ? existing.splitBetween.filter((p) => p !== personName)
+        : [...existing.splitBetween, personName];
+      const nextShares = isAssigned
+        ? pruneShares(existing.shares, nextSplitBetween)
+        : existing.shares;
+      newItems[itemIndex] = {
+        ...existing,
+        splitBetween: nextSplitBetween,
+        shares: nextShares,
+      };
+      return {
+        currentInvoice: {
+          ...state.currentInvoice,
+          items: newItems,
+        },
+        hasUnsavedChanges: true,
+      };
+    });
+    get().calculateTotals();
+  },
+
+  setItemShares: (itemIndex, shares) => {
+    set((state) => {
+      if (!state.currentInvoice) return state;
+      const newItems = [...state.currentInvoice.items];
+      const existing = newItems[itemIndex];
+      if (!existing) return state;
+      newItems[itemIndex] = { ...existing, shares };
       return {
         currentInvoice: {
           ...state.currentInvoice,
@@ -207,15 +247,18 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
       let totalAmount = 0;
       state.currentInvoice.items.forEach((item) => {
         totalAmount += item.price;
-        if (item.splitBetween.length > 0) {
-          const splitAmount = item.price / item.splitBetween.length;
-          item.splitBetween.forEach((person) => {
-            const personTotal = newTotals.find((p) => p.name === person);
-            if (personTotal) {
-              personTotal.total += splitAmount;
-            }
-          });
-        }
+        if (item.splitBetween.length === 0) return;
+        const amounts = computeSplitAmounts(
+          item.price,
+          item.splitBetween,
+          item.shares
+        );
+        item.splitBetween.forEach((person, i) => {
+          const personTotal = newTotals.find((p) => p.name === person);
+          if (personTotal) {
+            personTotal.total += amounts[i];
+          }
+        });
       });
       const owedPeople = getOwedPeople({ totals: newTotals });
       return {
@@ -277,6 +320,7 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
       items: currentInvoice.items.map((item) => ({
         ...item,
         splitBetween: [...item.splitBetween],
+        shares: item.shares ? { ...item.shares } : undefined,
       })),
       totals: currentInvoice.totals.map((person) => ({ ...person })),
       people: [...currentInvoice.people],

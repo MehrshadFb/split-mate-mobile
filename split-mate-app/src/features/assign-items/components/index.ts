@@ -1,4 +1,5 @@
 export { AssignItemsHeader } from "./AssignItemsHeader";
+export { CustomSplitModal } from "./CustomSplitModal";
 export { EmptyItemsList } from "./EmptyItemsList";
 export { ItemCard } from "./ItemCard";
 export { ManagePeopleSection } from "./ManagePeopleSection";

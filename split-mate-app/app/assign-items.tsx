@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
     AssignItemsHeader,
+    CustomSplitModal,
     EmptyItemsList,
     ItemCard,
     ManagePeopleSection,
@@ -62,7 +63,11 @@ export default function AssignItemsScreen() {
     handleChangePrice,
     handleDeleteItem,
     handleTogglePerson,
+    handleUpdateShares,
   } = useItemManagement();
+  const [adjustingSplitIndex, setAdjustingSplitIndex] = useState<number | null>(
+    null
+  );
 
   if (!currentInvoice) {
     return null;
@@ -72,6 +77,10 @@ export default function AssignItemsScreen() {
     (sum, item) => sum + item.price,
     0
   );
+  const adjustingItem =
+    adjustingSplitIndex !== null
+      ? currentInvoice.items[adjustingSplitIndex] ?? null
+      : null;
 
   return (
     <SafeAreaView
@@ -132,6 +141,7 @@ export default function AssignItemsScreen() {
                   onChangePrice={handleChangePrice}
                   onDelete={() => handleDeleteItem(index)}
                   onTogglePerson={(person) => handleTogglePerson(index, person)}
+                  onAdjustSplit={() => setAdjustingSplitIndex(index)}
                 />
               ))
             )}
@@ -177,6 +187,20 @@ export default function AssignItemsScreen() {
           </View>
         </View>
       </ScrollView>
+      <CustomSplitModal
+        visible={adjustingItem !== null}
+        itemName={adjustingItem?.name ?? ""}
+        price={adjustingItem?.price ?? 0}
+        splitBetween={adjustingItem?.splitBetween ?? []}
+        shares={adjustingItem?.shares}
+        onClose={() => setAdjustingSplitIndex(null)}
+        onSave={(shares) => {
+          if (adjustingSplitIndex !== null) {
+            handleUpdateShares(adjustingSplitIndex, shares);
+          }
+          setAdjustingSplitIndex(null);
+        }}
+      />
     </SafeAreaView>
   );
 }

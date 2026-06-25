@@ -2,6 +2,7 @@ export interface Item {
   name: string;
   price: number;
   splitBetween: string[];
+  shares?: Record<string, number>;
 }
 
 export interface Person {
