@@ -1,27 +1,22 @@
-import { useCallback, useEffect, useState } from "react";
-import { usePreventRemove } from "@react-navigation/native";
-import { useNavigation, useRouter } from "expo-router";
+import { useCallback, useEffect } from "react";
+import { useRouter } from "expo-router";
 import { Alert } from "react-native";
 import { useInvoiceStore } from "../../../shared/stores/invoiceStore";
 import { Invoice } from "../../../shared/types/invoice";
 import { getLocalDateString } from "../../../shared/utils/dateUtils";
 
-// TODO: refactor to separate concerns
 export const useReceiptActions = (
   getDisplayTitle: () => string,
   isEditingTitle: boolean,
   tempTitle: string
 ) => {
   const router = useRouter();
-  const navigation = useNavigation();
   const {
     currentInvoice,
     people,
-    saveCurrentInvoice,
     resetSession,
     clearInvoice,
     editingSavedInvoice,
-    hasUnsavedChanges,
     setEditingSavedInvoice,
     loadSavedInvoices,
     setPeople,
@@ -29,8 +24,8 @@ export const useReceiptActions = (
     setInvoice,
     calculateTotals,
     setInvoiceTitle,
+    flushPendingSave,
   } = useInvoiceStore();
-  const [isSaving, setIsSaving] = useState(false);
 
   const clearExistingSession = useCallback(() => {
     setEditingSavedInvoice(false);
@@ -51,82 +46,18 @@ export const useReceiptActions = (
       loadSavedInvoices();
       if (resetType === "existing") {
         clearExistingSession();
-        // For existing receipts, go back with animation
         if (router.canGoBack()) {
           router.back();
         } else {
           router.replace("/(tabs)/receipts");
         }
       } else {
-        // For new receipts, navigate to receipts tab to show the saved list
         resetSession();
         router.replace("/(tabs)/receipts");
       }
     },
     [loadSavedInvoices, clearExistingSession, resetSession, router]
   );
-
-  const handleSaveInvoice = useCallback(async () => {
-    if (!currentInvoice) {
-      return false;
-    }
-    // If title is being edited and has changed, save it first
-    if (isEditingTitle && tempTitle.trim() !== getDisplayTitle()) {
-      setInvoiceTitle(tempTitle.trim());
-    }
-    // Allow saving even with 0 items - user can add items later
-    try {
-      setIsSaving(true);
-      const savedInvoice = await saveCurrentInvoice();
-      if (savedInvoice) {
-        navigateToList(editingSavedInvoice ? "existing" : "new");
-        return true;
-      }
-    } catch (error) {
-      Alert.alert(
-        "Save failed",
-        "We couldn't store this receipt. Please try again."
-      );
-    } finally {
-      setIsSaving(false);
-    }
-
-    return false;
-  }, [
-    currentInvoice,
-    saveCurrentInvoice,
-    navigateToList,
-    editingSavedInvoice,
-    isEditingTitle,
-    tempTitle,
-    setInvoiceTitle,
-    getDisplayTitle,
-  ]);
-
-  // Prevent navigation with unsaved changes
-  usePreventRemove(hasUnsavedChanges, ({ data }) => {
-    Alert.alert(
-      "Unsaved changes",
-      "Do you want to save your changes before leaving?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Discard",
-          style: "destructive",
-          onPress: () => {
-            clearExistingSession();
-            navigation.dispatch(data.action);
-          },
-        },
-        {
-          text: "Save changes",
-          onPress: () => {
-            handleSaveInvoice();
-          },
-        },
-      ]
-    );
-  });
 
   // Initialize empty invoice if none exists (for manual entry)
   useEffect(() => {
@@ -154,13 +85,36 @@ export const useReceiptActions = (
     }
   }, [currentInvoice?.items, calculateTotals]);
 
-  const handleBack = useCallback(() => {
+  const finishAndExit = useCallback(
+    async (resetType: "new" | "existing") => {
+      if (isEditingTitle && tempTitle.trim() !== getDisplayTitle()) {
+        setInvoiceTitle(tempTitle.trim());
+      }
+      await flushPendingSave();
+      navigateToList(resetType);
+    },
+    [
+      isEditingTitle,
+      tempTitle,
+      getDisplayTitle,
+      setInvoiceTitle,
+      navigateToList,
+      flushPendingSave,
+    ]
+  );
+
+  const handleDone = useCallback(async () => {
+    await finishAndExit(editingSavedInvoice ? "existing" : "new");
+  }, [finishAndExit, editingSavedInvoice]);
+
+  const handleBack = useCallback(async () => {
+    await flushPendingSave();
     if (router.canGoBack()) {
       router.back();
     } else {
       router.replace("/(tabs)/receipts");
     }
-  }, [router]);
+  }, [router, flushPendingSave]);
 
   const handleDeleteReceipt = useCallback(async () => {
     if (!currentInvoice?.id) return;
@@ -176,7 +130,7 @@ export const useReceiptActions = (
             try {
               await deleteSavedInvoice(currentInvoice.id);
               navigateToList("existing");
-            } catch (error) {
+            } catch {
               Alert.alert(
                 "Delete Failed",
                 "We couldn't delete this receipt. Please try again."
@@ -189,8 +143,7 @@ export const useReceiptActions = (
   }, [currentInvoice, deleteSavedInvoice, navigateToList]);
 
   return {
-    isSaving,
-    handleSaveInvoice,
+    handleDone,
     handleBack,
     handleDeleteReceipt,
   };

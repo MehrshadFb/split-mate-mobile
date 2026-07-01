@@ -10,8 +10,6 @@ export const usePeopleManagement = () => {
     setPeople,
     setInvoice,
     calculateTotals,
-    editingSavedInvoice,
-    setHasUnsavedChanges,
   } = useInvoiceStore();
   const [showManagePeople, setShowManagePeople] = useState(false);
   const [newPersonName, setNewPersonName] = useState("");
@@ -37,9 +35,6 @@ export const usePeopleManagement = () => {
       });
     }
     calculateTotals();
-    if (editingSavedInvoice) {
-      setHasUnsavedChanges(true);
-    }
     setNewPersonName("");
   }, [
     newPersonName,
@@ -48,8 +43,6 @@ export const usePeopleManagement = () => {
     setPeople,
     setInvoice,
     calculateTotals,
-    editingSavedInvoice,
-    setHasUnsavedChanges,
   ]);
 
   const handleRemovePerson = useCallback(
@@ -93,23 +86,12 @@ export const usePeopleManagement = () => {
                 });
               }
               calculateTotals();
-              if (editingSavedInvoice) {
-                setHasUnsavedChanges(true);
-              }
             },
           },
         ]
       );
     },
-    [
-      people,
-      currentInvoice,
-      setPeople,
-      setInvoice,
-      calculateTotals,
-      editingSavedInvoice,
-      setHasUnsavedChanges,
-    ]
+    [people, currentInvoice, setPeople, setInvoice, calculateTotals]
   );
 
   return {

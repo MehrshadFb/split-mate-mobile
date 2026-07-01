@@ -2,13 +2,12 @@ import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { TouchableOpacity, View } from "react-native";
 import * as Haptics from "expo-haptics";
-import { ICON_SIZE, SPACING } from "../../../shared/constants/design";
+import { BORDER_RADIUS, ICON_SIZE, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
 
 interface AssignItemsHeaderProps {
   onBack: () => void;
-  onDelete?: () => void;
-  showDelete: boolean;
+  onDone: () => void;
   onShare?: () => void;
   showShare: boolean;
   isSharing?: boolean;
@@ -16,8 +15,7 @@ interface AssignItemsHeaderProps {
 
 export const AssignItemsHeader: React.FC<AssignItemsHeaderProps> = ({
   onBack,
-  onDelete,
-  showDelete,
+  onDone,
   onShare,
   showShare,
   isSharing = false,
@@ -34,9 +32,9 @@ export const AssignItemsHeader: React.FC<AssignItemsHeaderProps> = ({
     onShare?.();
   };
 
-  const handleDelete = () => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-    onDelete?.();
+  const handleDone = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    onDone();
   };
 
   return (
@@ -55,13 +53,15 @@ export const AssignItemsHeader: React.FC<AssignItemsHeaderProps> = ({
       >
         <Ionicons name="arrow-back" size={ICON_SIZE.lg} color={colors.text.primary} />
       </TouchableOpacity>
-      <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.lg }}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: SPACING.md }}>
         {showShare && onShare && (
           <TouchableOpacity
             onPress={handleShare}
             style={{ padding: SPACING.sm }}
             activeOpacity={0.6}
             disabled={isSharing}
+            accessibilityRole="button"
+            accessibilityLabel="Share receipt"
           >
             <Ionicons
               name={isSharing ? "hourglass-outline" : "share-outline"}
@@ -70,15 +70,26 @@ export const AssignItemsHeader: React.FC<AssignItemsHeaderProps> = ({
             />
           </TouchableOpacity>
         )}
-        {showDelete && onDelete && (
-          <TouchableOpacity
-            onPress={handleDelete}
-            style={{ padding: SPACING.sm }}
-            activeOpacity={0.6}
-          >
-            <Ionicons name="trash" size={ICON_SIZE.xl} color={colors.error} />
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity
+          onPress={handleDone}
+          activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel="Done"
+          style={{
+            width: 36,
+            height: 36,
+            borderRadius: BORDER_RADIUS.full,
+            backgroundColor: colors.accent.primary,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Ionicons
+            name="checkmark"
+            size={ICON_SIZE.lg}
+            color={colors.text.inverse}
+          />
+        </TouchableOpacity>
       </View>
     </View>
   );

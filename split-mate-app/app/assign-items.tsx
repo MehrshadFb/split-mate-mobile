@@ -42,8 +42,11 @@ export default function AssignItemsScreen() {
     handleSaveTitle,
     handleChangeTitleText,
   } = useReceiptTitle();
-  const { isSaving, handleSaveInvoice, handleBack, handleDeleteReceipt } =
-    useReceiptActions(getDisplayTitle, isEditingTitle, tempTitle);
+  const { handleDone, handleBack, handleDeleteReceipt } = useReceiptActions(
+    getDisplayTitle,
+    isEditingTitle,
+    tempTitle
+  );
   const { isGenerating, shareReceipt } = useShareReceipt();
   const {
     showManagePeople,
@@ -91,8 +94,7 @@ export default function AssignItemsScreen() {
           {/* Header */}
           <AssignItemsHeader
             onBack={handleBack}
-            onDelete={handleDeleteReceipt}
-            showDelete={editingSavedInvoice && !!currentInvoice?.id}
+            onDone={handleDone}
             onShare={() => shareReceipt(currentInvoice)}
             showShare={editingSavedInvoice && !!currentInvoice?.id}
             isSharing={isGenerating}
@@ -167,24 +169,25 @@ export default function AssignItemsScreen() {
                 onTogglePersonPaid={togglePersonPaid}
               />
             )}
-          {/* Save Button - Always visible */}
-          <View style={{ marginTop: SPACING["2xl"], marginBottom: SPACING.xl }}>
-            <Button
-              title={editingSavedInvoice ? "Update Receipt" : "Save Receipt"}
-              onPress={handleSaveInvoice}
-              variant="primary"
-              size="large"
-              fullWidth
-              loading={isSaving}
-              icon={
-                <Ionicons
-                  name="download-outline"
-                  size={ICON_SIZE.md}
-                  color={colors.text.inverse}
-                />
-              }
-            />
-          </View>
+          {/* Delete (only when editing an existing receipt) */}
+          {editingSavedInvoice && !!currentInvoice?.id && (
+            <View style={{ marginTop: SPACING["3xl"], marginBottom: SPACING.xl }}>
+              <Button
+                title="Delete Receipt"
+                onPress={handleDeleteReceipt}
+                variant="danger"
+                size="large"
+                fullWidth
+                icon={
+                  <Ionicons
+                    name="trash-outline"
+                    size={ICON_SIZE.md}
+                    color={colors.error}
+                  />
+                }
+              />
+            </View>
+          )}
         </View>
       </ScrollView>
       <CustomSplitModal
