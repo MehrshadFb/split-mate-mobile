@@ -59,8 +59,9 @@ export function Button({
         };
       case "danger":
         return {
-          backgroundColor: colors.error,
-          borderWidth: 0,
+          backgroundColor: "transparent",
+          borderWidth: 2,
+          borderColor: colors.error,
         };
     }
   };
@@ -74,7 +75,7 @@ export function Button({
       case "outline":
         return colors.accent.primary;
       case "danger":
-        return "white";
+        return colors.error;
     }
   };
 
@@ -102,9 +103,11 @@ export function Button({
       {loading ? (
         <ActivityIndicator
           color={
-            variant === "primary" || variant === "danger"
+            variant === "primary"
               ? "white"
-              : colors.accent.primary
+              : variant === "danger"
+                ? colors.error
+                : colors.accent.primary
           }
         />
       ) : (
