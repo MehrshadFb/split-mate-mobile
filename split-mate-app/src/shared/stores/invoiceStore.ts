@@ -147,10 +147,12 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => {
       const trimmedName = name.trim();
       if (!trimmedName) return;
       set((state) => ({ people: [...state.people, trimmedName] }));
+      get().calculateTotals();
     }),
 
     removePerson: withAutoSave((name: string) => {
       set((state) => ({ people: state.people.filter((p) => p !== name) }));
+      get().calculateTotals();
     }),
 
     setPeople: (people) => set({ people }),

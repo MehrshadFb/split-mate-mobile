@@ -7,9 +7,8 @@ export const usePeopleManagement = () => {
   const {
     currentInvoice,
     people,
-    setPeople,
-    setInvoice,
-    calculateTotals,
+    addPerson,
+    removePerson,
   } = useInvoiceStore();
   const [showManagePeople, setShowManagePeople] = useState(false);
   const [newPersonName, setNewPersonName] = useState("");
@@ -26,24 +25,9 @@ export const usePeopleManagement = () => {
       Alert.alert("Duplicate name", "This person is already on the list.");
       return;
     }
-    const updatedPeople = [...people, trimmedName];
-    setPeople(updatedPeople);
-    if (currentInvoice) {
-      setInvoice({
-        ...currentInvoice,
-        people: updatedPeople,
-      });
-    }
-    calculateTotals();
+    addPerson(trimmedName);
     setNewPersonName("");
-  }, [
-    newPersonName,
-    people,
-    currentInvoice,
-    setPeople,
-    setInvoice,
-    calculateTotals,
-  ]);
+  }, [newPersonName, people, addPerson]);
 
   const handleRemovePerson = useCallback(
     (personName: string) => {
@@ -77,21 +61,13 @@ export const usePeopleManagement = () => {
             text: "Remove",
             style: "destructive",
             onPress: () => {
-              const updatedPeople = people.filter((p) => p !== personName);
-              setPeople(updatedPeople);
-              if (currentInvoice) {
-                setInvoice({
-                  ...currentInvoice,
-                  people: updatedPeople,
-                });
-              }
-              calculateTotals();
+              removePerson(personName);
             },
           },
         ]
       );
     },
-    [people, currentInvoice, setPeople, setInvoice, calculateTotals]
+    [people, currentInvoice, removePerson]
   );
 
   return {
