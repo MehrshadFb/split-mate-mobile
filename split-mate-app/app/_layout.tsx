@@ -2,8 +2,9 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import * as SplashScreen from "expo-splash-screen";
 import { useCallback, useEffect, useState } from "react";
-import { View } from "react-native";
+import { AppState, View } from "react-native";
 import { ThemeProvider, useTheme } from "../src/shared/contexts/ThemeContext";
+import { useInvoiceStore } from "../src/shared/stores/invoiceStore";
 import "./globals.css";
 
 SplashScreen.preventAutoHideAsync();
@@ -50,6 +51,15 @@ function RootStack() {
 }
 
 export default function RootLayout() {
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (state) => {
+      if (state === "background" || state === "inactive") {
+        void useInvoiceStore.getState().flushPendingSave();
+      }
+    });
+    return () => sub.remove();
+  }, []);
+
   return (
     <ThemeProvider>
       <RootStack />
