@@ -95,6 +95,7 @@ export default function AssignItemsScreen() {
           <AssignItemsHeader
             onBack={handleBack}
             onDone={handleDone}
+            showDone={currentInvoice.items.length > 0}
             onShare={() => shareReceipt(currentInvoice)}
             showShare={editingSavedInvoice && !!currentInvoice?.id}
             isSharing={isGenerating}

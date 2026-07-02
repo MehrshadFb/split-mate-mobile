@@ -8,6 +8,7 @@ import { useTheme } from "../../../shared/contexts/ThemeContext";
 interface AssignItemsHeaderProps {
   onBack: () => void;
   onDone: () => void;
+  showDone: boolean;
   onShare?: () => void;
   showShare: boolean;
   isSharing?: boolean;
@@ -16,6 +17,7 @@ interface AssignItemsHeaderProps {
 export const AssignItemsHeader: React.FC<AssignItemsHeaderProps> = ({
   onBack,
   onDone,
+  showDone,
   onShare,
   showShare,
   isSharing = false,
@@ -70,26 +72,28 @@ export const AssignItemsHeader: React.FC<AssignItemsHeaderProps> = ({
             />
           </TouchableOpacity>
         )}
-        <TouchableOpacity
-          onPress={handleDone}
-          activeOpacity={0.8}
-          accessibilityRole="button"
-          accessibilityLabel="Done"
-          style={{
-            width: 36,
-            height: 36,
-            borderRadius: BORDER_RADIUS.full,
-            backgroundColor: colors.accent.primary,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Ionicons
-            name="checkmark"
-            size={ICON_SIZE.lg}
-            color={colors.text.inverse}
-          />
-        </TouchableOpacity>
+        {showDone && (
+          <TouchableOpacity
+            onPress={handleDone}
+            activeOpacity={0.8}
+            accessibilityRole="button"
+            accessibilityLabel="Done"
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: BORDER_RADIUS.full,
+              backgroundColor: colors.accent.primary,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Ionicons
+              name="checkmark"
+              size={ICON_SIZE.lg}
+              color={colors.text.inverse}
+            />
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
