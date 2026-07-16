@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Slider } from "../../../shared/components/Slider";
 import {
@@ -177,6 +178,7 @@ export const CustomSplitModal: React.FC<CustomSplitModalProps> = ({
       transparent
       onRequestClose={handleClose}
     >
+      <GestureHandlerRootView style={{ flex: 1 }}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -552,6 +554,7 @@ export const CustomSplitModal: React.FC<CustomSplitModalProps> = ({
           </Pressable>
         </Pressable>
       </KeyboardAvoidingView>
+      </GestureHandlerRootView>
     </Modal>
   );
 };
