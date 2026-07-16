@@ -2,7 +2,7 @@ import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { TouchableOpacity, View } from "react-native";
 import * as Haptics from "expo-haptics";
-import { BORDER_RADIUS, ICON_SIZE, SPACING } from "../../../shared/constants/design";
+import { AVATAR_SIZE, BORDER_RADIUS, ICON_SIZE, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
 
 interface AssignItemsHeaderProps {
@@ -45,13 +45,21 @@ export const AssignItemsHeader: React.FC<AssignItemsHeaderProps> = ({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        marginBottom: SPACING["2xl"],
+        marginBottom: SPACING.md,
       }}
     >
       <TouchableOpacity
         onPress={handleBack}
-        style={{ flexDirection: "row", alignItems: "center" }}
         activeOpacity={0.6}
+        accessibilityRole="button"
+        accessibilityLabel="Back"
+        style={{
+          width: AVATAR_SIZE.md,
+          height: AVATAR_SIZE.md,
+          alignItems: "center",
+          justifyContent: "center",
+          marginLeft: -SPACING.sm,
+        }}
       >
         <Ionicons name="arrow-back" size={ICON_SIZE.lg} color={colors.text.primary} />
       </TouchableOpacity>
@@ -59,15 +67,20 @@ export const AssignItemsHeader: React.FC<AssignItemsHeaderProps> = ({
         {showShare && onShare && (
           <TouchableOpacity
             onPress={handleShare}
-            style={{ padding: SPACING.sm }}
             activeOpacity={0.6}
             disabled={isSharing}
             accessibilityRole="button"
             accessibilityLabel="Share receipt"
+            style={{
+              width: AVATAR_SIZE.md,
+              height: AVATAR_SIZE.md,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
             <Ionicons
               name={isSharing ? "hourglass-outline" : "share-outline"}
-              size={ICON_SIZE.xl}
+              size={ICON_SIZE.lg}
               color={isSharing ? colors.text.secondary : colors.text.primary}
             />
           </TouchableOpacity>
@@ -79,8 +92,8 @@ export const AssignItemsHeader: React.FC<AssignItemsHeaderProps> = ({
             accessibilityRole="button"
             accessibilityLabel="Done"
             style={{
-              width: 36,
-              height: 36,
+              width: AVATAR_SIZE.md,
+              height: AVATAR_SIZE.md,
               borderRadius: BORDER_RADIUS.full,
               backgroundColor: colors.accent.primary,
               alignItems: "center",

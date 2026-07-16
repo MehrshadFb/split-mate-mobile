@@ -89,17 +89,27 @@ export default function AssignItemsScreen() {
     <SafeAreaView
       style={{ flex: 1, backgroundColor: colors.background.primary }}
     >
+      {/* Sticky Header */}
+      <View
+        style={{
+          paddingHorizontal: SPACING["2xl"],
+          paddingTop: SPACING.md,
+          borderBottomWidth: 1,
+          borderBottomColor: colors.border,
+          backgroundColor: colors.background.primary,
+        }}
+      >
+        <AssignItemsHeader
+          onBack={handleBack}
+          onDone={handleDone}
+          showDone={currentInvoice.items.length > 0}
+          onShare={() => shareReceipt(currentInvoice)}
+          showShare={editingSavedInvoice && !!currentInvoice?.id}
+          isSharing={isGenerating}
+        />
+      </View>
       <ScrollView className="flex-1">
-        <View className="p-6">
-          {/* Header */}
-          <AssignItemsHeader
-            onBack={handleBack}
-            onDone={handleDone}
-            showDone={currentInvoice.items.length > 0}
-            onShare={() => shareReceipt(currentInvoice)}
-            showShare={editingSavedInvoice && !!currentInvoice?.id}
-            isSharing={isGenerating}
-          />
+        <View className="px-6 pb-6 pt-4">
           {/* Receipt Title Editor */}
           <ReceiptTitleEditor
             value={isEditingTitle ? tempTitle : getDisplayTitle()}
