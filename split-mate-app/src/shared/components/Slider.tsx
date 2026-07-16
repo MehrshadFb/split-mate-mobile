@@ -1,10 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import {
-  LayoutChangeEvent,
-  PanResponder,
-  View,
-  ViewStyle,
-} from "react-native";
+import { LayoutChangeEvent, View, ViewStyle } from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -14,6 +10,8 @@ import Animated, {
 const THUMB_SIZE = 22;
 const TRACK_HEIGHT = 6;
 const HEIGHT = 36;
+const ACTIVATE_X = 8;
+const FAIL_Y = 12;
 
 interface SliderProps {
   value: number;
@@ -55,6 +53,13 @@ export const Slider: React.FC<SliderProps> = ({
 
   const range = Math.max(0.0001, maximumValue - minimumValue);
   const effectiveWidth = Math.max(1, containerWidth - THUMB_SIZE);
+  const clampedValue = Math.max(minimumValue, Math.min(maximumValue, value));
+  const thumbPosition =
+    ((clampedValue - minimumValue) / range) * effectiveWidth;
+  const thumbPositionRef = useRef(thumbPosition);
+  thumbPositionRef.current = thumbPosition;
+  const dragStartPos = useRef(0);
+  const activationOffset = useRef(0);
 
   useEffect(() => {
     if (containerWidth === 0) return;
@@ -79,40 +84,42 @@ export const Slider: React.FC<SliderProps> = ({
     setContainerWidth(e.nativeEvent.layout.width);
   };
 
-  const panResponder = useMemo(() => {
-    const clamp = (touchX: number) =>
-      Math.max(0, Math.min(effectiveWidth, touchX - THUMB_SIZE / 2));
+  const panGesture = useMemo(() => {
+    const clampPos = (position: number) =>
+      Math.max(0, Math.min(effectiveWidth, position));
     const toValue = (position: number) =>
       minimumValue + (position / effectiveWidth) * range;
 
-    return PanResponder.create({
-      onStartShouldSetPanResponder: () => !disabled,
-      onMoveShouldSetPanResponder: () => !disabled,
-      onPanResponderTerminationRequest: () => false,
-      onPanResponderGrant: (evt) => {
+    return Gesture.Pan()
+      .enabled(!disabled)
+      .maxPointers(1)
+      .activeOffsetX([-ACTIVATE_X, ACTIVATE_X])
+      .failOffsetY([-FAIL_Y, FAIL_Y])
+      .runOnJS(true)
+      .onStart((e) => {
         isDragging.current = true;
+        dragStartPos.current = thumbPositionRef.current;
+        activationOffset.current = e.translationX;
         scale.value = withTiming(1.15, { duration: 120 });
-        const next = clamp(evt.nativeEvent.locationX);
-        translateX.value = next;
-        callbacksRef.current.onValueChange(toValue(next));
         callbacksRef.current.onSlidingStart?.();
-      },
-      onPanResponderMove: (evt) => {
-        const next = clamp(evt.nativeEvent.locationX);
+      })
+      .onUpdate((e) => {
+        const next = clampPos(
+          dragStartPos.current + e.translationX - activationOffset.current
+        );
         translateX.value = next;
         callbacksRef.current.onValueChange(toValue(next));
-      },
-      onPanResponderRelease: (evt) => {
-        const next = clamp(evt.nativeEvent.locationX);
-        isDragging.current = false;
-        scale.value = withTiming(1, { duration: 140 });
+      })
+      .onEnd((e) => {
+        const next = clampPos(
+          dragStartPos.current + e.translationX - activationOffset.current
+        );
         callbacksRef.current.onSlidingComplete?.(toValue(next));
-      },
-      onPanResponderTerminate: () => {
+      })
+      .onFinalize(() => {
         isDragging.current = false;
         scale.value = withTiming(1, { duration: 140 });
-      },
-    });
+      });
   }, [disabled, effectiveWidth, minimumValue, range, scale, translateX]);
 
   const filledStyle = useAnimatedStyle(() => ({
@@ -127,62 +134,63 @@ export const Slider: React.FC<SliderProps> = ({
   }));
 
   return (
-    <View
-      onLayout={handleLayout}
-      {...panResponder.panHandlers}
-      style={[
-        {
-          height: HEIGHT,
-          justifyContent: "center",
-          opacity: disabled ? 0.4 : 1,
-        },
-        style,
-      ]}
-    >
+    <GestureDetector gesture={panGesture}>
       <View
-        pointerEvents="none"
-        style={{
-          position: "absolute",
-          left: THUMB_SIZE / 2,
-          right: THUMB_SIZE / 2,
-          height: TRACK_HEIGHT,
-          top: (HEIGHT - TRACK_HEIGHT) / 2,
-          backgroundColor: maximumTrackTintColor,
-          borderRadius: TRACK_HEIGHT / 2,
-          overflow: "hidden",
-        }}
+        onLayout={handleLayout}
+        style={[
+          {
+            height: HEIGHT,
+            justifyContent: "center",
+            opacity: disabled ? 0.4 : 1,
+          },
+          style,
+        ]}
       >
+        <View
+          pointerEvents="none"
+          style={{
+            position: "absolute",
+            left: THUMB_SIZE / 2,
+            right: THUMB_SIZE / 2,
+            height: TRACK_HEIGHT,
+            top: (HEIGHT - TRACK_HEIGHT) / 2,
+            backgroundColor: maximumTrackTintColor,
+            borderRadius: TRACK_HEIGHT / 2,
+            overflow: "hidden",
+          }}
+        >
+          <Animated.View
+            style={[
+              {
+                height: TRACK_HEIGHT,
+                backgroundColor: minimumTrackTintColor,
+                borderRadius: TRACK_HEIGHT / 2,
+              },
+              filledStyle,
+            ]}
+          />
+        </View>
         <Animated.View
+          pointerEvents="none"
           style={[
             {
-              height: TRACK_HEIGHT,
-              backgroundColor: minimumTrackTintColor,
-              borderRadius: TRACK_HEIGHT / 2,
+              position: "absolute",
+              top: (HEIGHT - THUMB_SIZE) / 2,
+              left: 0,
+              width: THUMB_SIZE,
+              height: THUMB_SIZE,
+              borderRadius: THUMB_SIZE / 2,
+              backgroundColor: thumbTintColor,
+              shadowColor: "#000",
+              shadowOpacity: 0.18,
+              shadowRadius: 4,
+              shadowOffset: { width: 0, height: 2 },
+              elevation: 3,
             },
-            filledStyle,
+            thumbStyle,
           ]}
         />
       </View>
-      <Animated.View
-        pointerEvents="none"
-        style={[
-          {
-            position: "absolute",
-            top: (HEIGHT - THUMB_SIZE) / 2,
-            left: 0,
-            width: THUMB_SIZE,
-            height: THUMB_SIZE,
-            borderRadius: THUMB_SIZE / 2,
-            backgroundColor: thumbTintColor,
-            shadowColor: "#000",
-            shadowOpacity: 0.18,
-            shadowRadius: 4,
-            shadowOffset: { width: 0, height: 2 },
-            elevation: 3,
-          },
-          thumbStyle,
-        ]}
-      />
-    </View>
+    </GestureDetector>
   );
 };
