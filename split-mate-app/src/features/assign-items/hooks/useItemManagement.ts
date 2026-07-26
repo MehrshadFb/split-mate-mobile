@@ -1,12 +1,6 @@
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { useInvoiceStore } from "../../../shared/stores/invoiceStore";
 import { Item } from "../../../shared/types/invoice";
-
-interface EditingItem {
-  index: number;
-  name: string;
-  price: string;
-}
 
 export const useItemManagement = () => {
   const {
@@ -17,7 +11,6 @@ export const useItemManagement = () => {
     togglePersonForItem,
     setItemShares,
   } = useInvoiceStore();
-  const [editingItem, setEditingItem] = useState<EditingItem | null>(null);
 
   const handleAddItem = useCallback(() => {
     if (!currentInvoice) return;
@@ -30,50 +23,21 @@ export const useItemManagement = () => {
     addItem(newItem);
   }, [currentInvoice, addItem]);
 
-  const handleStartEdit = useCallback((index: number, item: Item) => {
-    setEditingItem({
-      index,
-      name: item.name,
-      price: item.price === 0 ? "" : item.price.toString(),
-    });
-  }, []);
-
-  const handleSaveEdit = useCallback(() => {
-    if (!editingItem) return;
-    const price =
-      editingItem.price.trim() === "" ? 0 : parseFloat(editingItem.price);
-    const name =
-      editingItem.name.trim() === ""
-        ? `Item #${editingItem.index + 1}`
-        : editingItem.name;
-    updateItem(editingItem.index, {
-      name,
-      price: isNaN(price) ? 0 : price,
-    });
-    setEditingItem(null);
-  }, [editingItem, updateItem]);
-
-  const handleCancelEdit = useCallback(() => {
-    setEditingItem(null);
-  }, []);
-
-  const handleChangeName = useCallback(
-    (text: string) => {
-      if (!editingItem) return;
-      setEditingItem({ ...editingItem, name: text });
+  const handleRenameItem = useCallback(
+    (index: number, name: string) => {
+      const trimmed = name.trim();
+      if (!trimmed) return;
+      updateItem(index, { name: trimmed });
     },
-    [editingItem]
+    [updateItem]
   );
 
-  const handleChangePrice = useCallback(
-    (text: string) => {
-      if (!editingItem) return;
-      const validInput = /^\d*\.?\d{0,2}$/;
-      if (text === "" || validInput.test(text)) {
-        setEditingItem({ ...editingItem, price: text });
-      }
+  const handleChangeItemPrice = useCallback(
+    (index: number, price: number) => {
+      if (!isFinite(price) || price < 0) return;
+      updateItem(index, { price: Math.round(price * 100) / 100 });
     },
-    [editingItem]
+    [updateItem]
   );
 
   const handleDeleteItem = useCallback(
@@ -98,13 +62,9 @@ export const useItemManagement = () => {
   );
 
   return {
-    editingItem,
     handleAddItem,
-    handleStartEdit,
-    handleSaveEdit,
-    handleCancelEdit,
-    handleChangeName,
-    handleChangePrice,
+    handleRenameItem,
+    handleChangeItemPrice,
     handleDeleteItem,
     handleTogglePerson,
     handleUpdateShares,
