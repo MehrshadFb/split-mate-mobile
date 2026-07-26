@@ -2,9 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  KeyboardAvoidingView,
   Modal,
-  Platform,
   Pressable,
   ScrollView,
   Text,
@@ -179,10 +177,7 @@ export const CustomSplitModal: React.FC<CustomSplitModalProps> = ({
       onRequestClose={handleClose}
     >
       <GestureHandlerRootView style={{ flex: 1 }}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-      >
+      <View style={{ flex: 1 }}>
         <Pressable
           onPress={handleClose}
           style={{
@@ -254,6 +249,7 @@ export const CustomSplitModal: React.FC<CustomSplitModalProps> = ({
 
               <ScrollView
                 style={{ flexShrink: 1 }}
+                automaticallyAdjustKeyboardInsets
                 contentContainerStyle={{ padding: SPACING.xl }}
                 keyboardShouldPersistTaps="handled"
               >
@@ -553,7 +549,7 @@ export const CustomSplitModal: React.FC<CustomSplitModalProps> = ({
             </SafeAreaView>
           </Pressable>
         </Pressable>
-      </KeyboardAvoidingView>
+      </View>
       </GestureHandlerRootView>
     </Modal>
   );
