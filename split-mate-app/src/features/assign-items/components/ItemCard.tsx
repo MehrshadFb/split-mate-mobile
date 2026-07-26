@@ -143,9 +143,11 @@ export const ItemCard: React.FC<ItemCardProps> = ({
             <TouchableOpacity
               onPress={beginEditName}
               activeOpacity={0.6}
+              disabled={editingField !== null}
               hitSlop={{ top: 8, bottom: 8, left: 0, right: 8 }}
               accessibilityRole="button"
               accessibilityLabel={`Rename ${item.name}`}
+              style={{ alignSelf: "flex-start" }}
             >
               <Text
                 style={{
@@ -203,6 +205,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({
           <TouchableOpacity
             onPress={beginEditPrice}
             activeOpacity={0.6}
+            disabled={editingField !== null}
             hitSlop={{ top: 12, bottom: 12, left: 12, right: 0 }}
             accessibilityRole="button"
             accessibilityLabel={`Edit price of ${item.name}`}
@@ -218,6 +221,38 @@ export const ItemCard: React.FC<ItemCardProps> = ({
               ${item.price.toFixed(2)}
             </Text>
           </TouchableOpacity>
+        )}
+        {/* Trash hides while either field is being edited: a card in edit
+            state shouldn't offer a way to destroy what's being typed. */}
+        {editingField === null && (
+          <>
+            <View
+              style={{
+                width: 1,
+                height: FONT_SIZE.xl,
+                backgroundColor: colors.border,
+                marginLeft: SPACING.md,
+                marginRight: SPACING.md - SPACING.xs,
+              }}
+            />
+            <TouchableOpacity
+              onPress={handleDelete}
+              hitSlop={{ top: 8, bottom: 8, left: 0, right: 8 }}
+              activeOpacity={0.6}
+              accessibilityRole="button"
+              accessibilityLabel={`Delete ${item.name}`}
+              style={{
+                padding: SPACING.xs,
+                marginRight: -SPACING.xs,
+              }}
+            >
+              <Ionicons
+                name="trash-outline"
+                size={ICON_SIZE.md}
+                color={colors.text.tertiary}
+              />
+            </TouchableOpacity>
+          </>
         )}
       </View>
       <View
@@ -278,15 +313,8 @@ export const ItemCard: React.FC<ItemCardProps> = ({
           );
         })}
       </View>
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginTop: SPACING.md,
-        }}
-      >
-        {canAdjustSplit ? (
+      {canAdjustSplit && (
+        <View style={{ marginTop: SPACING.md, alignItems: "flex-start" }}>
           <TouchableOpacity
             onPress={onAdjustSplit}
             style={{
@@ -327,24 +355,8 @@ export const ItemCard: React.FC<ItemCardProps> = ({
               {hasCustomSplit ? "Custom split" : "Adjust portions"}
             </Text>
           </TouchableOpacity>
-        ) : (
-          <View />
-        )}
-        <TouchableOpacity
-          onPress={handleDelete}
-          hitSlop={8}
-          activeOpacity={0.6}
-          accessibilityRole="button"
-          accessibilityLabel={`Delete ${item.name}`}
-          style={{ padding: SPACING.xs }}
-        >
-          <Ionicons
-            name="trash-outline"
-            size={ICON_SIZE.md}
-            color={colors.text.tertiary}
-          />
-        </TouchableOpacity>
-      </View>
+        </View>
+      )}
     </View>
   );
 };
