@@ -200,7 +200,7 @@ export const CustomSplitModal: React.FC<CustomSplitModalProps> = ({
               maxHeight: "90%",
             }}
           >
-            <SafeAreaView edges={["bottom"]}>
+            <SafeAreaView edges={["bottom"]} style={{ flexShrink: 1 }}>
               <View
                 style={{
                   flexDirection: "row",
@@ -253,7 +253,7 @@ export const CustomSplitModal: React.FC<CustomSplitModalProps> = ({
               </View>
 
               <ScrollView
-                style={{ maxHeight: 520 }}
+                style={{ flexShrink: 1 }}
                 contentContainerStyle={{ padding: SPACING.xl }}
                 keyboardShouldPersistTaps="handled"
               >
