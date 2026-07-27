@@ -57,13 +57,9 @@ export default function AssignItemsScreen() {
     handleRemovePerson,
   } = usePeopleManagement();
   const {
-    editingItem,
     handleAddItem,
-    handleStartEdit,
-    handleSaveEdit,
-    handleCancelEdit,
-    handleChangeName,
-    handleChangePrice,
+    handleRenameItem,
+    handleChangeItemPrice,
     handleDeleteItem,
     handleTogglePerson,
     handleUpdateShares,
@@ -108,7 +104,7 @@ export default function AssignItemsScreen() {
           isSharing={isGenerating}
         />
       </View>
-      <ScrollView className="flex-1">
+      <ScrollView className="flex-1" automaticallyAdjustKeyboardInsets>
         <View className="px-6 pb-6 pt-4">
           {/* Receipt Title Editor */}
           <ReceiptTitleEditor
@@ -142,16 +138,9 @@ export default function AssignItemsScreen() {
                 <ItemCard
                   key={index}
                   item={item}
-                  index={index}
                   people={people}
-                  isEditing={editingItem?.index === index}
-                  editName={editingItem?.name || ""}
-                  editPrice={editingItem?.price || ""}
-                  onStartEdit={() => handleStartEdit(index, item)}
-                  onSaveEdit={handleSaveEdit}
-                  onCancelEdit={handleCancelEdit}
-                  onChangeName={handleChangeName}
-                  onChangePrice={handleChangePrice}
+                  onRename={(name) => handleRenameItem(index, name)}
+                  onChangePrice={(price) => handleChangeItemPrice(index, price)}
                   onDelete={() => handleDeleteItem(index)}
                   onTogglePerson={(person) => handleTogglePerson(index, person)}
                   onAdjustSplit={() => setAdjustingSplitIndex(index)}

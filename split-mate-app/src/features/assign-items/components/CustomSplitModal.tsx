@@ -397,30 +397,44 @@ export const CustomSplitModal: React.FC<CustomSplitModalProps> = ({
                             {person}
                           </Text>
                           {isEditing ? (
-                            <TextInput
-                              value={editText}
-                              onChangeText={setEditText}
-                              onBlur={() => commitEdit(person, editText)}
-                              onSubmitEditing={() =>
-                                commitEdit(person, editText)
-                              }
-                              keyboardType="decimal-pad"
-                              autoFocus
-                              selectTextOnFocus
+                            <View
                               style={{
-                                minWidth: 96,
-                                paddingHorizontal: SPACING.sm,
-                                paddingVertical: SPACING.xs,
-                                borderRadius: BORDER_RADIUS.sm,
-                                borderWidth: 1,
-                                borderColor: colors.accent.primary,
-                                color: colors.accent.primary,
-                                fontSize: FONT_SIZE.lg,
-                                fontWeight: FONT_WEIGHT.bold,
-                                textAlign: "right",
-                                backgroundColor: colors.background.primary,
+                                flexDirection: "row",
+                                alignItems: "center",
                               }}
-                            />
+                            >
+                              <Text
+                                style={{
+                                  color: colors.accent.primary,
+                                  fontWeight: FONT_WEIGHT.bold,
+                                  fontSize: FONT_SIZE.lg,
+                                  marginRight: SPACING.xs,
+                                }}
+                              >
+                                $
+                              </Text>
+                              <TextInput
+                                value={editText}
+                                onChangeText={setEditText}
+                                onBlur={() => commitEdit(person, editText)}
+                                onSubmitEditing={() =>
+                                  commitEdit(person, editText)
+                                }
+                                keyboardType="decimal-pad"
+                                autoFocus
+                                selectTextOnFocus
+                                style={{
+                                  color: colors.accent.primary,
+                                  fontWeight: FONT_WEIGHT.bold,
+                                  fontSize: FONT_SIZE.lg,
+                                  paddingVertical: SPACING.xs,
+                                  minWidth: 64,
+                                  textAlign: "right",
+                                  borderBottomWidth: 1.5,
+                                  borderBottomColor: colors.accent.primary,
+                                }}
+                              />
+                            </View>
                           ) : (
                             <TouchableOpacity
                               onPress={() => beginEdit(person)}
