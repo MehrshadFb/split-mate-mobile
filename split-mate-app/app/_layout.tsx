@@ -3,6 +3,7 @@ import { StatusBar } from "expo-status-bar";
 import * as SplashScreen from "expo-splash-screen";
 import { useCallback, useEffect, useState } from "react";
 import { AppState, View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { ThemeProvider, useTheme } from "../src/shared/contexts/ThemeContext";
 import { useInvoiceStore } from "../src/shared/stores/invoiceStore";
 import "./globals.css";
@@ -61,8 +62,10 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <ThemeProvider>
-      <RootStack />
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider>
+        <RootStack />
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }

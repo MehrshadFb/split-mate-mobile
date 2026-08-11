@@ -1,6 +1,7 @@
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Text, View } from "react-native";
+import { Pressable } from "react-native-gesture-handler";
 import * as Haptics from "expo-haptics";
 import { AVATAR_SIZE, BORDER_RADIUS, CARD_STYLES, FONT_SIZE, FONT_WEIGHT, ICON_SIZE, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
@@ -40,10 +41,9 @@ export const ReceiptCard: React.FC<ReceiptCardProps> = ({
   };
 
   return (
-    <TouchableOpacity
+    <Pressable
       onPress={handlePress}
-      activeOpacity={0.7}
-      style={{
+      style={({ pressed }) => ({
         flexDirection: "row",
         alignItems: "center",
         backgroundColor: colors.background.secondary,
@@ -54,7 +54,8 @@ export const ReceiptCard: React.FC<ReceiptCardProps> = ({
         borderColor: paymentProgress.isPaid
           ? colors.accent.primary
           : colors.border,
-      }}
+        opacity: pressed ? 0.7 : 1,
+      })}
     >
       <View
         style={{
@@ -145,6 +146,6 @@ export const ReceiptCard: React.FC<ReceiptCardProps> = ({
         color={colors.text.tertiary}
         style={{ marginLeft: SPACING.md }}
       />
-    </TouchableOpacity>
+    </Pressable>
   );
 };

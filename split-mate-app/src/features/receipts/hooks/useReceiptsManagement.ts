@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useRouter } from "expo-router";
+import { Alert } from "react-native";
 import { useInvoiceStore } from "../../../shared/stores/invoiceStore";
 import { Invoice } from "../../../shared/types/invoice";
 
@@ -12,6 +13,7 @@ export const useReceiptsManagement = () => {
     setPeople,
     calculateTotals,
     setEditingSavedInvoice,
+    deleteSavedInvoice,
   } = useInvoiceStore();
 
   useEffect(() => {
@@ -40,9 +42,32 @@ export const useReceiptsManagement = () => {
     router.push("/(tabs)/mates");
   };
 
+  const handleDeleteSavedInvoice = (invoice: Invoice) => {
+    Alert.alert(
+      "Delete Receipt",
+      "Are you sure you want to delete this receipt? This action cannot be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => {
+            deleteSavedInvoice(invoice.id).catch(() => {
+              Alert.alert(
+                "Delete Failed",
+                "We couldn't delete this receipt. Please try again."
+              );
+            });
+          },
+        },
+      ]
+    );
+  };
+
   return {
     savedInvoices,
     handleOpenSavedInvoice,
     handleStartNew,
+    handleDeleteSavedInvoice,
   };
 };
