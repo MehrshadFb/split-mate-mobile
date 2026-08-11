@@ -1,9 +1,12 @@
 import { useCallback, useEffect } from "react";
 import { useRouter } from "expo-router";
-import { Alert } from "react-native";
 import { useInvoiceStore } from "../../../shared/stores/invoiceStore";
 import { Invoice } from "../../../shared/types/invoice";
 import { getLocalDateString } from "../../../shared/utils/dateUtils";
+import {
+  confirmDeleteReceipt,
+  showDeleteReceiptFailedAlert,
+} from "../../../shared/utils/receiptAlerts";
 
 export const useReceiptActions = (
   getDisplayTitle: () => string,
@@ -118,28 +121,14 @@ export const useReceiptActions = (
 
   const handleDeleteReceipt = useCallback(async () => {
     if (!currentInvoice?.id) return;
-    Alert.alert(
-      "Delete Receipt",
-      "Are you sure you want to delete this receipt? This action cannot be undone.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await deleteSavedInvoice(currentInvoice.id);
-              navigateToList("existing");
-            } catch {
-              Alert.alert(
-                "Delete Failed",
-                "We couldn't delete this receipt. Please try again."
-              );
-            }
-          },
-        },
-      ]
-    );
+    confirmDeleteReceipt(async () => {
+      try {
+        await deleteSavedInvoice(currentInvoice.id);
+        navigateToList("existing");
+      } catch {
+        showDeleteReceiptFailedAlert();
+      }
+    });
   }, [currentInvoice, deleteSavedInvoice, navigateToList]);
 
   return {
