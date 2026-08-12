@@ -13,6 +13,8 @@ interface SplitSummaryProps {
   totalAmount: number;
   totals: PersonTotal[];
   paidBy: string[];
+  unassignedAmount: number;
+  unassignedCount: number;
   onTogglePersonPaid: (personName: string) => void;
 }
 
@@ -20,9 +22,12 @@ export const SplitSummary: React.FC<SplitSummaryProps> = ({
   totalAmount,
   totals,
   paidBy,
+  unassignedAmount,
+  unassignedCount,
   onTogglePersonPaid,
 }) => {
   const { colors } = useTheme();
+  const hasUnassigned = unassignedAmount > 0.005;
 
   return (
     <View style={{ marginTop: SPACING["2xl"] }}>
@@ -245,6 +250,46 @@ export const SplitSummary: React.FC<SplitSummaryProps> = ({
             );
           })}
         </View>
+        {hasUnassigned && (
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              backgroundColor: colors.accent.light,
+              borderRadius: BORDER_RADIUS.md,
+              paddingHorizontal: SPACING.lg,
+              paddingVertical: SPACING.md,
+            }}
+          >
+            <Ionicons
+              name="alert-circle-outline"
+              size={ICON_SIZE.md}
+              color={colors.accent.primary}
+              style={{ marginRight: SPACING.md }}
+            />
+            <Text
+              style={{
+                flex: 1,
+                color: colors.accent.primary,
+                fontSize: FONT_SIZE.sm,
+                fontWeight: FONT_WEIGHT.semibold,
+              }}
+            >
+              {unassignedCount === 1
+                ? "1 item left to split"
+                : `${unassignedCount} items left to split`}
+            </Text>
+            <Text
+              style={{
+                color: colors.accent.primary,
+                fontSize: FONT_SIZE.base,
+                fontWeight: FONT_WEIGHT.bold,
+              }}
+            >
+              ${unassignedAmount.toFixed(2)}
+            </Text>
+          </View>
+        )}
       </View>
     </View>
   );

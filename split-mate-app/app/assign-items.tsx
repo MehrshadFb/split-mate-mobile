@@ -76,6 +76,13 @@ export default function AssignItemsScreen() {
     (sum, item) => sum + item.price,
     0
   );
+  const unassignedItems = currentInvoice.items.filter(
+    (item) => item.splitBetween.length === 0
+  );
+  const unassignedAmount = unassignedItems.reduce(
+    (sum, item) => sum + item.price,
+    0
+  );
   const adjustingItem =
     adjustingSplitIndex !== null
       ? currentInvoice.items[adjustingSplitIndex] ?? null
@@ -166,6 +173,8 @@ export default function AssignItemsScreen() {
                 totalAmount={totalAmount}
                 totals={currentInvoice.totals}
                 paidBy={currentInvoice.paidBy ?? []}
+                unassignedAmount={unassignedAmount}
+                unassignedCount={unassignedItems.length}
                 onTogglePersonPaid={togglePersonPaid}
               />
             )}
