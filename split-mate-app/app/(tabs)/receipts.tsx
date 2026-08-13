@@ -13,8 +13,12 @@ import { useTheme } from "../../src/shared/contexts/ThemeContext";
 
 export default function ReceiptsScreen() {
   const { colors } = useTheme();
-  const { savedInvoices, handleOpenSavedInvoice, handleStartNew } =
-    useReceiptsManagement();
+  const {
+    savedInvoices,
+    handleOpenSavedInvoice,
+    handleStartNew,
+    handleDeleteSavedInvoice,
+  } = useReceiptsManagement();
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background.primary }}>
@@ -35,6 +39,7 @@ export default function ReceiptsScreen() {
             <ReceiptsList
               invoices={savedInvoices}
               onSelectInvoice={handleOpenSavedInvoice}
+              onDeleteInvoice={handleDeleteSavedInvoice}
               getTitle={getReceiptTitle}
               formatDate={(invoice) => formatReceiptDate(invoice.date)}
             />

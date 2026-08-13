@@ -2,6 +2,10 @@ import { useEffect } from "react";
 import { useRouter } from "expo-router";
 import { useInvoiceStore } from "../../../shared/stores/invoiceStore";
 import { Invoice } from "../../../shared/types/invoice";
+import {
+  confirmDeleteReceipt,
+  showDeleteReceiptFailedAlert,
+} from "../../../shared/utils/receiptAlerts";
 
 export const useReceiptsManagement = () => {
   const router = useRouter();
@@ -12,6 +16,7 @@ export const useReceiptsManagement = () => {
     setPeople,
     calculateTotals,
     setEditingSavedInvoice,
+    deleteSavedInvoice,
   } = useInvoiceStore();
 
   useEffect(() => {
@@ -40,9 +45,16 @@ export const useReceiptsManagement = () => {
     router.push("/(tabs)/mates");
   };
 
+  const handleDeleteSavedInvoice = (invoice: Invoice) => {
+    confirmDeleteReceipt(() => {
+      deleteSavedInvoice(invoice.id).catch(showDeleteReceiptFailedAlert);
+    });
+  };
+
   return {
     savedInvoices,
     handleOpenSavedInvoice,
     handleStartNew,
+    handleDeleteSavedInvoice,
   };
 };
