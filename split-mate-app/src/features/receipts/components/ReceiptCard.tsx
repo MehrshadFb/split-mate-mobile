@@ -54,8 +54,15 @@ export const ReceiptCard: React.FC<ReceiptCardProps> = ({
   return (
     <GestureDetector gesture={tapGesture}>
       <View
+        accessible
         accessibilityRole="button"
         accessibilityLabel={`Open ${title}`}
+        accessibilityActions={[{ name: "activate" }]}
+        onAccessibilityAction={(event) => {
+          if (event.nativeEvent.actionName === "activate") {
+            handlePress();
+          }
+        }}
         style={{
           flexDirection: "row",
           alignItems: "center",
