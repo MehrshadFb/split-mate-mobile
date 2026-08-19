@@ -27,6 +27,9 @@ export const ReceiptsList: React.FC<ReceiptsListProps> = ({
   const { colors } = useTheme();
   // Only one row may stay open: opening a row closes the previous one.
   const openRow = useRef<SwipeableMethods | null>(null);
+  // True while any row is mid-drag; presses are ignored so a swipe can
+  // never end up opening the receipt, regardless of native cancellation.
+  const isSwiping = useRef(false);
   const rowRefs = useRef(
     new Map<string, React.RefObject<SwipeableMethods | null>>()
   );
@@ -81,13 +84,23 @@ export const ReceiptsList: React.FC<ReceiptsListProps> = ({
             friction={2}
             rightThreshold={40}
             overshootRight={false}
+            onSwipeableOpenStartDrag={() => {
+              isSwiping.current = true;
+            }}
+            onSwipeableCloseStartDrag={() => {
+              isSwiping.current = true;
+            }}
             onSwipeableWillOpen={() => {
               if (openRow.current && openRow.current !== rowRef.current) {
                 openRow.current.close();
               }
               openRow.current = rowRef.current;
             }}
+            onSwipeableOpen={() => {
+              isSwiping.current = false;
+            }}
             onSwipeableClose={() => {
+              isSwiping.current = false;
               if (openRow.current === rowRef.current) {
                 openRow.current = null;
               }
@@ -100,7 +113,14 @@ export const ReceiptsList: React.FC<ReceiptsListProps> = ({
               invoice={invoice}
               title={getTitle(invoice)}
               formattedDate={formatDate(invoice)}
-              onPress={() => onSelectInvoice(invoice)}
+              onPress={() => {
+                if (isSwiping.current) return;
+                if (openRow.current) {
+                  openRow.current.close();
+                  return;
+                }
+                onSelectInvoice(invoice);
+              }}
             />
           </ReanimatedSwipeable>
         );
