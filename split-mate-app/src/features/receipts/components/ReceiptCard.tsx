@@ -1,7 +1,7 @@
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { Text, View } from "react-native";
-import { RectButton } from "react-native-gesture-handler";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import * as Haptics from "expo-haptics";
 import { AVATAR_SIZE, BORDER_RADIUS, CARD_STYLES, FONT_SIZE, FONT_WEIGHT, ICON_SIZE, SPACING } from "../../../shared/constants/design";
 import { useTheme } from "../../../shared/contexts/ThemeContext";
@@ -40,25 +40,42 @@ export const ReceiptCard: React.FC<ReceiptCardProps> = ({
     onPress();
   };
 
+  // Tap fails natively once the finger travels past maxDistance, so a
+  // swipe can never register as a press and a press never blocks a swipe.
+  const tapGesture = Gesture.Tap()
+    .maxDistance(10)
+    .runOnJS(true)
+    .onEnd((_event, success) => {
+      if (success) {
+        handlePress();
+      }
+    });
+
   return (
-    <RectButton
-      onPress={handlePress}
-      activeOpacity={0.7}
-      underlayColor={colors.neutral[200]}
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        backgroundColor: colors.background.secondary,
-        borderRadius: CARD_STYLES.borderRadius,
-        padding: CARD_STYLES.padding,
-        marginBottom: CARD_STYLES.marginBottom,
-        borderWidth: 1,
-        borderColor: paymentProgress.isPaid
-          ? colors.accent.primary
-          : colors.border,
-        overflow: "hidden",
-      }}
-    >
+    <GestureDetector gesture={tapGesture}>
+      <View
+        accessible
+        accessibilityRole="button"
+        accessibilityLabel={`Open ${title}`}
+        accessibilityActions={[{ name: "activate" }]}
+        onAccessibilityAction={(event) => {
+          if (event.nativeEvent.actionName === "activate") {
+            handlePress();
+          }
+        }}
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          backgroundColor: colors.background.secondary,
+          borderRadius: CARD_STYLES.borderRadius,
+          padding: CARD_STYLES.padding,
+          marginBottom: CARD_STYLES.marginBottom,
+          borderWidth: 1,
+          borderColor: paymentProgress.isPaid
+            ? colors.accent.primary
+            : colors.border,
+        }}
+      >
       <View
         style={{
           width: AVATAR_SIZE.lg,
@@ -148,6 +165,7 @@ export const ReceiptCard: React.FC<ReceiptCardProps> = ({
         color={colors.text.tertiary}
         style={{ marginLeft: SPACING.md }}
       />
-    </RectButton>
+      </View>
+    </GestureDetector>
   );
 };
