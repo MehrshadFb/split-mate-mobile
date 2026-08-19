@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useRouter } from "expo-router";
 import { useInvoiceStore } from "../../../shared/stores/invoiceStore";
 import { Invoice } from "../../../shared/types/invoice";
@@ -81,8 +81,14 @@ export const useReceiptActions = (
     }
   }, [currentInvoice, people, setInvoice]);
 
-  // Calculate totals whenever items change
+  const skipInitialTotals = useRef(editingSavedInvoice);
+
+  // Calculate totals whenever items change (skip once for pre-computed saved receipts)
   useEffect(() => {
+    if (skipInitialTotals.current) {
+      skipInitialTotals.current = false;
+      return;
+    }
     if (currentInvoice?.items.length) {
       calculateTotals();
     }
