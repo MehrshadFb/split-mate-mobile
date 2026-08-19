@@ -103,8 +103,11 @@ export const ReceiptsList: React.FC<ReceiptsListProps> = ({
               onPress={() => {
                 // iMessage behavior: while a row's delete action is open,
                 // a tap anywhere just closes it instead of navigating.
+                // Clear the ref immediately (not in onSwipeableClose) so a
+                // follow-up tap during the close animation isn't swallowed.
                 if (openRow.current) {
                   openRow.current.close();
+                  openRow.current = null;
                   return;
                 }
                 onSelectInvoice(invoice);
