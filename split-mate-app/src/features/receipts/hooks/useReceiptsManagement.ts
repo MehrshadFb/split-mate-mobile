@@ -12,10 +12,7 @@ export const useReceiptsManagement = () => {
   const {
     savedInvoices,
     loadSavedInvoices,
-    setInvoice,
-    setPeople,
-    calculateTotals,
-    setEditingSavedInvoice,
+    openSavedInvoice,
     deleteSavedInvoice,
   } = useInvoiceStore();
 
@@ -24,21 +21,8 @@ export const useReceiptsManagement = () => {
   }, [loadSavedInvoices]);
 
   const handleOpenSavedInvoice = (invoice: Invoice) => {
-    const cloned: Invoice = {
-      ...invoice,
-      people: [...invoice.people],
-      items: invoice.items.map((item) => ({
-        ...item,
-        splitBetween: [...item.splitBetween],
-      })),
-      totals: invoice.totals.map((person) => ({ ...person })),
-      paidBy: invoice.paidBy ?? [],
-    };
-    setPeople(cloned.people);
-    setInvoice(cloned);
-    calculateTotals();
-    setEditingSavedInvoice(true);
     router.push("/assign-items");
+    openSavedInvoice(invoice);
   };
 
   const handleStartNew = () => {

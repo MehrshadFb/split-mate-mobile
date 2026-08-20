@@ -31,6 +31,7 @@ interface InvoiceState {
   loadSavedInvoices: () => Promise<void>;
   deleteSavedInvoice: (invoiceId: string) => Promise<void>;
   setEditingSavedInvoice: (value: boolean) => void;
+  openSavedInvoice: (invoice: Invoice) => void;
   flushPendingSave: () => Promise<void>;
 }
 
@@ -365,6 +366,25 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => {
     },
 
     setEditingSavedInvoice: (value) => set({ editingSavedInvoice: value }),
+
+    openSavedInvoice: (invoice) => {
+      const cloned: Invoice = {
+        ...invoice,
+        people: [...invoice.people],
+        items: invoice.items.map((item) => ({
+          ...item,
+          splitBetween: [...item.splitBetween],
+          shares: item.shares ? { ...item.shares } : undefined,
+        })),
+        totals: invoice.totals.map((person) => ({ ...person })),
+        paidBy: invoice.paidBy ?? [],
+      };
+      set({
+        people: cloned.people,
+        currentInvoice: cloned,
+        editingSavedInvoice: true,
+      });
+    },
 
     flushPendingSave,
   };

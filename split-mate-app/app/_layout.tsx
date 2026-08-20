@@ -37,7 +37,7 @@ function RootStack() {
           animation: "slide_from_right",
           gestureDirection: "horizontal",
           fullScreenGestureEnabled: false,
-          animationDuration: 250,
+          animationDuration: 200,
           contentStyle: {
             backgroundColor: colors.background.primary,
           },
