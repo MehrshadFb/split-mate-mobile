@@ -22,7 +22,7 @@ const config = {
   },
   gemini: {
     apiKey: process.env.GEMINI_API_KEY,
-    model: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
+    model: process.env.GEMINI_MODEL || 'gemini-3.8-flash',
     maxRetries: getInt(process.env.MAX_GEMINI_RETRIES, 3),
     timeoutMs: getInt(process.env.GEMINI_TIMEOUT_MS, 30000),
     retryDelayMs: getInt(process.env.RETRY_DELAY_MS, 1000),
