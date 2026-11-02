@@ -11,7 +11,7 @@ import {
   View,
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Slider } from "../../../shared/components/Slider";
 import {
   BORDER_RADIUS,
@@ -48,6 +48,7 @@ export const CustomSplitModal: React.FC<CustomSplitModalProps> = ({
   onSave,
 }) => {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const [amounts, setAmounts] = useState<Record<string, number>>({});
   const [locked, setLocked] = useState<Set<string>>(new Set());
   const [editingPerson, setEditingPerson] = useState<string | null>(null);
@@ -180,6 +181,7 @@ export const CustomSplitModal: React.FC<CustomSplitModalProps> = ({
       <View style={{ flex: 1 }}>
         <Pressable
           onPress={handleClose}
+          accessible={false}
           style={{
             flex: 1,
             backgroundColor: "rgba(0,0,0,0.4)",
@@ -188,6 +190,7 @@ export const CustomSplitModal: React.FC<CustomSplitModalProps> = ({
         >
           <Pressable
             onPress={(e) => e.stopPropagation()}
+            accessible={false}
             style={{
               backgroundColor: colors.background.primary,
               borderTopLeftRadius: BORDER_RADIUS.xl,
@@ -195,7 +198,14 @@ export const CustomSplitModal: React.FC<CustomSplitModalProps> = ({
               maxHeight: "90%",
             }}
           >
-            <SafeAreaView edges={["bottom"]} style={{ flexShrink: 1 }}>
+            <View
+              style={{
+                flexShrink: 1,
+                paddingBottom: insets.bottom,
+                paddingLeft: insets.left,
+                paddingRight: insets.right,
+              }}
+            >
               <View
                 style={{
                   flexDirection: "row",
@@ -560,7 +570,7 @@ export const CustomSplitModal: React.FC<CustomSplitModalProps> = ({
                   </Text>
                 </TouchableOpacity>
               </View>
-            </SafeAreaView>
+            </View>
           </Pressable>
         </Pressable>
       </View>

@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { ScrollView, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import {
     AssignItemsHeader,
     CustomSplitModal,
@@ -27,6 +30,7 @@ import { getLocalDateString } from "../src/shared/utils/dateUtils";
 
 export default function AssignItemsScreen() {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const {
     currentInvoice,
     people,
@@ -91,6 +95,7 @@ export default function AssignItemsScreen() {
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: colors.background.primary }}
+      edges={["top", "left", "right"]}
     >
       {/* Sticky Header */}
       <View
@@ -111,7 +116,11 @@ export default function AssignItemsScreen() {
           isSharing={isGenerating}
         />
       </View>
-      <ScrollView className="flex-1" automaticallyAdjustKeyboardInsets>
+      <ScrollView
+        className="flex-1"
+        automaticallyAdjustKeyboardInsets
+        contentContainerStyle={{ paddingBottom: insets.bottom }}
+      >
         <View className="px-6 pb-6 pt-4">
           {/* Receipt Title Editor */}
           <ReceiptTitleEditor
