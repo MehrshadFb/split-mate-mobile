@@ -48,7 +48,7 @@ export function useShareReceipt(): UseShareReceiptReturn {
       }
       // Create a file instance from the generated PDF URI and copy it with proper name
       const sourceFile = new File(uri);
-      sourceFile.copy(targetFile);
+      await sourceFile.copy(targetFile);
       // Share the PDF file with proper filename
       await Sharing.shareAsync(targetFile.uri, {
         mimeType: "application/pdf",
