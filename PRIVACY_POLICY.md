@@ -1,6 +1,6 @@
 # Privacy Policy for SplitMate
 
-**Last Updated: December 30, 2025**
+**Last Updated: November 2, 2026**
 
 ## Introduction
 
@@ -36,10 +36,10 @@ We use the information we collect solely to provide and improve the App's functi
 
 | Data Type | Purpose | Storage Location |
 |-----------|---------|------------------|
-| Mate Names | To assign items and calculate split amounts | Device only |
-| Receipt Data | To save and display your bill splits | Device only |
+| Mate Names | To assign items and calculate split amounts | Your device and its backups |
+| Receipt Data | To save and display your bill splits | Your device and its backups |
 | Receipt Images | To extract item names and prices using AI | Processed in real-time, not stored |
-| Theme Preference | To display your preferred color scheme | Device only |
+| Theme Preference | To display your preferred color scheme | Your device and its backups |
 
 ## Third-Party Services
 
@@ -64,10 +64,10 @@ We do not share your data with any other third-party services, analytics provide
 
 All your personal data (mates, receipts, preferences) is stored locally on your device using secure device storage. This data:
 
-- Never leaves your device (except receipt images during scanning)
+- Never leaves your device, except receipt images during scanning and backups or transfers you make with iCloud, a computer, or a new device
 - Is not backed up to our servers
 - Is not accessible to us
-- Is deleted when you uninstall the App
+- Is deleted from your device when you uninstall the App, though copies may remain in existing device backups until you delete those backups
 
 ### Server Processing
 
@@ -129,7 +129,7 @@ If you are a California resident, you have the right to:
 - Request deletion of your personal information (uninstall the App or delete data within the App)
 - Not be discriminated against for exercising your privacy rights
 
-Since we collect minimal data and store it only on your device, you already have full access to and control over your information.
+Since we collect minimal data and store it only on your device and its backups, you already have full access to and control over your information.
 
 ## European Privacy Rights (GDPR)
 
