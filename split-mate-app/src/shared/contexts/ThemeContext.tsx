@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useColorScheme } from "react-native";
+import { Appearance, useColorScheme } from "react-native";
 
 type Theme = "light" | "dark" | "auto";
 type ColorScheme = "light" | "dark";
@@ -88,6 +88,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     loadTheme();
   }, []);
+
+  useEffect(() => {
+    if (!isThemeLoaded) return;
+    Appearance.setColorScheme(theme === "auto" ? "unspecified" : theme);
+  }, [theme, isThemeLoaded]);
 
   const loadTheme = async () => {
     try {

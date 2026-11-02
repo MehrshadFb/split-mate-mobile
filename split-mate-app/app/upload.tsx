@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { ScrollView, View } from "react-native";
@@ -22,6 +22,7 @@ import { useInvoiceStore } from "../src/shared/stores/invoiceStore";
 export default function UploadScreen() {
   const router = useRouter();
   const { colors } = useTheme();
+  const scrollRef = useRef<React.ComponentRef<typeof ScrollView>>(null);
   const { uploadReceipts, isLoading, uploadProgress, error, clearError } =
     useUpload();
   const { addItem, clearInvoice, setEditingSavedInvoice } = useInvoiceStore();
@@ -71,7 +72,7 @@ export default function UploadScreen() {
       style={{ flex: 1, backgroundColor: colors.background.primary }}
       edges={["top", "left", "right"]}
     >
-      <ScrollView style={{ flex: 1 }}>
+      <ScrollView ref={scrollRef} style={{ flex: 1 }}>
         <View style={{ padding: SPACING.xl }}>
           {/* Header */}
           <UploadHeader
@@ -99,11 +100,20 @@ export default function UploadScreen() {
           )}
           {/* Error Message */}
           {error && (
-            <ErrorMessage
-              error={error}
-              onRetry={handleProceed}
-              onDismiss={clearError}
-            />
+            <View
+              onLayout={(event) =>
+                scrollRef.current?.scrollTo({
+                  y: event.nativeEvent.layout.y - SPACING.xl,
+                  animated: true,
+                })
+              }
+            >
+              <ErrorMessage
+                error={error}
+                onRetry={handleProceed}
+                onDismiss={clearError}
+              />
+            </View>
           )}
           <Divider text="or" />
           {/* Manual Entry Button */}
