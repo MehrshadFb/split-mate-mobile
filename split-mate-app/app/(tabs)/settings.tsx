@@ -1,5 +1,6 @@
 import React from "react";
 import { ScrollView, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { SPACING } from "../../src/shared/constants/design";
 import { useTheme } from "../../src/shared/contexts/ThemeContext";
 import {
@@ -14,7 +15,10 @@ export default function SettingsScreen() {
   const { colors } = useTheme();
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background.primary }}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: colors.background.primary }}
+      edges={["left", "right"]}
+    >
       <ScrollView
         style={{ flex: 1 }}
         contentInsetAdjustmentBehavior="automatic"
@@ -37,6 +41,6 @@ export default function SettingsScreen() {
           <AppInfoCard />
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }

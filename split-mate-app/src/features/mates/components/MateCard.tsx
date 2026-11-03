@@ -53,15 +53,21 @@ export const MateCard: React.FC<MateCardProps> = ({ name, onRemove }) => {
         </View>
         <Text
           style={{
+            flex: 1,
             color: colors.text.primary,
             fontWeight: FONT_WEIGHT.medium,
             fontSize: FONT_SIZE.base,
           }}
+          numberOfLines={1}
         >
           {name}
         </Text>
       </View>
-      <TouchableOpacity onPress={onRemove} activeOpacity={0.7}>
+      <TouchableOpacity
+        onPress={onRemove}
+        activeOpacity={0.7}
+        style={{ marginLeft: SPACING.md }}
+      >
         <Ionicons name="close" size={ICON_SIZE.md} color={colors.error} />
       </TouchableOpacity>
     </View>
