@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { Alert, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { AVATAR_SIZE, BORDER_RADIUS, CARD_STYLES, FONT_SIZE, FONT_WEIGHT, ICON_SIZE, SPACING } from "../../../shared/constants/design";
@@ -30,41 +30,38 @@ export const ItemCard: React.FC<ItemCardProps> = ({
   const { colors } = useTheme();
   const [editingField, setEditingField] = useState<EditingField>(null);
   const [draft, setDraft] = useState("");
+  const originalName = useRef(item.name);
+  const originalPrice = useRef(item.price);
   const canAdjustSplit = item.splitBetween.length >= 2 && item.price > 0;
   const hasCustomSplit = isCustomSplit(item.splitBetween, item.shares);
 
   const beginEditName = () => {
+    originalName.current = item.name;
     setDraft(item.name);
     setEditingField("name");
   };
 
   const beginEditPrice = () => {
+    originalPrice.current = item.price;
     setDraft(item.price === 0 ? "" : item.price.toFixed(2));
     setEditingField("price");
   };
 
-  const commitName = () => {
-    const trimmed = draft.trim();
-    if (trimmed && trimmed !== item.name) {
-      onRename(trimmed);
-    }
+  const finishEditing = () => {
     setEditingField(null);
     setDraft("");
   };
 
-  const commitPrice = () => {
-    const parsed = parseFloat(draft);
-    if (!isNaN(parsed) && parsed >= 0 && parsed !== item.price) {
-      onChangePrice(parsed);
-    }
-    setEditingField(null);
-    setDraft("");
+  const handleNameDraft = (text: string) => {
+    setDraft(text);
+    onRename(text.trim() || originalName.current);
   };
 
   const handlePriceDraft = (text: string) => {
-    if (text === "" || /^\d*\.?\d{0,2}$/.test(text)) {
-      setDraft(text);
-    }
+    if (text !== "" && !/^\d*\.?\d{0,2}$/.test(text)) return;
+    setDraft(text);
+    const parsed = parseFloat(text);
+    onChangePrice(isNaN(parsed) ? originalPrice.current : parsed);
   };
 
   const handleDelete = () => {
@@ -122,9 +119,9 @@ export const ItemCard: React.FC<ItemCardProps> = ({
           {editingField === "name" ? (
             <TextInput
               value={draft}
-              onChangeText={setDraft}
-              onBlur={commitName}
-              onSubmitEditing={commitName}
+              onChangeText={handleNameDraft}
+              onBlur={finishEditing}
+              onSubmitEditing={finishEditing}
               autoFocus
               selectTextOnFocus
               returnKeyType="done"
@@ -182,8 +179,8 @@ export const ItemCard: React.FC<ItemCardProps> = ({
             <TextInput
               value={draft}
               onChangeText={handlePriceDraft}
-              onBlur={commitPrice}
-              onSubmitEditing={commitPrice}
+              onBlur={finishEditing}
+              onSubmitEditing={finishEditing}
               autoFocus
               selectTextOnFocus
               keyboardType="decimal-pad"
