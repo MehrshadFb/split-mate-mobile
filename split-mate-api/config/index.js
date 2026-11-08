@@ -25,6 +25,8 @@ const config = {
     model: process.env.GEMINI_MODEL || 'gemini-3.8-flash',
     maxRetries: getInt(process.env.MAX_GEMINI_RETRIES, 3),
     timeoutMs: getInt(process.env.GEMINI_TIMEOUT_MS, 30000),
+    totalBudgetMs: getInt(process.env.GEMINI_TOTAL_BUDGET_MS, 50000),
+    minAttemptMs: 5000,
     retryDelayMs: getInt(process.env.RETRY_DELAY_MS, 1000),
     retryFactor: 2,
   },

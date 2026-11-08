@@ -56,18 +56,28 @@ Rules:
     }
   }
 
-  async _callGeminiWithTimeout(imagePart) {
+  async _callGeminiWithTimeout(imagePart, timeoutMs) {
     const prompt = this._buildPrompt();
-    const geminiPromise = this.model.generateContent([prompt, imagePart]);
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Gemini API timeout')), config.gemini.timeoutMs)
-    );
-    const result = await Promise.race([geminiPromise, timeoutPromise]); // Race Gemini API call against timeout
-    const response = await result.response;
-    return response.text();
+    // Abort the HTTP request on timeout so a hung call doesn't keep running
+    // and holding the image in memory after we've given up on it
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const result = await this.model.generateContent([prompt, imagePart], {
+        signal: controller.signal,
+      });
+      return result.response.text();
+    } catch (error) {
+      if (controller.signal.aborted) {
+        throw new Error(`Gemini API timeout after ${timeoutMs}ms`);
+      }
+      throw error;
+    } finally {
+      clearTimeout(timer);
+    }
   }
 
-  async analyzeReceipt(fileBuffer, mimeType) {
+  async analyzeReceipt(fileBuffer, mimeType, timeoutMs = config.gemini.timeoutMs) {
     if (!Buffer.isBuffer(fileBuffer)) {
       throw new ValidationError('Invalid file buffer', 'INVALID_FILE');
     }
@@ -78,37 +88,55 @@ Rules:
         mimeType,
       },
     };
-    const responseText = await this._callGeminiWithTimeout(imagePart);
+    const responseText = await this._callGeminiWithTimeout(imagePart, timeoutMs);
     const items = this._parseResponse(responseText);
     const validatedItems = validateExtractedItems(items);
     return validatedItems;
   }
 
   async analyzeReceiptWithRetry(fileBuffer, mimeType) {
+    const { maxRetries, timeoutMs, totalBudgetMs, minAttemptMs } = config.gemini;
+    const deadline = Date.now() + totalBudgetMs;
+    const sizeKb = Math.round(fileBuffer.length / 1024);
     let lastError;
-    for (let attempt = 0; attempt < config.gemini.maxRetries; attempt++) {
+
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      const remaining = deadline - Date.now();
+      if (remaining < minAttemptMs) {
+        console.error(`Gemini time budget exhausted after ${attempt} attempt(s)`);
+        break;
+      }
+      const attemptTimeout = Math.min(timeoutMs, remaining);
+      const startedAt = Date.now();
       try {
-        return await this.analyzeReceipt(fileBuffer, mimeType);
+        const items = await this.analyzeReceipt(fileBuffer, mimeType, attemptTimeout);
+        console.log(
+          `Gemini analysis attempt ${attempt + 1}/${maxRetries} succeeded in ${Date.now() - startedAt}ms (${sizeKb}KB image)`
+        );
+        return items;
       } catch (error) {
         lastError = error;
         console.error(
-          `Gemini analysis attempt ${attempt + 1}/${config.gemini.maxRetries} failed:`,
-          error.message
+          `Gemini analysis attempt ${attempt + 1}/${maxRetries} failed after ${Date.now() - startedAt}ms (${sizeKb}KB image):`,
+          error.name !== 'Error' ? `${error.name}: ${error.message}` : error.message
         );
         if (error instanceof ValidationError) { // Don't retry on validation errors
           throw error;
         }
-        if (attempt < config.gemini.maxRetries - 1) {
-          // Exponential backoff with jitter before next attempt
+        if (attempt < maxRetries - 1) {
+          // Exponential backoff with jitter, skipped if it would eat the last usable attempt
           const baseDelay = config.gemini.retryDelayMs * Math.pow(config.gemini.retryFactor, attempt);
-          const jitter = Math.random() * 0.3 * baseDelay;
-          const delay = baseDelay + jitter;
+          const delay = baseDelay + Math.random() * 0.3 * baseDelay;
+          if (deadline - Date.now() - delay < minAttemptMs) {
+            console.error('Not enough time budget left for another attempt');
+            break;
+          }
           console.log(`Retrying in ${Math.round(delay)}ms...`);
           await new Promise(resolve => setTimeout(resolve, delay));
         }
       }
     }
-    throw this._categorizeError(lastError); // All attempts failed
+    throw this._categorizeError(lastError || new Error('Gemini API timeout')); // All attempts failed
   }
 
   _categorizeError(error) {
