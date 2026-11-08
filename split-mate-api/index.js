@@ -39,7 +39,7 @@ function startServer() {
     console.log(`   Environment: ${config.server.environment}`);
     console.log(`   Gemini Model: ${config.gemini.model}`);
     console.log(`   Max Retries: ${config.gemini.maxRetries}`);
-    console.log(`   Timeout: ${config.gemini.timeoutMs}ms`);
+    console.log(`   Timeout: ${config.gemini.timeoutMs}ms per attempt, ${config.gemini.totalBudgetMs}ms total`);
     console.log(`   Max File Size: ${config.upload.maxFileSizeMB}MB`);
     console.log(`   Rate Limiting: ${config.redis.enabled ? 'Upstash Redis' : 'In-Memory'}`);
     console.log('================================');

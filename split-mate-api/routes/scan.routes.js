@@ -16,21 +16,24 @@ router.post(
     const jobService = getJobService();
     const jobInfo = jobService.createJob(req.file);
 
-    processReceipt(jobInfo.scanJobId).catch(error => {
-      console.error(`Error processing scan ${jobInfo.scanJobId}:`, error);
-    });
+    // Process inside the request, not in the background
+    await processReceipt(jobInfo.scanJobId);
 
+    const job = jobService.getJobStatus(jobInfo.scanJobId);
     res.status(201).json({
       success: true,
       data: {
-        scanJobId: jobInfo.scanJobId,
-        status: jobInfo.status,
-        message: 'Receipt uploaded successfully. Processing started.',
+        ...job,
+        message:
+          job.status === 'scanned'
+            ? 'Receipt scanned successfully.'
+            : 'Receipt could not be scanned.',
       },
     });
   })
 );
 
+// Legacy: app builds <= 27
 router.get(
   '/:scanJobId',
   asyncHandler(async (req, res) => {
