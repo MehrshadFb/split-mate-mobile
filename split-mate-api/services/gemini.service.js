@@ -1,6 +1,43 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { GoogleGenerativeAI, SchemaType: T } = require('@google/generative-ai');
 const config = require('../config');
 const { validateExtractedItems, ValidationError } = require('../utils/validators');
+const { toAppItems } = require('../utils/receipt');
+
+const amountLine = {
+  type: T.OBJECT,
+  properties: { label: { type: T.STRING }, amount: { type: T.NUMBER } },
+  required: ['label', 'amount'],
+};
+
+// Gemini fills this in with what is printed on the receipt; utils/receipt.js does the maths
+const RECEIPT_SCHEMA = {
+  type: T.OBJECT,
+  properties: {
+    isReceipt: { type: T.BOOLEAN },
+    items: {
+      type: T.ARRAY,
+      items: {
+        type: T.OBJECT,
+        properties: {
+          name: { type: T.STRING },
+          price: { type: T.NUMBER, description: 'Line amount as printed for this item, quantity already included.' },
+          adjustments: {
+            type: T.ARRAY,
+            items: amountLine,
+            description: 'Discounts (negative) and deposits or fees (positive) that belong to this item.',
+          },
+        },
+        required: ['name', 'price', 'adjustments'],
+      },
+    },
+    billDiscounts: { type: T.ARRAY, items: amountLine, description: 'Discounts on the whole bill, not tied to one item. Negative amounts.' },
+    fees: { type: T.ARRAY, items: amountLine, description: 'Service charges or fees on the whole bill. Positive amounts.' },
+    taxes: { type: T.ARRAY, items: amountLine, description: 'Each tax amount printed on the receipt.' },
+    pricesIncludeTax: { type: T.BOOLEAN, description: 'True if the item prices already include the tax.' },
+    total: { type: T.NUMBER, description: 'Final amount paid, before any tip.' },
+  },
+  required: ['isReceipt', 'items', 'billDiscounts', 'fees', 'taxes', 'pricesIncludeTax', 'total'],
+};
 
 // Gemini refused the request itself (bad request, auth, model not found). 429 rate limits
 // and 5xx errors can succeed on a later attempt, so they're still retried.
@@ -17,6 +54,8 @@ class GeminiService {
     this.model = this.genAI.getGenerativeModel({
       model: config.gemini.model,
       generationConfig: {
+        responseMimeType: 'application/json',
+        responseSchema: RECEIPT_SCHEMA,
         // Default thinking time varies wildly on some receipts (15-70s for the same photo)
         thinkingConfig: { thinkingLevel: config.gemini.thinkingLevel },
       },
@@ -25,44 +64,31 @@ class GeminiService {
 
   _buildPrompt() {
     return `
-Analyze this image. First, determine if this is a receipt or invoice for purchased items.
+Transcribe this receipt into the JSON schema. Copy amounts exactly as printed and do not calculate anything.
 
-If this is NOT a receipt/invoice (e.g., it's a wall, person, random object, etc.), return an empty array: []
-
-If this IS a receipt/invoice, extract all items with their prices, including tax as a separate item.
-
-Return ONLY a JSON array in this exact format:
-[
-  {"name": "item name", "price": 12.99},
-  {"name": "another item", "price": 5.50},
-  {"name": "Tax", "price": 2.34}
-]
+If the image is not a receipt or invoice for purchased items (e.g. a wall, a person, a random object), set isReceipt to false and leave the lists empty.
 
 Rules:
-- Include all purchased items (food, products, services)
-- Include tax as a separate item with name "Tax" if tax is shown on the receipt
-- Include any service charges or fees as separate items
-- Exclude tips, subtotals, grand totals, payment methods, store info, dates, etc.
-- Exclude TPD (Total Potential Discount) as it represents discounts, not charges
-- Extract exact item names as they appear on the receipt
-- Prices should be numbers (not strings)
-- If you can't clearly read an item or price, skip it
-- Return only the JSON array, no other text or explanation
-- If this is not a receipt, return []
+- items: every purchased product or service, with the amount printed on its line. Use the item name exactly as printed.
+- A discount line directly below an item, or one that references the item's code, goes in that item's adjustments as a NEGATIVE amount. This includes coupons, "TPD/<item code>" lines, "<coupon number> / <item code or MULTIPLE>" lines, instant savings, member savings, multibuy savings and "Rabatt"/"Rabat" lines. A trailing minus ("5.00-") and a leading minus ("-5.00") both mean negative.
+- A bottle deposit, "Pfand", eco fee or environmental fee printed below an item goes in that item's adjustments as a POSITIVE amount.
+- billDiscounts: discounts on the whole bill that are not tied to one item, such as "15% off", "happy hour" or "employee discount".
+- fees: service charges or delivery fees on the whole bill.
+- Do NOT include summary lines such as "Instant savings", "You saved" or "Total savings", or subtotals, totals, payments, change, tips, loyalty points, store details or dates.
+- taxes: each tax amount printed (GST, PST, HST, TAX, VAT, MwSt, PTU, IVA...).
+- pricesIncludeTax: true when the receipt shows the tax as already included in the prices (VAT "incl.", "enthalten", a Netto/Steuer/Brutto table, or the item prices already add up to the total). Otherwise false.
+- total: the final amount charged, before any tip.
+- If you can't clearly read an item or its price, skip it.
     `.trim();
   }
 
   _parseResponse(text) {
     try {
-      const jsonMatch = text.match(/\[[\s\S]*\]/);
-      if (!jsonMatch) {
-        throw new Error('No valid JSON array found in response');
+      const receipt = JSON.parse(text);
+      if (!receipt || typeof receipt !== 'object' || !Array.isArray(receipt.items)) {
+        throw new Error('Response does not match the receipt schema');
       }
-      const items = JSON.parse(jsonMatch[0]);
-      if (!Array.isArray(items)) {
-        throw new Error('Response is not an array');
-      }
-      return items;
+      return receipt;
     } catch (error) {
       throw new Error(`Failed to parse Gemini response: ${error.message}`);
     }
@@ -101,9 +127,15 @@ Rules:
       },
     };
     const responseText = await this._callGeminiWithTimeout(imagePart, timeoutMs);
-    const items = this._parseResponse(responseText);
-    const validatedItems = validateExtractedItems(items);
-    return validatedItems;
+    const receipt = this._parseResponse(responseText);
+    const { items, check } = toAppItems(receipt);
+    if (check && !check.matches) {
+      // Logged so receipts that trip up the scan can be found later
+      console.warn(
+        `Receipt total mismatch: items add up to ${check.splitTotal}, receipt says ${check.printedTotal} (tax added: ${check.addedTax})`
+      );
+    }
+    return validateExtractedItems(items);
   }
 
   async analyzeReceiptWithRetry(fileBuffer, mimeType) {

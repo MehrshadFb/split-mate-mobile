@@ -74,7 +74,7 @@ function validateExtractedItems(items) {
     } else if (typeof item.price === 'string') {
       price = parseFloat(item.price);
     }
-    if (isNaN(price) || price < 0) { // Negative prices are invalid, but what if a negative price is used as a discount?
+    if (isNaN(price) || price < 0) { // Discounts are already folded into item prices by utils/receipt.js
       price = 0;
     }
     price = Math.round(price * 100) / 100; // Round to 2 decimal places
