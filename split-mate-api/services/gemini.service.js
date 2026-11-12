@@ -8,7 +8,13 @@ class GeminiService {
       throw new Error('GEMINI_API_KEY is required');
     }
     this.genAI = new GoogleGenerativeAI(config.gemini.apiKey);
-    this.model = this.genAI.getGenerativeModel({ model: config.gemini.model });
+    this.model = this.genAI.getGenerativeModel({
+      model: config.gemini.model,
+      generationConfig: {
+        // Default thinking time varies wildly on some receipts (15-70s for the same photo)
+        thinkingConfig: { thinkingLevel: config.gemini.thinkingLevel },
+      },
+    });
   }
 
   _buildPrompt() {
