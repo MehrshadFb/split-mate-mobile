@@ -11,6 +11,17 @@ function getInt(value, fallback) {
   return isNaN(parsed) ? fallback : parsed;
 }
 
+// Gemini rejects every request with an unsupported level (gemini-3.8-flash has no "minimal"),
+// so a bad value falls back to low instead of breaking every scan
+const THINKING_LEVELS = ['low', 'medium', 'high'];
+function getThinkingLevel(value) {
+  if (!value) return 'low';
+  const level = value.trim().toLowerCase();
+  if (THINKING_LEVELS.includes(level)) return level;
+  console.warn(`Unsupported GEMINI_THINKING_LEVEL "${value}", using "low" (allowed: ${THINKING_LEVELS.join(', ')})`);
+  return 'low';
+}
+
 const config = {
   server: {
     port: getInt(process.env.PORT, 3000),
@@ -23,6 +34,7 @@ const config = {
   gemini: {
     apiKey: process.env.GEMINI_API_KEY,
     model: process.env.GEMINI_MODEL || 'gemini-3.8-flash',
+    thinkingLevel: getThinkingLevel(process.env.GEMINI_THINKING_LEVEL),
     maxRetries: getInt(process.env.MAX_GEMINI_RETRIES, 3),
     timeoutMs: getInt(process.env.GEMINI_TIMEOUT_MS, 30000),
     totalBudgetMs: getInt(process.env.GEMINI_TOTAL_BUDGET_MS, 50000),
