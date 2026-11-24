@@ -30,11 +30,13 @@ const MAX_TAX_LINES = 10; // 2^10 combinations at most
 // Ties go to the reading without combined lines, then to the smaller amount.
 function chooseTax(amounts, gap) {
   const fallback = sumOf(withoutCombinedLines(amounts));
-  if (!Number.isFinite(gap) || amounts.length > MAX_TAX_LINES) return fallback;
+  // Too many lines to try every combination: try each distinct amount instead
+  const lines = amounts.length > MAX_TAX_LINES ? [...new Set(amounts)] : amounts;
+  if (!Number.isFinite(gap) || lines.length > MAX_TAX_LINES) return fallback;
   const distance = (amount) => round2(Math.abs(amount - gap));
   let best = fallback;
-  for (let mask = 1; mask < 1 << amounts.length; mask++) {
-    const amount = sumOf(amounts.filter((_, i) => mask & (1 << i)));
+  for (let mask = 1; mask < 1 << lines.length; mask++) {
+    const amount = sumOf(lines.filter((_, i) => mask & (1 << i)));
     if (distance(amount) < distance(best) || (distance(amount) === distance(best) && best !== fallback && amount < best)) {
       best = amount;
     }

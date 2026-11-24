@@ -79,14 +79,6 @@ function validateExtractedItems(items) {
     return { name, price };
   });
 
-  const hasValidItems = validatedItems.some(item => item.price > 0);
-  if (!hasValidItems) {
-    throw new ValidationError(
-      'No valid items with prices found - this may not be a receipt',
-      'INVALID_RECEIPT'
-    );
-  }
-
   return validatedItems;
 }
 
