@@ -129,6 +129,11 @@ Rules:
     const receipt = this._parseResponse(responseText);
     const { items, printedTotal } = toAppItems(receipt);
     const validatedItems = validateExtractedItems(items);
+    // All $0 is only real for a fully comped bill; otherwise the prices weren't read
+    const isComped = Number.isFinite(printedTotal) && Math.abs(printedTotal) <= 0.02;
+    if (!isComped && validatedItems.every((item) => item.price === 0)) {
+      throw new ValidationError('No valid items with prices found - this may not be a receipt', 'INVALID_RECEIPT');
+    }
     // Checked on the exact list the app receives, so receipts that trip up the scan can be found later
     const mismatch = totalMismatch(validatedItems, printedTotal);
     if (!Number.isFinite(printedTotal)) {
