@@ -2,8 +2,7 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const config = require('../config');
 const { validateExtractedItems, ValidationError } = require('../utils/validators');
 
-// Gemini refused the request itself (bad request, auth, model not found). 429 rate limits
-// and 5xx errors can succeed on a later attempt, so they're still retried.
+// 4xx errors other than 429 won't succeed on retry
 function isRequestRejected(error) {
   return error.status >= 400 && error.status < 500 && error.status !== 429;
 }
@@ -17,7 +16,6 @@ class GeminiService {
     this.model = this.genAI.getGenerativeModel({
       model: config.gemini.model,
       generationConfig: {
-        // Default thinking time varies wildly on some receipts (15-70s for the same photo)
         thinkingConfig: { thinkingLevel: config.gemini.thinkingLevel },
       },
     });
@@ -135,7 +133,7 @@ Rules:
         if (error instanceof ValidationError) { // Don't retry on validation errors
           throw error;
         }
-        if (isRequestRejected(error)) { // e.g. 400 Bad Request: retrying the same request can't succeed
+        if (isRequestRejected(error)) { // Gemini rejected the request
           break;
         }
         if (attempt < maxRetries - 1) {

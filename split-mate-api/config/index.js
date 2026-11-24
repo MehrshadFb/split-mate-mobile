@@ -11,8 +11,6 @@ function getInt(value, fallback) {
   return isNaN(parsed) ? fallback : parsed;
 }
 
-// Gemini rejects every request with an unsupported level (gemini-3.8-flash has no "minimal"),
-// so a bad value falls back to low instead of breaking every scan
 const THINKING_LEVELS = ['low', 'medium', 'high'];
 function getThinkingLevel(value) {
   if (!value) return 'low';
