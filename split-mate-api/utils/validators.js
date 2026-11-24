@@ -63,10 +63,7 @@ function validateExtractedItems(items) {
       );
     }
 
-    const name = item.name?.trim();
-    if (!name || typeof name !== 'string') {
-      return { name: 'Unknown Item', price: 0 };
-    }
+    const name = (typeof item.name === 'string' && item.name.trim()) || 'Unknown Item'; // Keep the price even without a name
 
     let price = 0;
     if (typeof item.price === 'number') {

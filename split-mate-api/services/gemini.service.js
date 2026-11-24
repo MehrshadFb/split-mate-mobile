@@ -1,7 +1,7 @@
 const { GoogleGenerativeAI, SchemaType: T } = require('@google/generative-ai');
 const config = require('../config');
 const { validateExtractedItems, ValidationError } = require('../utils/validators');
-const { toAppItems } = require('../utils/receipt');
+const { toAppItems, totalMismatch } = require('../utils/receipt');
 
 const amountLine = {
   type: T.OBJECT,
@@ -127,14 +127,14 @@ Rules:
     };
     const responseText = await this._callGeminiWithTimeout(imagePart, timeoutMs);
     const receipt = this._parseResponse(responseText);
-    const { items, check } = toAppItems(receipt);
-    if (check && !check.matches) {
-      // Logged so receipts that trip up the scan can be found later
-      console.warn(
-        `Receipt total mismatch: items add up to ${check.splitTotal}, receipt says ${check.printedTotal} (tax added: ${check.addedTax})`
-      );
+    const { items, printedTotal } = toAppItems(receipt);
+    const validatedItems = validateExtractedItems(items);
+    // Checked on the exact list the app receives, so receipts that trip up the scan can be found later
+    const mismatch = totalMismatch(validatedItems, printedTotal);
+    if (mismatch) {
+      console.warn(`Receipt total mismatch: items add up to ${mismatch.splitTotal}, receipt says ${mismatch.printedTotal}`);
     }
-    return validateExtractedItems(items);
+    return validatedItems;
   }
 
   async analyzeReceiptWithRetry(fileBuffer, mimeType) {
