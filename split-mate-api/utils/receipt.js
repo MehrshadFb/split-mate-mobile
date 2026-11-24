@@ -23,20 +23,23 @@ function withoutCombinedLines(amounts) {
   }
 }
 
-const distinctOf = (amounts) => [...new Set(amounts)];
+const MAX_TAX_LINES = 10; // 2^10 combinations at most
 
-// Ways to read the tax lines. Receipts can add a combined total line or print a tax twice,
-// so the printed total picks between these. The first one is used when there's no total.
-function taxOptions(taxes) {
-  const amounts = taxes.map(amountOf).filter((amount) => amount > 0);
-  const options = [
-    withoutCombinedLines(amounts),
-    amounts,
-    distinctOf(amounts),
-    withoutCombinedLines(distinctOf(amounts)),
-    distinctOf(withoutCombinedLines(amounts)),
-  ].map(sumOf);
-  return [...new Set(options)];
+// Picks how much tax to charge from the printed tax lines. Receipts can print a tax twice or add
+// a combined total line, so with a printed total, the set of lines that lands closest to it wins.
+// Ties go to the reading without combined lines, then to the smaller amount.
+function chooseTax(amounts, gap) {
+  const fallback = sumOf(withoutCombinedLines(amounts));
+  if (!Number.isFinite(gap) || amounts.length > MAX_TAX_LINES) return fallback;
+  const distance = (amount) => round2(Math.abs(amount - gap));
+  let best = fallback;
+  for (let mask = 1; mask < 1 << amounts.length; mask++) {
+    const amount = sumOf(amounts.filter((_, i) => mask & (1 << i)));
+    if (distance(amount) < distance(best) || (distance(amount) === distance(best) && best !== fallback && amount < best)) {
+      best = amount;
+    }
+  }
+  return best;
 }
 
 // Takes a (negative) discount off lines in proportion to their price, never below $0.
@@ -103,16 +106,15 @@ function toAppItems(receipt) {
   // Add whichever tax amount (or none, if prices already include tax) lands closest to
   // the printed total. Gemini's pricesIncludeTax only breaks a tie or a missing total.
   const beforeTax = sumOf([...items, ...fees].map((item) => item.price));
-  const options = taxOptions(receipt.taxes || []);
-  let tax;
+  const taxLines = (receipt.taxes || []).map(amountOf).filter((amount) => amount > 0);
+  let tax = chooseTax(taxLines, printedTotal - beforeTax);
   if (Number.isFinite(printedTotal)) {
     const distance = (amount) => round2(Math.abs(beforeTax + amount - printedTotal));
-    tax = options.reduce((best, amount) => (distance(amount) < distance(best) ? amount : best));
     if (distance(0) < distance(tax) || (distance(0) === distance(tax) && receipt.pricesIncludeTax === true)) {
       tax = 0;
     }
-  } else {
-    tax = receipt.pricesIncludeTax === true ? 0 : options[0];
+  } else if (receipt.pricesIncludeTax === true) {
+    tax = 0;
   }
 
   const result = [...items, ...fees];
