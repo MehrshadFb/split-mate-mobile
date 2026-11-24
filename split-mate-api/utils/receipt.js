@@ -10,26 +10,53 @@ const amountOf = (line) => toNumber(line?.amount);
 const sumOf = (values) => round2(values.reduce((total, value) => total + value, 0));
 const cleanName = (name, fallback) => String(name ?? '').replace(/\s+/g, ' ').trim() || fallback;
 
-// Tax amounts to try. A line equal to the sum of the others is a combined total
-// (or the same tax printed twice), so the total without it is tried first.
+// Drops lines that equal the sum of the rest (a combined total, or the same tax printed twice)
+function withoutSummaryLines(amounts) {
+  let lines = [...amounts];
+  for (;;) {
+    const i = lines.findIndex((amount, k) =>
+      lines.length > 1 && Math.abs(amount - sumOf(lines.filter((_, j) => j !== k))) <= TOLERANCE
+    );
+    if (i === -1) return lines;
+    lines = lines.filter((_, j) => j !== i);
+  }
+}
+
+// Tax amounts to try, smallest first. Receipts can print a tax twice or add a combined
+// total line, so the printed total picks between these readings.
 function taxOptions(taxes) {
   const amounts = taxes.map(amountOf).filter((amount) => amount > 0);
-  const all = sumOf(amounts);
-  if (amounts.length < 2) return [all];
-  const duplicate = amounts.find((amount, i) =>
-    Math.abs(amount - sumOf(amounts.filter((_, j) => j !== i))) <= TOLERANCE
-  );
-  return duplicate === undefined ? [all] : [round2(all - duplicate), all];
+  const distinct = [...new Set(amounts)];
+  const options = [amounts, withoutSummaryLines(amounts), distinct, withoutSummaryLines(distinct)]
+    .map(sumOf);
+  return [...new Set(options)].sort((a, b) => a - b);
+}
+
+// Takes a (negative) discount off lines in proportion to their price, never below $0.
+// Returns the part of the discount that didn't fit.
+function spreadDiscount(lines, discount) {
+  const total = sumOf(lines.map((line) => line.price));
+  if (discount >= 0 || total <= 0) return { lines, leftover: discount };
+  const target = Math.max(round2(total + discount), 0);
+  const spread = lines.map((line) => ({ ...line, price: round2((line.price * target) / total) }));
+  // Put any rounding pennies on the most expensive line so the total stays exact
+  const drift = round2(target - sumOf(spread.map((line) => line.price)));
+  if (drift !== 0) {
+    const largest = spread.reduce((a, b) => (b.price > a.price ? b : a));
+    largest.price = round2(largest.price + drift);
+  }
+  return { lines: spread, leftover: round2(total + discount - target) };
 }
 
 function toAppItems(receipt) {
   if (!receipt || receipt.isReceipt === false || !Array.isArray(receipt.items)) {
     return { items: [], printedTotal: null };
   }
-  const printedTotal = Number(receipt.total) > 0 ? Number(receipt.total) : NaN; // 0 or missing means no total
+  const hasTotal = receipt.total !== null && receipt.total !== undefined && receipt.total !== '';
+  const printedTotal = hasTotal ? Number(receipt.total) : NaN;
 
   // Discounts that can't come off a single item are spread over the whole bill
-  let billDiscount = sumOf((receipt.billDiscounts || []).map(amountOf));
+  let billDiscount = sumOf((receipt.billDiscounts || []).map((line) => -Math.abs(amountOf(line))));
 
   // Fold each item's own discounts and deposits into its price
   let items = [];
@@ -53,25 +80,18 @@ function toAppItems(receipt) {
     }
   }
 
-  const fees = [];
+  let fees = [];
   for (const fee of receipt.fees || []) {
     const price = round2(amountOf(fee));
     if (price > 0) fees.push({ name: cleanName(fee.label, 'Fee'), price });
     else if (price < 0) billDiscount = round2(billDiscount + price);
   }
 
-  // Spread bill-wide discounts across items in proportion to their price
-  const itemsTotal = sumOf(items.map((item) => item.price));
-  if (billDiscount !== 0 && itemsTotal > 0) {
-    const target = Math.max(round2(itemsTotal + billDiscount), 0);
-    items = items.map((item) => ({ ...item, price: round2((item.price * target) / itemsTotal) }));
-    // Put any rounding pennies on the most expensive item so the total stays exact
-    const drift = round2(target - sumOf(items.map((item) => item.price)));
-    if (drift !== 0) {
-      const largest = items.reduce((a, b) => (b.price > a.price ? b : a));
-      largest.price = round2(largest.price + drift);
-    }
-  }
+  // Spread bill-wide discounts across items by price; anything left once items are free comes off fees
+  const afterItems = spreadDiscount(items, billDiscount);
+  const afterFees = spreadDiscount(fees, afterItems.leftover);
+  items = afterItems.lines;
+  fees = afterFees.lines;
 
   // Add whichever tax amount (or none, if prices already include tax) lands closest to
   // the printed total. Gemini's pricesIncludeTax only breaks a tie or a missing total.

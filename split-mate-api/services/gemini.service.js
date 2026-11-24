@@ -34,7 +34,7 @@ const RECEIPT_SCHEMA = {
     fees: { type: T.ARRAY, items: amountLine, description: 'Service charges or fees on the whole bill. Positive amounts.' },
     taxes: { type: T.ARRAY, items: amountLine, description: 'Each tax amount printed on the receipt.' },
     pricesIncludeTax: { type: T.BOOLEAN, description: 'True if the item prices already include the tax.' },
-    total: { type: T.NUMBER, description: 'Final amount paid, before any tip.' },
+    total: { type: T.NUMBER, nullable: true, description: 'Final amount paid, before any tip. null if no total is printed.' },
   },
   required: ['isReceipt', 'items', 'billDiscounts', 'fees', 'taxes', 'pricesIncludeTax', 'total'],
 };
@@ -76,7 +76,7 @@ Rules:
 - Do NOT include summary lines such as "Instant savings", "You saved" or "Total savings", or subtotals, totals, payments, change, tips, loyalty points, store details or dates.
 - taxes: each tax amount printed (GST, PST, HST, TAX, VAT, MwSt, PTU, IVA...).
 - pricesIncludeTax: true when the receipt shows the tax as already included in the prices (VAT "incl.", "enthalten", a Netto/Steuer/Brutto table, or the item prices already add up to the total). Otherwise false.
-- total: the final amount charged, before any tip.
+- total: the final amount charged, before any tip. Use null if no total is printed.
 - If you can't clearly read an item or its price, skip it.
     `.trim();
   }
