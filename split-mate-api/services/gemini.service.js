@@ -2,13 +2,23 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const config = require('../config');
 const { validateExtractedItems, ValidationError } = require('../utils/validators');
 
+// 4xx errors other than 429 won't succeed on retry
+function isRequestRejected(error) {
+  return error.status >= 400 && error.status < 500 && error.status !== 429;
+}
+
 class GeminiService {
   constructor() {
     if (!config.gemini.apiKey) {
       throw new Error('GEMINI_API_KEY is required');
     }
     this.genAI = new GoogleGenerativeAI(config.gemini.apiKey);
-    this.model = this.genAI.getGenerativeModel({ model: config.gemini.model });
+    this.model = this.genAI.getGenerativeModel({
+      model: config.gemini.model,
+      generationConfig: {
+        thinkingConfig: { thinkingLevel: config.gemini.thinkingLevel },
+      },
+    });
   }
 
   _buildPrompt() {
@@ -122,6 +132,9 @@ Rules:
         );
         if (error instanceof ValidationError) { // Don't retry on validation errors
           throw error;
+        }
+        if (isRequestRejected(error)) { // Gemini rejected the request
+          break;
         }
         if (attempt < maxRetries - 1) {
           // Exponential backoff with jitter, skipped if it would eat the last usable attempt

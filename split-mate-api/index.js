@@ -37,7 +37,7 @@ function startServer() {
     console.log('================================');
     console.log(`   Port: ${config.server.port}`);
     console.log(`   Environment: ${config.server.environment}`);
-    console.log(`   Gemini Model: ${config.gemini.model}`);
+    console.log(`   Gemini Model: ${config.gemini.model} (thinking: ${config.gemini.thinkingLevel})`);
     console.log(`   Max Retries: ${config.gemini.maxRetries}`);
     console.log(`   Timeout: ${config.gemini.timeoutMs}ms per attempt, ${config.gemini.totalBudgetMs}ms total`);
     console.log(`   Max File Size: ${config.upload.maxFileSizeMB}MB`);
