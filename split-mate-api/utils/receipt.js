@@ -10,26 +10,33 @@ const amountOf = (line) => toNumber(line?.amount);
 const sumOf = (values) => round2(values.reduce((total, value) => total + value, 0));
 const cleanName = (name, fallback) => String(name ?? '').replace(/\s+/g, ' ').trim() || fallback;
 
-// Drops lines that equal the sum of the rest (a combined total, or the same tax printed twice)
-function withoutSummaryLines(amounts) {
+// Drops combined-total lines: a line equal to the sum of two or more of the other lines
+function withoutCombinedLines(amounts) {
   let lines = [...amounts];
   for (;;) {
-    const i = lines.findIndex((amount, k) =>
-      lines.length > 1 && Math.abs(amount - sumOf(lines.filter((_, j) => j !== k))) <= TOLERANCE
-    );
+    const i = lines.findIndex((amount, k) => {
+      const others = lines.filter((_, j) => j !== k);
+      return others.length >= 2 && Math.abs(amount - sumOf(others)) <= TOLERANCE;
+    });
     if (i === -1) return lines;
     lines = lines.filter((_, j) => j !== i);
   }
 }
 
-// Tax amounts to try, smallest first. Receipts can print a tax twice or add a combined
-// total line, so the printed total picks between these readings.
+const distinctOf = (amounts) => [...new Set(amounts)];
+
+// Ways to read the tax lines. Receipts can add a combined total line or print a tax twice,
+// so the printed total picks between these. The first one is used when there's no total.
 function taxOptions(taxes) {
   const amounts = taxes.map(amountOf).filter((amount) => amount > 0);
-  const distinct = [...new Set(amounts)];
-  const options = [amounts, withoutSummaryLines(amounts), distinct, withoutSummaryLines(distinct)]
-    .map(sumOf);
-  return [...new Set(options)].sort((a, b) => a - b);
+  const options = [
+    withoutCombinedLines(amounts),
+    amounts,
+    distinctOf(amounts),
+    withoutCombinedLines(distinctOf(amounts)),
+    distinctOf(withoutCombinedLines(amounts)),
+  ].map(sumOf);
+  return [...new Set(options)];
 }
 
 // Takes a (negative) discount off lines in proportion to their price, never below $0.

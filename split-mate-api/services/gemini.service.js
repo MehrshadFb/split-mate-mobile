@@ -131,7 +131,9 @@ Rules:
     const validatedItems = validateExtractedItems(items);
     // Checked on the exact list the app receives, so receipts that trip up the scan can be found later
     const mismatch = totalMismatch(validatedItems, printedTotal);
-    if (mismatch) {
+    if (!Number.isFinite(printedTotal)) {
+      console.warn('Receipt has no printed total, so the split could not be checked');
+    } else if (mismatch) {
       console.warn(`Receipt total mismatch: items add up to ${mismatch.splitTotal}, receipt says ${mismatch.printedTotal}`);
     }
     return validatedItems;
