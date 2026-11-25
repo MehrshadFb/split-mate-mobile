@@ -63,10 +63,7 @@ function validateExtractedItems(items) {
       );
     }
 
-    const name = item.name?.trim();
-    if (!name || typeof name !== 'string') {
-      return { name: 'Unknown Item', price: 0 };
-    }
+    const name = (typeof item.name === 'string' && item.name.trim()) || 'Unknown Item'; // Keep the price even without a name
 
     let price = 0;
     if (typeof item.price === 'number') {
@@ -74,21 +71,13 @@ function validateExtractedItems(items) {
     } else if (typeof item.price === 'string') {
       price = parseFloat(item.price);
     }
-    if (isNaN(price) || price < 0) { // Negative prices are invalid, but what if a negative price is used as a discount?
+    if (isNaN(price) || price < 0) { // Discounts are already folded into item prices by utils/receipt.js
       price = 0;
     }
     price = Math.round(price * 100) / 100; // Round to 2 decimal places
 
     return { name, price };
   });
-
-  const hasValidItems = validatedItems.some(item => item.price > 0);
-  if (!hasValidItems) {
-    throw new ValidationError(
-      'No valid items with prices found - this may not be a receipt',
-      'INVALID_RECEIPT'
-    );
-  }
 
   return validatedItems;
 }
