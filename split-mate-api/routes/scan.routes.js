@@ -4,22 +4,40 @@ const upload = require('../middleware/upload.middleware');
 const { validateFile, validateScanJobId } = require('../utils/validators');
 const { getJobService } = require('../services/job.service');
 const { getGeminiService } = require('../services/gemini.service');
+const config = require('../config');
 
 const router = express.Router();
 
+let isFirstScanOnInstance = true; // The first scan on a new server instance also pays for its startup
+
+function appBuild(userAgent) {
+  const match = /SplitMate\/(\S+)/.exec(userAgent || '');
+  return match ? match[1] : 'unknown';
+}
+
 router.post(
   '/',
+  (req, res, next) => {
+    req.scanStartedAt = Date.now();
+    next();
+  },
   upload.single('receipt'),
   asyncHandler(async (req, res) => {
+    const receiveMs = Date.now() - req.scanStartedAt;
     validateFile(req.file);
+    // Claimed on arrival: with overlapping scans, the first one in is the one that paid for startup
+    const firstScanOnInstance = isFirstScanOnInstance;
+    isFirstScanOnInstance = false;
 
     const jobService = getJobService();
     const jobInfo = jobService.createJob(req.file);
 
     // Process inside the request, not in the background
-    await processReceipt(jobInfo.scanJobId);
+    const stats = {};
+    await processReceipt(jobInfo.scanJobId, stats);
 
     const job = jobService.getJobStatus(jobInfo.scanJobId);
+    logScan(req, job, stats, receiveMs, firstScanOnInstance);
     res.status(201).json({
       success: true,
       data: {
@@ -50,7 +68,7 @@ router.get(
   })
 );
 
-async function processReceipt(scanJobId) {
+async function processReceipt(scanJobId, stats = {}) {
   const jobService = getJobService();
   const geminiService = getGeminiService();
 
@@ -66,13 +84,42 @@ async function processReceipt(scanJobId) {
     
     const items = await geminiService.analyzeReceiptWithRetry(
       job.fileBuffer,
-      job.mimeType
+      job.mimeType,
+      stats
     );
 
     jobService.markJobSuccess(scanJobId, items);
   } catch (error) {
     jobService.markJobFailed(scanJobId, error);
   }
+}
+
+// One structured line per scan, queryable in Cloud Logging
+function logScan(req, job, stats, receiveMs, firstScanOnInstance) {
+  const failed = job.status !== 'scanned';
+  console.log(JSON.stringify({
+    severity: failed || stats.totalCheck === 'mismatch' ? 'WARNING' : 'INFO',
+    message: `scan ${job.status}: ${failed ? job.error?.code : `total ${stats.totalCheck}`}`,
+    event: 'scan',
+    status: job.status,
+    errorCode: job.error?.code ?? null,
+    appBuild: appBuild(req.get('user-agent')),
+    firstScanOnInstance,
+    fileKb: Math.round(req.file.size / 1024),
+    mimeType: req.file.mimetype,
+    model: config.gemini.model,
+    thinkingLevel: config.gemini.thinkingLevel,
+    receiveMs,
+    totalMs: Date.now() - req.scanStartedAt,
+    attempts: stats.attemptMs?.length ?? 0,
+    attemptMs: stats.attemptMs ?? [],
+    tokens: stats.tokens ?? null,
+    itemCount: stats.itemCount ?? null,
+    totalCheck: stats.totalCheck ?? null,
+    totalOffBy: stats.totalOffBy ?? null,
+    taxAdded: stats.taxAdded ?? null,
+    discountLines: stats.discountLines ?? null,
+  }));
 }
 
 module.exports = router;

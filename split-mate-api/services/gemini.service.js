@@ -44,6 +44,16 @@ function isRequestRejected(error) {
   return error.status >= 400 && error.status < 500 && error.status !== 429;
 }
 
+// Discount lines Gemini found, for logging. Tolerates odd shapes so logging can't fail a scan.
+function countDiscountLines(receipt) {
+  const list = (value) => (Array.isArray(value) ? value : []);
+  const itemDiscounts = list(receipt.items).reduce(
+    (count, item) => count + list(item?.adjustments).filter((line) => Number(line?.amount) < 0).length,
+    0
+  );
+  return itemDiscounts + list(receipt.billDiscounts).length;
+}
+
 class GeminiService {
   constructor() {
     if (!config.gemini.apiKey) {
@@ -103,7 +113,7 @@ Rules:
       const result = await this.model.generateContent([prompt, imagePart], {
         signal: controller.signal,
       });
-      return result.response.text();
+      return { text: result.response.text(), usage: result.response.usageMetadata };
     } catch (error) {
       if (controller.signal.aborted) {
         throw new Error(`Gemini API timeout after ${timeoutMs}ms`);
@@ -114,7 +124,7 @@ Rules:
     }
   }
 
-  async analyzeReceipt(fileBuffer, mimeType, timeoutMs = config.gemini.timeoutMs) {
+  async analyzeReceipt(fileBuffer, mimeType, timeoutMs = config.gemini.timeoutMs, stats = {}) {
     if (!Buffer.isBuffer(fileBuffer)) {
       throw new ValidationError('Invalid file buffer', 'INVALID_FILE');
     }
@@ -125,8 +135,16 @@ Rules:
         mimeType,
       },
     };
-    const responseText = await this._callGeminiWithTimeout(imagePart, timeoutMs);
-    const receipt = this._parseResponse(responseText);
+    const { text, usage } = await this._callGeminiWithTimeout(imagePart, timeoutMs);
+    // Gemini leaves out thoughtsTokenCount when it did no thinking; no usage at all means unknown
+    stats.tokens = usage
+      ? {
+          image: usage.promptTokensDetails?.find((detail) => detail.modality === 'IMAGE')?.tokenCount ?? null,
+          thinking: usage.thoughtsTokenCount ?? 0,
+          output: usage.candidatesTokenCount ?? null,
+        }
+      : null;
+    const receipt = this._parseResponse(text);
     const { items, printedTotal } = toAppItems(receipt);
     const validatedItems = validateExtractedItems(items);
     // A split of about $0 is only real for a fully comped bill; otherwise the prices weren't read
@@ -137,16 +155,17 @@ Rules:
     }
     // Checked on the exact list the app receives, so receipts that trip up the scan can be found later
     const mismatch = totalMismatch(validatedItems, printedTotal);
-    if (!Number.isFinite(printedTotal)) {
-      console.warn('Receipt has no printed total, so the split could not be checked');
-    } else if (mismatch) {
-      console.warn(`Receipt total mismatch: items add up to ${mismatch.splitTotal}, receipt says ${mismatch.printedTotal}`);
-    }
+    stats.totalCheck = !Number.isFinite(printedTotal) ? 'no_total' : mismatch ? 'mismatch' : 'match';
+    stats.totalOffBy = mismatch ? Math.round((mismatch.splitTotal - mismatch.printedTotal) * 100) / 100 : null;
+    stats.itemCount = validatedItems.length;
+    stats.taxAdded = validatedItems.some((item) => item.name === 'Tax');
+    stats.discountLines = countDiscountLines(receipt);
     return validatedItems;
   }
 
-  async analyzeReceiptWithRetry(fileBuffer, mimeType) {
+  async analyzeReceiptWithRetry(fileBuffer, mimeType, stats = {}) {
     const { maxRetries, timeoutMs, totalBudgetMs, minAttemptMs } = config.gemini;
+    stats.attemptMs = [];
     const deadline = Date.now() + totalBudgetMs;
     const sizeKb = Math.round(fileBuffer.length / 1024);
     let lastError;
@@ -160,13 +179,15 @@ Rules:
       const attemptTimeout = Math.min(timeoutMs, remaining);
       const startedAt = Date.now();
       try {
-        const items = await this.analyzeReceipt(fileBuffer, mimeType, attemptTimeout);
+        const items = await this.analyzeReceipt(fileBuffer, mimeType, attemptTimeout, stats);
+        stats.attemptMs.push(Date.now() - startedAt);
         console.log(
           `Gemini analysis attempt ${attempt + 1}/${maxRetries} succeeded in ${Date.now() - startedAt}ms (${sizeKb}KB image)`
         );
         return items;
       } catch (error) {
         lastError = error;
+        stats.attemptMs.push(Date.now() - startedAt);
         console.error(
           `Gemini analysis attempt ${attempt + 1}/${maxRetries} failed after ${Date.now() - startedAt}ms (${sizeKb}KB image):`,
           error.name !== 'Error' ? `${error.name}: ${error.message}` : error.message
