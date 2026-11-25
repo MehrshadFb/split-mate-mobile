@@ -44,6 +44,16 @@ function isRequestRejected(error) {
   return error.status >= 400 && error.status < 500 && error.status !== 429;
 }
 
+// Discount lines Gemini found, for logging. Tolerates odd shapes so logging can't fail a scan.
+function countDiscountLines(receipt) {
+  const list = (value) => (Array.isArray(value) ? value : []);
+  const itemDiscounts = list(receipt.items).reduce(
+    (count, item) => count + list(item?.adjustments).filter((line) => Number(line?.amount) < 0).length,
+    0
+  );
+  return itemDiscounts + list(receipt.billDiscounts).length;
+}
+
 class GeminiService {
   constructor() {
     if (!config.gemini.apiKey) {
@@ -126,11 +136,14 @@ Rules:
       },
     };
     const { text, usage } = await this._callGeminiWithTimeout(imagePart, timeoutMs);
-    stats.tokens = {
-      image: usage?.promptTokensDetails?.find((detail) => detail.modality === 'IMAGE')?.tokenCount ?? null,
-      thinking: usage?.thoughtsTokenCount ?? 0,
-      output: usage?.candidatesTokenCount ?? null,
-    };
+    // Gemini leaves out thoughtsTokenCount when it did no thinking; no usage at all means unknown
+    stats.tokens = usage
+      ? {
+          image: usage.promptTokensDetails?.find((detail) => detail.modality === 'IMAGE')?.tokenCount ?? null,
+          thinking: usage.thoughtsTokenCount ?? 0,
+          output: usage.candidatesTokenCount ?? null,
+        }
+      : null;
     const receipt = this._parseResponse(text);
     const { items, printedTotal } = toAppItems(receipt);
     const validatedItems = validateExtractedItems(items);
@@ -143,12 +156,10 @@ Rules:
     // Checked on the exact list the app receives, so receipts that trip up the scan can be found later
     const mismatch = totalMismatch(validatedItems, printedTotal);
     stats.totalCheck = !Number.isFinite(printedTotal) ? 'no_total' : mismatch ? 'mismatch' : 'match';
-    if (mismatch) stats.totalOffBy = Math.round((mismatch.splitTotal - mismatch.printedTotal) * 100) / 100;
+    stats.totalOffBy = mismatch ? Math.round((mismatch.splitTotal - mismatch.printedTotal) * 100) / 100 : null;
     stats.itemCount = validatedItems.length;
     stats.taxAdded = validatedItems.some((item) => item.name === 'Tax');
-    stats.discountLines =
-      receipt.items.reduce((count, item) => count + (item.adjustments || []).filter((a) => a.amount < 0).length, 0) +
-      (receipt.billDiscounts || []).length;
+    stats.discountLines = countDiscountLines(receipt);
     return validatedItems;
   }
 

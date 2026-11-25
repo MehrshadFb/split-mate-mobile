@@ -25,6 +25,9 @@ router.post(
   asyncHandler(async (req, res) => {
     const receiveMs = Date.now() - req.scanStartedAt;
     validateFile(req.file);
+    // Claimed on arrival: with overlapping scans, the first one in is the one that paid for startup
+    const firstScanOnInstance = isFirstScanOnInstance;
+    isFirstScanOnInstance = false;
 
     const jobService = getJobService();
     const jobInfo = jobService.createJob(req.file);
@@ -34,7 +37,7 @@ router.post(
     await processReceipt(jobInfo.scanJobId, stats);
 
     const job = jobService.getJobStatus(jobInfo.scanJobId);
-    logScan(req, job, stats, receiveMs);
+    logScan(req, job, stats, receiveMs, firstScanOnInstance);
     res.status(201).json({
       success: true,
       data: {
@@ -92,7 +95,7 @@ async function processReceipt(scanJobId, stats = {}) {
 }
 
 // One structured line per scan, queryable in Cloud Logging
-function logScan(req, job, stats, receiveMs) {
+function logScan(req, job, stats, receiveMs, firstScanOnInstance) {
   const failed = job.status !== 'scanned';
   console.log(JSON.stringify({
     severity: failed || stats.totalCheck === 'mismatch' ? 'WARNING' : 'INFO',
@@ -101,7 +104,7 @@ function logScan(req, job, stats, receiveMs) {
     status: job.status,
     errorCode: job.error?.code ?? null,
     appBuild: appBuild(req.get('user-agent')),
-    firstScanOnInstance: isFirstScanOnInstance,
+    firstScanOnInstance,
     fileKb: Math.round(req.file.size / 1024),
     mimeType: req.file.mimetype,
     model: config.gemini.model,
@@ -111,13 +114,12 @@ function logScan(req, job, stats, receiveMs) {
     attempts: stats.attemptMs?.length ?? 0,
     attemptMs: stats.attemptMs ?? [],
     tokens: stats.tokens ?? null,
-    itemCount: stats.itemCount ?? 0,
+    itemCount: stats.itemCount ?? null,
     totalCheck: stats.totalCheck ?? null,
     totalOffBy: stats.totalOffBy ?? null,
     taxAdded: stats.taxAdded ?? null,
     discountLines: stats.discountLines ?? null,
   }));
-  isFirstScanOnInstance = false;
 }
 
 module.exports = router;
