@@ -4,6 +4,7 @@ const upload = require('../middleware/upload.middleware');
 const { validateFile, validateScanJobId } = require('../utils/validators');
 const { getJobService } = require('../services/job.service');
 const { getGeminiService } = require('../services/gemini.service');
+const config = require('../config');
 
 const router = express.Router();
 
@@ -103,6 +104,8 @@ function logScan(req, job, stats, receiveMs) {
     firstScanOnInstance: isFirstScanOnInstance,
     fileKb: Math.round(req.file.size / 1024),
     mimeType: req.file.mimetype,
+    model: config.gemini.model,
+    thinkingLevel: config.gemini.thinkingLevel,
     receiveMs,
     totalMs: Date.now() - req.scanStartedAt,
     attempts: stats.attemptMs?.length ?? 0,
