@@ -10,17 +10,16 @@ const amountOf = (line) => toNumber(line?.amount);
 const sumOf = (values) => round2(values.reduce((total, value) => total + value, 0));
 const cleanName = (name, fallback) => String(name ?? '').replace(/\s+/g, ' ').trim() || fallback;
 
-// Drops combined-total lines: a line equal to the sum of two or more of the other lines
+// Drops the combined tax total: the largest line equal to the sum of two or more other lines.
+// Only one is removed, so a real tax that happens to equal the rest is kept.
 function withoutCombinedLines(amounts) {
-  let lines = [...amounts];
-  for (;;) {
-    const i = lines.findIndex((amount, k) => {
-      const others = lines.filter((_, j) => j !== k);
-      return others.length >= 2 && Math.abs(amount - sumOf(others)) <= TOLERANCE;
-    });
-    if (i === -1) return lines;
-    lines = lines.filter((_, j) => j !== i);
-  }
+  let combined = -1;
+  amounts.forEach((amount, k) => {
+    const others = amounts.filter((_, j) => j !== k);
+    const isTotal = others.length >= 2 && Math.abs(amount - sumOf(others)) <= TOLERANCE;
+    if (isTotal && (combined === -1 || amount > amounts[combined])) combined = k;
+  });
+  return combined === -1 ? amounts : amounts.filter((_, j) => j !== combined);
 }
 
 const MAX_TAX_LINES = 10; // 2^10 combinations at most
